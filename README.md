@@ -24,7 +24,7 @@ TODO
 - 调用流程：
     1. 使用APIKey和PubKey创建Client
     2. 调用Client对应的成员方法
-- com.zhipu.oapi.demo有完整的demo示例，请替换自己的ApiKey和ApiSecret进行测试
+- com.zhipu.modelapi.demo有完整的demo示例，请替换自己的ApiKey和ApiSecret进行测试
 
 ### 创建Client
 
