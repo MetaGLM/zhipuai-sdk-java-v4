@@ -24,8 +24,8 @@ public class ConfigV3 {
     private ICache cache;
     // 传输层
     private IHttpTransport httpTransport;
-    private int requestTimeOut;
-    private TimeUnit timeOutTimeUnit;
+    private int requestTimeOut = 200;
+    private TimeUnit timeOutTimeUnit = TimeUnit.SECONDS;
 
     // 开发能力
     private boolean devMode;
