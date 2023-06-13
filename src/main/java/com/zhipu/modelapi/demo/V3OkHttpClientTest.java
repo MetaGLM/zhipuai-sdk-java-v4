@@ -23,7 +23,7 @@ public class V3OkHttpClientTest {
         //String taskId = testAsyncInvoke();
         // 1.2 query model result
         // 根据模型不同，异步调用可能需要等待约30s
-        //testQueryResult(taskId);
+        //testQueryResult(taskId, 30 * 1000);
 
         // 2. sse-invoke调用模型，使用标准Listener，等待finish事件完成之后直接返回结果，效果等同于同步调用（method = invoke）
         // 如果有自定义listener的需求，例如搭建sse server，在自己的客户端上实现流式展示，
@@ -77,7 +77,10 @@ public class V3OkHttpClientTest {
          return taskId;
      }
 
-     private static void testQueryResult(String taskId) {
+     private static void testQueryResult(String taskId, long waitMillis) throws Exception{
+        if (waitMillis > 0) {
+            Thread.sleep(waitMillis);
+        }
          QueryModelResultRequest request = queryRequest(taskId);
          QueryModelResultResponse queryResultResp = client.queryModelResult(request);
          System.out.println(String.format("call query result finished, code: %d", queryResultResp.getCode()));
@@ -114,7 +117,7 @@ public class V3OkHttpClientTest {
 
     private static ModelApiRequest asyncRequest() {
         ModelApiRequest modelApiRequest = new ModelApiRequest();
-        modelApiRequest.setModelId(Constants.ModelChatGLM6BSSE);
+        modelApiRequest.setModelId(Constants.ModelChatGLM6B);
         modelApiRequest.setInvokeMethod(Constants.invokeMethodAsync);
         ModelApiRequest.Prompt prompt = new ModelApiRequest.Prompt(ModelConstants.roleUser, "ChatGPT和你哪个更强大");
         List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
@@ -142,7 +145,7 @@ public class V3OkHttpClientTest {
 
     private static ModelApiRequest sseEnglishRequest() {
         ModelApiRequest modelApiRequest = new ModelApiRequest();
-        modelApiRequest.setModelId(Constants.ModelChatGLM6BSSE);
+        modelApiRequest.setModelId(Constants.ModelChatGLM6B);
         modelApiRequest.setInvokeMethod(Constants.invokeMethodSse);
 
         // 可自定义sse listener
@@ -167,7 +170,7 @@ public class V3OkHttpClientTest {
 
     private static ModelApiRequest sseRequest() {
         ModelApiRequest modelApiRequest = new ModelApiRequest();
-        modelApiRequest.setModelId(Constants.ModelChatGLM6BSSE);
+        modelApiRequest.setModelId(Constants.ModelChatGLM6B);
         modelApiRequest.setInvokeMethod(Constants.invokeMethodSse);
         //modelApiRequest.setIncremental(false);
         // 可自定义sse listener
