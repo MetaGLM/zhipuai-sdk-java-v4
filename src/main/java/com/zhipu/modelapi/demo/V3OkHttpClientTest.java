@@ -11,7 +11,7 @@ import java.util.concurrent.CountDownLatch;
 public class V3OkHttpClientTest {
 
     private static ClientV3 client = new ClientV3.Builder(TestConstants.testKeyV3, TestConstants.testSecretV3)
-            //.devMode(true)
+            .devMode(true)
             .build();
     // 请自定义自己的业务id
     private static final String requestIdTemplate = "mycompany-%d";

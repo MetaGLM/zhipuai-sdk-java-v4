@@ -26,8 +26,13 @@ public class RealEventSource implements EventSource, Callback, okhttp3.Callback 
 
     public void connect(OkHttpClient client) {
         client = client.newBuilder().eventListener(EventListener.NONE).build();
-        call = client.newCall(request);
-        call.enqueue(this);
+        Response response = null;
+        try{
+            response = client.newCall(request).execute();
+            processResponse(response);
+        }catch (Exception e){
+            this.listener.onFailure(this, e, response);
+        }
     }
 
     @Override
