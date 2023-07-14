@@ -4,7 +4,7 @@
 Java），让开发者更便捷的调用智谱开放API
 
 ## 简介
-
+- <font color="red">**java sdk仍在开发测试阶段，有bug请留言联系**</font>
 - 对所有接口进行了类型封装，无需查阅API文档即可完成接入
 - 初始化client并调用成员函数，无需关注http调用过程的各种细节，所见即所得
 - 默认缓存token
@@ -20,59 +20,48 @@ TODO
 ```
 
 ## 使用
-
 - 调用流程：
-    1. 使用APIKey和PubKey创建Client
+    1. 使用APISecretKey创建Client
     2. 调用Client对应的成员方法
-- com.zhipu.modelapi.demo有完整的demo示例，请替换自己的ApiKey和ApiSecret进行测试
+- com.zhipu.oapi.demo有完整的demo示例，请替换自己的ApiKey和ApiSecret进行测试
 
 ### 创建Client
 
 ```
-    ClientV3 client = new ClientV3.Builder("{Your ApiKey}", "Your ApiSecret")
+    //ClientV3 client = new ClientV3.Builder("{Your ApiKey}", "Your ApiSecret")
+    //            .httpTransport(new ApacheHttpClientTransport())// 传输层默认使用okhttpclient，如果需要修改位其他http client（如apache），可以在这里指定。注意apache不支持sse调用
+    //            .build();
+    ClientV3 client = new ClientV3.Builder("{Your ApiSecretKey}")
                 .httpTransport(new ApacheHttpClientTransport())// 传输层默认使用okhttpclient，如果需要修改位其他http client（如apache），可以在这里指定。注意apache不支持sse调用
-                .build();
-```        
-
-### 异步调用
-
+                .build();       
 ```
-    # 1. 调用模型接口（同步响应只返回taskOrderNo）
-    Client client = builder.build();    
-    ModelApiRequest modelApiRequest = new ModelApiRequest();
-    // 指定模型
-    modelApiRequest.setModelId(Constants.ModelTest);
-    // 指定模型访问方式
-    modelApiRequest.setInvokeMethod(Constants.invokeMethodAsync);
-    // 指定输入
-    modelApiRequest.setPrompt("ChatGPT和你哪个更强大");
-    // 设置会话历史
-    ModelApiRequest.QA history1 = new ModelApiRequest.QA("你好", "我是人工智能助手");
-    ModelApiRequest.QA history2 = new ModelApiRequest.QA("你叫什么名字", "我叫chatGLM");
-    List<ModelApiRequest.QA> history = new ArrayList<>();
-    history.add(history1);
-    history.add(history2);
-    modelApiRequest.setHistory(history);
-    ModelApiResponse modelApiResp = client.invokeModelApi(modelApiRequest);
-    
-    # 2. 查询指定taskOrderNo的结果，根据模型和输入内容的不同，通常需要等待10-300s模型才能完成处理
-    QueryModelResultRequest queryModelResultRequest = new QueryModelResultRequest();
-    queryModelResultRequest.setTaskOrderNo(taskOrderNo);
-    QueryModelResultResponse queryResultResp = client.queryModelResult(request);
-``` 
 
 ### sse调用
 ```
-    ModelApiRequest modelApiRequest = new ModelApiRequest();
-    modelApiRequest.setModelId(Constants.ModelTest);
-    modelApiRequest.setInvokeMethod(Constants.invokeMethodSse);
-    // 可自定义sse listener
-    modelApiRequest.setSseListener(new StandardEventSourceListener());
-    modelApiRequest.setPrompt("ChatGPT和你哪个更强大")
-    ModelApiRequest.QA history1 = new ModelApiRequest.QA("你好", "我是人工智能助手");
-    ModelApiRequest.QA history2 = new ModelApiRequest.QA("你叫什么名字", "我叫chatGLM");
-    List<ModelApiRequest.QA> history = new ArrayList<>();
-    history.add(history1);
-    history.add(history2);
-    modelApiRequest.setHistory(history);
+        // 建议直接查看demo包代码，这里更新可能不及时
+        ModelApiRequest modelApiRequest = new ModelApiRequest();
+        modelApiRequest.setModelId(Constants.ModelChatGLM6B);
+        modelApiRequest.setInvokeMethod(Constants.invokeMethodSse);
+        // 可自定义sse listener
+        StandardEventSourceListener listener = new StandardEventSourceListener();
+        listener.setIncremental(false);
+        modelApiRequest.setSseListener(listener);
+        modelApiRequest.setIncremental(false);
+        // 构建prompt
+        ModelApiRequest.Prompt prompt = new ModelApiRequest.Prompt(ModelConstants.roleUser, "tell me something about C Ronaldo in English");
+        List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
+        prompts.add(prompt);
+        modelApiRequest.setPrompt(prompts);
+        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+        modelApiRequest.setRequestId(requestId);
+        
+        ModelApiResponse sseModelApiResp = client.invokeModelApi(sseModelApiRequest);
+        System.out.println(String.format("call model api finished, method: %s", sseModelApiRequest.getInvokeMethod()));
+        System.out.println(String.format("invoke api code: %d", sseModelApiResp.getCode()));
+        System.out.println("model output:");
+        System.out.println(sseModelApiResp.getData().getChoices().get(0).getContent());
+        System.out.println("usage:");
+        String usage = new Gson().toJson(sseModelApiResp.getData().getUsage(), Usage.class);
+        System.out.println(usage);
+        System.out.println("task_id: " + sseModelApiResp.getData().getTaskId());
 ```

@@ -1,14 +1,17 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 package okhttp3.internal.sse;
 
 import okio.Buffer;
 import okio.BufferedSource;
 import okio.ByteString;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 
 public final class ServerSentEventReader {
-
     private static final ByteString CRLF = ByteString.encodeUtf8("\r\n");
     private static final ByteString DATA = ByteString.encodeUtf8("data");
     private static final ByteString META = ByteString.encodeUtf8("meta");
@@ -16,18 +19,18 @@ public final class ServerSentEventReader {
     private static final ByteString EVENT = ByteString.encodeUtf8("event");
     private static final ByteString RETRY = ByteString.encodeUtf8("retry");
     private final BufferedSource source;
-    private final ServerSentEventReader.Callback callback;
+    private final Callback callback;
     private String lastId = null;
 
     public ServerSentEventReader(BufferedSource source, Callback callback) {
         if (source == null) {
             throw new NullPointerException("source == null");
-        }
-        if (callback == null) {
+        } else if (callback == null) {
             throw new NullPointerException("callback == null");
+        } else {
+            this.source = source;
+            this.callback = callback;
         }
-        this.source = source;
-        this.callback = callback;
     }
 
     boolean processNextEvent() throws IOException {
@@ -36,15 +39,15 @@ public final class ServerSentEventReader {
         Buffer data = new Buffer();
         Buffer meta = new Buffer();
 
-        while(true) {
-            long lineEnd = this.source.indexOf(CRLF);
-            if (lineEnd==-1L){
+        while (true) {
+            long lineEnd = this.source.indexOfElement(CRLF);
+            if (lineEnd == -1L) {
                 return false;
             }
             switch (source.getBuffer().getByte(0)) {
                 case '\r':
                 case '\n':
-                    completeEvent(id, type, data, meta);
+                    completeEvent(id, type, data,meta);
                     return true;
                 case 'm':
                     if (this.isKey(META)) {
@@ -52,30 +55,34 @@ public final class ServerSentEventReader {
                         continue;
                     }
                 case 'd':
-                    if (this.isKey(DATA)) {
+                    if (isKey(DATA)) {
                         parseData(data, lineEnd);
                         continue;
                     }
                     break;
+
                 case 'e':
-                    if (this.isKey(EVENT)) {
+                    if (isKey(EVENT)) {
                         type = parseEvent(lineEnd);
                         continue;
                     }
                     break;
+
                 case 'i':
-                    if (this.isKey(ID)) {
+                    if (isKey(ID)) {
                         id = parseId(lineEnd);
                         continue;
                     }
                     break;
+
                 case 'r':
-                    if (this.isKey(RETRY)) {
+                    if (isKey(RETRY)) {
                         parseRetry(lineEnd);
                         continue;
                     }
                     break;
             }
+
             source.skip(lineEnd);
             skipCrAndOrLf();
         }
@@ -92,6 +99,7 @@ public final class ServerSentEventReader {
                 this.callback.onEvent(id, type, data.readUtf8(), null);
             }
         }
+
     }
 
     private void parseData(Buffer data, long end) throws IOException {
@@ -104,34 +112,38 @@ public final class ServerSentEventReader {
     private String parseEvent(long end) throws IOException {
         String type = null;
         end -= this.skipNameAndDivider(5L);
-        if (end !=0L) {
+        if (end != 0L) {
             type = this.source.readUtf8(end);
         }
+
         this.skipCrAndOrLf();
         return type;
     }
 
     private String parseId(long end) throws IOException {
-        String id = null;
         end -= this.skipNameAndDivider(2L);
-        if (end != 0L){
+        String id;
+        if (end != 0L) {
             id = this.source.readUtf8(end);
+        } else {
+            id = null;
         }
+
         this.skipCrAndOrLf();
         return id;
     }
 
-    private void parseRetry(long end) throws IOException{
+    private void parseRetry(long end) throws IOException {
         end -= this.skipNameAndDivider(5L);
         String retryString = this.source.readUtf8(end);
         long retryMs = -1L;
-        try{
-            retryMs = Long.parseLong(retryString);
-        }catch (NumberFormatException var7) {
 
+        try {
+            retryMs = Long.parseLong(retryString);
+        } catch (NumberFormatException var7) {
         }
 
-        if (retryMs != -1L){
+        if (retryMs != -1L) {
             this.callback.onRetryChange(retryMs);
         }
 
@@ -142,34 +154,34 @@ public final class ServerSentEventReader {
         if (!this.source.rangeEquals(0L, key)) {
             return false;
         } else {
-            byte nextByte = this.source.getBuffer().getByte((long)key.size());
+            byte nextByte = this.source.getBuffer().getByte((long) key.size());
             return nextByte == 58 || nextByte == 13 || nextByte == 10;
         }
     }
 
     private void skipCrAndOrLf() throws IOException {
-        if ((this.source.readByte() & 255) == 13 &&
-                this.source.request(1L) &&
-                this.source.getBuffer().getByte(0L) == 10) {
+        if ((this.source.readByte() & 255) == 13 && this.source.request(1L) && this.source.getBuffer().getByte(0L) == 10) {
             this.source.skip(1L);
         }
+
     }
 
     private long skipNameAndDivider(long length) throws IOException {
         this.source.skip(length);
-        if(this.source.getBuffer().getByte(0L) == 58) {
+        if (this.source.getBuffer().getByte(0L) == 58) {
             this.source.skip(1L);
             ++length;
-            if(this.source.getBuffer().getByte(0L) == 32){
+            if (this.source.getBuffer().getByte(0L) == 32) {
                 this.source.skip(1L);
                 ++length;
             }
         }
+
         return length;
     }
 
     public interface Callback {
-        void onEvent(@Nullable String var1, @Nullable String var2, String var3, String var4);
+        void onEvent(String var1,String var2, String var3, String var4);
 
         void onRetryChange(long var1);
     }
