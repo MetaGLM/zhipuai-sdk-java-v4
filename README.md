@@ -16,7 +16,11 @@ Java），让开发者更便捷的调用智谱开放API
 - maven坐标
 
 ```
-TODO
+        <dependency>
+            <groupId>cn.bigmodel.openapi</groupId>
+            <artifactId>oapi-java-sdk</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 ```
 
 ## 使用
