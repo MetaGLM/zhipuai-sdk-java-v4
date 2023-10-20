@@ -12,9 +12,24 @@ import java.util.concurrent.CountDownLatch;
 public class V3OkHttpClientTest {
 
     // 请先填写自己的apiKey再调用demo查看效果
+    public static OkHttpClient getInstance() {
+        OkHttpClient okHttpClient=new OkHttpClient.Builder()//构建器
+                .proxy(Proxy.NO_PROXY) //来屏蔽系统代理
+                .retryOnConnectionFailure(true)
+                .connectTimeout(300, TimeUnit.SECONDS)//连接超时
+                .writeTimeout(300, TimeUnit.SECONDS)//写入超时
+                .readTimeout(300, TimeUnit.SECONDS)//读取超时
+                .build();
+        okHttpClient.dispatcher().setMaxRequestsPerHost(200); //设置最大并发请求数，避免等待延迟
+        okHttpClient.dispatcher().setMaxRequests(200);
+        return okHttpClient;
+    }
+
     private static ClientV3 client = new ClientV3.Builder(TestConstants.onlineKeyV3, TestConstants.onlineSecretV3)
-            //.devMode(true)
-            .build();
+        .httpTransport(new OkHttpTransport(getInstance()))
+        //.devMode(true)
+        .build();
+
     // 请自定义自己的业务id
     private static final String requestIdTemplate = "mycompany-%d";
 
