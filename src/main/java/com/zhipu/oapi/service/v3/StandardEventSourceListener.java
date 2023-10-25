@@ -1,5 +1,7 @@
 package com.zhipu.oapi.service.v3;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -37,9 +39,11 @@ public class StandardEventSourceListener extends ModelEventSourceListener {
     }
 
     @Override
-    public void onEvent(EventSource eventSource, String id, String type, String data, String meta) {
+    public void onEvent(EventSource eventSource, String id, String type, String data) {
         //String formatData = gson.fromJson(data, JsonObject.class).get(ModelConstants.sseFormat).getAsString();
-        if ("finish".equals(type) && StringUtils.isNotEmpty(meta)) {
+        if ("finish".equals(type)) {
+            JSONObject jsonObject = JSON.parseObject(data);
+            String meta = jsonObject.getString("meta");
             this.meta = gson.fromJson(meta, SseMeta.class);
         }
         if (this.isIncremental()) {

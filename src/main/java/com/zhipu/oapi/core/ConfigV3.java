@@ -10,9 +10,9 @@ public class ConfigV3 {
 
     // api credentials
     // apiSecretKey = {apiKey}.{apiSecret}
-    private String apiSecretKey;
-    private String apiKey="3e19ab475b83623745c3b142b47d4dba.QTfN9TJHQ0yX87fC";
-    private String apiSecret;
+    private String apiSecretKey="4b723e1372a8870b7a55a1efdf07167b.CBOojhvRVim74p2z";
+    private String apiKey="4b723e1372a8870b7a55a1efdf07167b";
+    private String apiSecret = "CBOojhvRVim74p2z";
 
     // jwt config
     // jwt过期时间，默认30分钟
