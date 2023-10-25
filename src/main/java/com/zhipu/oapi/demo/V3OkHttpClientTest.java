@@ -1,13 +1,20 @@
 package com.zhipu.oapi.demo;
 
+import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.zhipu.oapi.ClientV3;
 import com.zhipu.oapi.Constants;
+import com.zhipu.oapi.core.httpclient.OkHttpTransport;
 import com.zhipu.oapi.service.v3.*;
+import okhttp3.OkHttpClient;
 
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static cn.hutool.http.ContentType.JSON;
 
 public class V3OkHttpClientTest {
 
@@ -51,7 +58,12 @@ public class V3OkHttpClientTest {
         //parallelSseInvoke();
 
         // 4. sse-invoke english
-        testSseEnglishInvoke();
+//        testSseEnglishInvoke();
+
+
+        // 5. invoke调用模型,直接返回结果
+        testInvoke();
+
     }
 
     private static void parallelSseInvoke() throws InterruptedException {
@@ -108,6 +120,15 @@ public class V3OkHttpClientTest {
          System.out.println(sseModelApiResp.getData().getChoices().get(0).getContent());
      }
 
+    private static void testInvoke() {
+        ModelApiRequest invokeModelApiRequest = invokeRequest();
+        ModelApiResponse invokeModelApiResp = client.invokeModelApi(invokeModelApiRequest);
+        System.out.println("invokeModelApiResp:"+ com.alibaba.fastjson.JSON.toJSONString(invokeModelApiResp));
+//        System.out.println(String.format("call model api finished, method: %s", invokeModelApiRequest.getInvokeMethod()));
+//        System.out.println(String.format("invoke api code: %d", invokeModelApiResp.getCode()));
+//        System.out.println("model output:");
+//        System.out.println(invokeModelApiResp.getData().getChoices().get(0).getContent());
+    }
     private static void testSseEnglishInvoke() {
         ModelApiRequest sseModelApiRequest = sseEnglishRequest();
         ModelApiResponse sseModelApiResp = client.invokeModelApi(sseModelApiRequest);
@@ -166,6 +187,19 @@ public class V3OkHttpClientTest {
         modelApiRequest.setInvokeMethod(Constants.invokeMethodSse);
         // 可自定义sse listener
         modelApiRequest.setSseListener(new StandardEventSourceListener());
+        ModelApiRequest.Prompt prompt = new ModelApiRequest.Prompt(ModelConstants.roleUser, "ChatGPT和你哪个更强大");
+        List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
+        prompts.add(prompt);
+        modelApiRequest.setPrompt(prompts);
+        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+        modelApiRequest.setRequestId(requestId);
+        return modelApiRequest;
+    }
+
+    private static ModelApiRequest invokeRequest() {
+        ModelApiRequest modelApiRequest = new ModelApiRequest();
+        modelApiRequest.setModelId(Constants.ModelChatGLM6BAsync);
+        modelApiRequest.setInvokeMethod(Constants.invokeMethod);
         ModelApiRequest.Prompt prompt = new ModelApiRequest.Prompt(ModelConstants.roleUser, "ChatGPT和你哪个更强大");
         List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
         prompts.add(prompt);
