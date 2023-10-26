@@ -67,7 +67,7 @@ public class OkHttpTransport extends BaseHttpTransport {
     /**
      * sse调用只会返回输出结果
      * @param request
-     * @return
+     * @return RawResponse
      * @throws Exception
      */
     @Override

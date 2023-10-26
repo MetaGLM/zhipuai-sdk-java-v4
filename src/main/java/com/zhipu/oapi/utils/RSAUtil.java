@@ -15,7 +15,7 @@ public class RSAUtil {
      *
      * @param data                  待加密数据
      * @param base64StringPublicKey base64编码后的公钥串
-     * @return
+     * @return String
      */
     public static String encrypt(String data, String base64StringPublicKey) {
         try {
