@@ -15,7 +15,7 @@ public class WuDaoUtils {
 	 * @param createTokenUrl 获取token
 	 * @param apiKey
 	 * @param publicKey
-	 * @return
+	 * @return Map<String, Object>
 	 * @throws Exception
 	 */
 	public static Map<String, Object> getToken(String createTokenUrl, String apiKey, String publicKey)
@@ -38,7 +38,7 @@ public class WuDaoUtils {
 	 * @param engineUrl 引擎请求地址
 	 * @param authToken 鉴权token
 	 * @param paramsMap
-	 * @return
+	 * @return Map<String, Object>
 	 * @throws Exception
 	 */
 	public static Map<String, Object> executePost(String engineUrl, String authToken, Map<String, Object> paramsMap)
