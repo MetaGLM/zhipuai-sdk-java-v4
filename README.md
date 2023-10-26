@@ -14,7 +14,7 @@ Java），让开发者更便捷的调用智谱开放API
 
 - 运行环境：JDK1.8+
 - maven坐标
-
+todo 1.0.1版本待发布到中央仓库中！！
 ```
         <dependency>
             <groupId>cn.bigmodel.openapi</groupId>
