@@ -13,9 +13,9 @@ public class StringUtils {
     }
 
     /**
-     * @param tpl。the template, use {Name} as placeholder, e.g.: "My name is {name}"
-     * @param params. the k-v pair. key should exist  in tpl. with the template above, key can be "name"
-     * @return
+     * @param tpl the template, use {Name} as placeholder, e.g.: "My name is {name}"
+     * @param params the k-v pair. key should exist  in tpl. with the template above, key can be "name"
+     * @return String
      */
     public static String formatString(final String tpl, Map<String, String> params) {
         List<KvWrapper> paramWrappers = params.entrySet().stream().map(StringUtils::toWrapper).collect(Collectors.toList());

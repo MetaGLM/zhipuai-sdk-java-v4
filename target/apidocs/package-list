@@ -1,0 +1,12 @@
+com.zhipu.oapi
+com.zhipu.oapi.core
+com.zhipu.oapi.core.cache
+com.zhipu.oapi.core.httpclient
+com.zhipu.oapi.core.request
+com.zhipu.oapi.core.response
+com.zhipu.oapi.core.token
+com.zhipu.oapi.demo
+com.zhipu.oapi.service
+com.zhipu.oapi.service.v2
+com.zhipu.oapi.service.v3
+com.zhipu.oapi.utils
