@@ -27,6 +27,7 @@ public class StringUtils {
         List<String> sortedValues = paramWrappers.stream().sorted(Comparator.comparing(KvWrapper::getIdxInTpl)).map(x -> x.getValue()).collect(Collectors.toList());
         String standardTpl = tpl;
         for (String s : params.keySet()) {
+            String.format("{%s}", s);
             String placeHolderName = String.format("{%s}", s);
             standardTpl = standardTpl.replace(placeHolderName, "%s");
         }
