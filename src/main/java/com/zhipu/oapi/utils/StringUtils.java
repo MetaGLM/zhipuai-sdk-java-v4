@@ -13,9 +13,9 @@ public class StringUtils {
     }
 
     /**
-     * @param tpl。the template, use {Name} as placeholder, e.g.: "My name is {name}"
-     * @param params. the k-v pair. key should exist  in tpl. with the template above, key can be "name"
-     * @return
+     * @param tpl the template, use {Name} as placeholder, e.g.: "My name is {name}"
+     * @param params the k-v pair. key should exist  in tpl. with the template above, key can be "name"
+     * @return String
      */
     public static String formatString(final String tpl, Map<String, String> params) {
         List<KvWrapper> paramWrappers = params.entrySet().stream().map(StringUtils::toWrapper).collect(Collectors.toList());
@@ -27,6 +27,7 @@ public class StringUtils {
         List<String> sortedValues = paramWrappers.stream().sorted(Comparator.comparing(KvWrapper::getIdxInTpl)).map(x -> x.getValue()).collect(Collectors.toList());
         String standardTpl = tpl;
         for (String s : params.keySet()) {
+            String.format("{%s}", s);
             String placeHolderName = String.format("{%s}", s);
             standardTpl = standardTpl.replace(placeHolderName, "%s");
         }

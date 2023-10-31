@@ -50,6 +50,8 @@ public class ClientV3 {
             return asyncInvoke(request);
         } else if (Constants.invokeMethodSse.equals(request.getInvokeMethod())) {
             return sseInvoke(request);
+        }else if (Constants.invokeMethod.equals(request.getInvokeMethod())) {
+            return invoke(request);
         }
         return null;
     }
@@ -173,13 +175,59 @@ public class ClientV3 {
         return resp;
     }
 
+    private ModelApiResponse invoke(ModelApiRequest request) {
+
+        RawRequest rawReq = new RawRequest();
+        // body
+        // String requestTaskNo = IdUtil.getSnowflake(1, 2).nextIdStr();
+        Map<String, Object> paramsMap = new HashMap();
+        paramsMap.put("request_id", request.getRequestId());
+        paramsMap.put("prompt", request.getPrompt());
+        // incremental暂不支持配置，强制为true（增量返回）
+        paramsMap.put("incremental", request.isIncremental());
+        paramsMap.put("temperature", request.getTemperature());
+        paramsMap.put("top_p", request.getTopP());
+
+
+        rawReq.setBody(paramsMap);
+
+
+        // url
+        rawReq.setReqUrl(baseModelUrl());
+        Map<String, String> pathParams = new HashMap<>();
+        pathParams.put("model", request.getModelId());
+        pathParams.put("invoke_method", Constants.invokeMethod);
+        rawReq.setPathParams(pathParams);
+
+        // token
+        String token = GlobalTokenManager.getTokenManagerV3().getToken(config);
+        rawReq.setToken(token);
+
+        ModelApiResponse resp = new ModelApiResponse();
+        try {
+            RawResponse rawResp = this.getConfig().getHttpTransport().executePost(rawReq);
+            resp.setCode(rawResp.getStatusCode());
+            resp.setMsg(rawResp.getMsg());
+            Gson gson = new Gson();
+            ModelData data = gson.fromJson(new String(rawResp.getBody()), ModelData.class);
+            resp.setData(data);
+            return resp;
+        } catch (Exception e) {
+            logger.error("sse invoke model fail!", e);
+            resp.setCode(500);
+            resp.setMsg("internal error");
+        }
+
+        return resp;
+    }
+
     private String validateParams(ModelApiRequest request) {
         if (request == null) {
             return "request can not be null";
         }
         // 目前仅支持异步和sse接口
         if (!Constants.invokeMethodAsync.equals(request.getInvokeMethod())
-                && !Constants.invokeMethodSse.equals(request.getInvokeMethod())) {
+                && !Constants.invokeMethodSse.equals(request.getInvokeMethod())  && !Constants.invokeMethod.equals(request.getInvokeMethod())) {
             return "invalid invoke method";
         }
         //

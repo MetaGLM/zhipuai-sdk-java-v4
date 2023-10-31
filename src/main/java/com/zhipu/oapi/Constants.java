@@ -16,6 +16,8 @@ public class Constants {
 
     // model ids
     public static final String ModelChatGLM6B = "chatGLM_6b_SSE";
+
+    public static final String ModelChatGLM6BAsync = "chatGLM_6b";
     public static final String ModelArticle = "article-model";
     public static final String ModelTitleGeneration = "title-creation";
     // 代码生成
@@ -29,6 +31,8 @@ public class Constants {
     // invoke methods
     public static final String invokeMethodAsync = "async-invoke";
     public static final String invokeMethodSse = "sse-invoke";
+
+    public static final String invokeMethod = "invoke";
 
     // http keywords
     public static final String authHeaderKey = "Authorization";
