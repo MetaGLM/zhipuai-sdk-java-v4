@@ -9,12 +9,11 @@ Java），让开发者更便捷的调用智谱开放API
 - 初始化client并调用成员函数，无需关注http调用过程的各种细节，所见即所得
 - 默认缓存token
 - 支持主流http client实现，已支持apache httpclient、okhttpclient
-
+- 添加同步调用、去除自定义okhttp sse listener实现（meta解析优化）
 ## 安装
 
 - 运行环境：JDK1.8+
 - maven坐标
-- todo 1.0.1版本待发布到中央仓库中！！
 ```
         <dependency>
             <groupId>cn.bigmodel.openapi</groupId>
