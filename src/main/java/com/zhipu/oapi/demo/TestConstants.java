@@ -9,8 +9,8 @@ public class TestConstants {
     public static final String testKeyV3 = "29368361dfef6c629bbd8177bdc06fe1";
     // V3 api secret
     public static final String testSecretV3 = "dzYUDwms9spdJnMU";
-    public static final String onlineKeyV3 = "50e1b91eef3172bf0521c1096bab98ac";
-    public static final String onlineSecretV3 = "Ud21FsTy5pn1Likh";
+    public static final String onlineKeyV3 = "4b723e1372a8870b7a55a1efdf07167b";
+    public static final String onlineSecretV3 = "CBOojhvRVim74p2z";
 
 
     // 请求地址
