@@ -10,6 +10,7 @@ Java），让开发者更便捷的调用智谱开放API
 - 默认缓存token
 - 支持主流http client实现，已支持apache httpclient、okhttpclient
 - 添加同步调用、去除自定义okhttp sse listener实现（meta解析优化）
+- 修复同步调用500问题
 ## 安装
 
 - 运行环境：JDK1.8+
@@ -18,7 +19,7 @@ Java），让开发者更便捷的调用智谱开放API
         <dependency>
             <groupId>cn.bigmodel.openapi</groupId>
             <artifactId>oapi-java-sdk</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </dependency>
 ```
 
