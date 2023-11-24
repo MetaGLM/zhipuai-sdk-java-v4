@@ -22,6 +22,18 @@ public class ModelApiRequest {
     private boolean incremental = true;
     private ModelEventSourceListener sseListener;
 
+    // 用于控制每次返回内容的类型，空或者没有此字段时默认按照json_string返回
+    private String returnType;
+
+
+    public String getReturnType(){
+        return returnType;
+    }
+
+    public void setReturnType(String returnType){
+        this.returnType = returnType;
+    }
+
     public String getInvokeMethod() {
         return invokeMethod;
     }

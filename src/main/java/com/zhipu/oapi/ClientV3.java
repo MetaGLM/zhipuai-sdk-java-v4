@@ -100,6 +100,7 @@ public class ClientV3 {
             Map<String, String> pathParams = new HashMap<>();
             pathParams.put("model", request.getModelId());
             pathParams.put("invoke_method", Constants.invokeMethodAsync);
+            paramsMap.put("return_type", request.getReturnType());
             rawReq.setPathParams(pathParams);
             rawReq.setConfigV3(config);
             String token = GlobalTokenManager.getTokenManagerV3().getToken(config);
@@ -134,7 +135,7 @@ public class ClientV3 {
         paramsMap.put("incremental", request.isIncremental());
         paramsMap.put("temperature", request.getTemperature());
         paramsMap.put("top_p", request.getTopP());
-
+        paramsMap.put("return_type", request.getReturnType());
         // sseformat, 用于兼容解决sse增量模式okhttpsse截取data:后面空格问题, [data: hello]。只在增量模式下使用sseFormat。
         if (request.isIncremental()) {
             paramsMap.put("sseFormat", ModelConstants.sseFormat);
@@ -187,6 +188,7 @@ public class ClientV3 {
         paramsMap.put("incremental", request.isIncremental());
         paramsMap.put("temperature", request.getTemperature());
         paramsMap.put("top_p", request.getTopP());
+        paramsMap.put("return_type", request.getReturnType());
 
 
         rawReq.setBody(paramsMap);
