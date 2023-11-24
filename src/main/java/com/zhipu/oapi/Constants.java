@@ -18,6 +18,8 @@ public class Constants {
     public static final String ModelChatGLM6B = "chatGLM_6b_SSE";
 
     public static final String ModelChatGLM6BAsync = "chatGLM_6b";
+
+    public static final String ModelChatGLMTRUBO = "chatGLM_turbo";
     public static final String ModelArticle = "article-model";
     public static final String ModelTitleGeneration = "title-creation";
     // 代码生成
