@@ -210,12 +210,14 @@ public class ClientV3 {
             RawResponse rawResp = this.getConfig().getHttpTransport().executePost(rawReq);
             resp.setCode(rawResp.getStatusCode());
             resp.setMsg(rawResp.getMsg());
-            Gson gson = new Gson();
-            ModelData data = gson.fromJson(new String(rawResp.getBody()), ModelData.class);
-            resp.setData(data);
+            if (rawResp.getStatusCode() == 200) {
+                Gson gson = new Gson();
+                ModelData data = gson.fromJson(new String(rawResp.getBody()), ModelData.class);
+                resp.setData(data);
+            }
             return resp;
         } catch (Exception e) {
-            logger.error("sse invoke model fail!", e);
+            logger.error("invoke model fail!", e);
             resp.setCode(500);
             resp.setMsg("internal error");
         }
