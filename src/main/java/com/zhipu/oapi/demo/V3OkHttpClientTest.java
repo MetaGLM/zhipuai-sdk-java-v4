@@ -52,17 +52,17 @@ public class V3OkHttpClientTest {
         // testQueryResult();
 
         // 2. sse-invoke调用模型，使用标准Listener，直接返回结果
-        // testSseInvoke();
+         testSseInvoke();
 
         // 3. parallel sse invoke
-        //parallelSseInvoke();
+        // parallelSseInvoke();
 
         // 4. sse-invoke english
-//        testSseEnglishInvoke();
+        //  testSseEnglishInvoke();
 
 
         // 5. invoke调用模型,直接返回结果
-        testInvoke();
+        //   testInvoke();
 
     }
 
@@ -146,6 +146,8 @@ public class V3OkHttpClientTest {
         ModelApiRequest modelApiRequest = new ModelApiRequest();
         modelApiRequest.setModelId(Constants.ModelChatGLM6B);
         modelApiRequest.setInvokeMethod(Constants.invokeMethodAsync);
+        // returnType 非必填参数
+        modelApiRequest.setReturnType(Constants.RETURN_TYPE_JSON);
         ModelApiRequest.Prompt prompt = new ModelApiRequest.Prompt(ModelConstants.roleUser, "ChatGPT和你哪个更强大");
         List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
         prompts.add(prompt);
@@ -185,6 +187,8 @@ public class V3OkHttpClientTest {
         ModelApiRequest modelApiRequest = new ModelApiRequest();
         modelApiRequest.setModelId(Constants.ModelChatGLM6B);
         modelApiRequest.setInvokeMethod(Constants.invokeMethodSse);
+        // returnType 非必填参数
+        modelApiRequest.setReturnType(Constants.RETURN_TYPE_JSON);
         // 可自定义sse listener
         modelApiRequest.setSseListener(new StandardEventSourceListener());
         ModelApiRequest.Prompt prompt = new ModelApiRequest.Prompt(ModelConstants.roleUser, "ChatGPT和你哪个更强大");
@@ -200,6 +204,8 @@ public class V3OkHttpClientTest {
         ModelApiRequest modelApiRequest = new ModelApiRequest();
         modelApiRequest.setModelId(Constants.ModelChatGLM6BAsync);
         modelApiRequest.setInvokeMethod(Constants.invokeMethod);
+        // returnType 非必填参数
+        modelApiRequest.setReturnType(Constants.RETURN_TYPE_TEXT);
         ModelApiRequest.Prompt prompt = new ModelApiRequest.Prompt(ModelConstants.roleUser, "ChatGPT和你哪个更强大");
         List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
         prompts.add(prompt);

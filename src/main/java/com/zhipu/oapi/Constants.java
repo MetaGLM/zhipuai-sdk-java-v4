@@ -48,4 +48,10 @@ public class Constants {
     public static final String resultKeyMsg = "msg";
     public static final String resultKeySuccess = "success";
     public static final String resultKeyData = "data";
+
+    // 返回标准对JSON字符串
+    public static final String RETURN_TYPE_JSON = "json_string";
+
+    // 返回原始对文本内容
+    public static final String RETURN_TYPE_TEXT = "text";
 }
