@@ -101,6 +101,9 @@ public class ClientV3 {
             pathParams.put("model", request.getModelId());
             pathParams.put("invoke_method", Constants.invokeMethodAsync);
             paramsMap.put("return_type", request.getReturnType());
+            if(!request.getRef().isEmpty()){
+                paramsMap.put("ref", request.getRef());
+            }
             rawReq.setPathParams(pathParams);
             rawReq.setConfigV3(config);
             String token = GlobalTokenManager.getTokenManagerV3().getToken(config);
@@ -123,6 +126,8 @@ public class ClientV3 {
         }
     }
 
+
+
     private ModelApiResponse sseInvoke(ModelApiRequest request) {
 
         RawRequest rawReq = new RawRequest();
@@ -141,8 +146,9 @@ public class ClientV3 {
             paramsMap.put("sseFormat", ModelConstants.sseFormat);
         }
         rawReq.setBody(paramsMap);
-
-
+       if(!request.getRef().isEmpty()){
+          paramsMap.put("ref", request.getRef());
+       }
         // sse info
         // TODO: listener放到config更合适
         rawReq.setSseListener(request.getSseListener());
@@ -189,7 +195,9 @@ public class ClientV3 {
         paramsMap.put("temperature", request.getTemperature());
         paramsMap.put("top_p", request.getTopP());
         paramsMap.put("return_type", request.getReturnType());
-
+        if(!request.getRef().isEmpty()){
+            paramsMap.put("ref", request.getRef());
+        }
 
         rawReq.setBody(paramsMap);
 

@@ -10,6 +10,7 @@ import okhttp3.OkHttpClient;
 
 import java.net.Proxy;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -152,6 +153,14 @@ public class V3OkHttpClientTest {
         List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
         prompts.add(prompt);
         modelApiRequest.setPrompt(prompts);
+        modelApiRequest.setRef(new HashMap<String, Object>(){{
+            put("enable",false);
+        }});
+//        modelApiRequest.setRef(new HashMap<String, Object>(){{
+//            put("enable",true);
+//            put("search_query","历史");
+//
+//        }});
         // 自定义业务id，需保证唯一性
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         modelApiRequest.setRequestId(requestId);
@@ -195,6 +204,14 @@ public class V3OkHttpClientTest {
         List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
         prompts.add(prompt);
         modelApiRequest.setPrompt(prompts);
+        modelApiRequest.setRef(new HashMap<String, Object>(){{
+            put("enable",false);
+        }});
+//        modelApiRequest.setRef(new HashMap<String, Object>(){{
+//            put("enable",true);
+//            put("search_query","历史");
+//
+//        }});
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         modelApiRequest.setRequestId(requestId);
         return modelApiRequest;
@@ -210,6 +227,14 @@ public class V3OkHttpClientTest {
         List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
         prompts.add(prompt);
         modelApiRequest.setPrompt(prompts);
+        modelApiRequest.setRef(new HashMap<String, Object>(){{
+            put("enable",false);
+        }});
+//        modelApiRequest.setRef(new HashMap<String, Object>(){{
+//            put("enable",true);
+//            put("search_query","历史");
+//
+//        }});
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         modelApiRequest.setRequestId(requestId);
         return modelApiRequest;

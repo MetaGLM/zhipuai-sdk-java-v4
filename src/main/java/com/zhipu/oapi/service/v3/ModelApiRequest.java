@@ -1,6 +1,9 @@
 package com.zhipu.oapi.service.v3;
 
+import javafx.beans.binding.ObjectExpression;
+
 import java.util.List;
+import java.util.Map;
 
 public class ModelApiRequest {
 
@@ -25,6 +28,15 @@ public class ModelApiRequest {
     // 用于控制每次返回内容的类型，空或者没有此字段时默认按照json_string返回
     private String returnType;
 
+    private Map<String, Object> ref;
+
+    public Map<String, Object> getRef(){
+        return ref;
+    }
+
+    public void setRef(Map<String, Object> ref){
+        this.ref = ref;
+    }
 
     public String getReturnType(){
         return returnType;
