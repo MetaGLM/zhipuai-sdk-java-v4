@@ -63,7 +63,7 @@ public class V3OkHttpClientTest {
 
 
         // 5. invoke调用模型,直接返回结果
-        //   testInvoke();
+        //  testInvoke();
 
     }
 
@@ -153,14 +153,15 @@ public class V3OkHttpClientTest {
         List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
         prompts.add(prompt);
         modelApiRequest.setPrompt(prompts);
-        modelApiRequest.setRef(new HashMap<String, Object>(){{
-            put("enable",false);
-        }});
-//        modelApiRequest.setRef(new HashMap<String, Object>(){{
-//            put("enable",true);
-//            put("search_query","历史");
-//
-//        }});
+        // 关闭搜索示例
+        //  modelApiRequest.setRef(new HashMap<String, Object>(){{
+        //    put("enable",false);
+        // }});
+        // 开启搜索示例
+        // modelApiRequest.setRef(new HashMap<String, Object>(){{
+        //    put("enable",true);
+        //    put("search_query","历史");
+        //  }});
         // 自定义业务id，需保证唯一性
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         modelApiRequest.setRequestId(requestId);
@@ -177,7 +178,15 @@ public class V3OkHttpClientTest {
         listener.setIncremental(false);
         modelApiRequest.setSseListener(listener);
         modelApiRequest.setIncremental(false);
-
+        // 关闭搜索示例
+        //  modelApiRequest.setRef(new HashMap<String, Object>(){{
+        //    put("enable",false);
+        // }});
+        // 开启搜索示例
+        // modelApiRequest.setRef(new HashMap<String, Object>(){{
+        //    put("enable",true);
+        //    put("search_query","历史");
+        //  }});
         ModelApiRequest.Prompt prompt = new ModelApiRequest.Prompt(ModelConstants.roleUser, "tell me something about C Ronaldo in English");
         List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
         prompts.add(prompt);
@@ -204,14 +213,15 @@ public class V3OkHttpClientTest {
         List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
         prompts.add(prompt);
         modelApiRequest.setPrompt(prompts);
-        modelApiRequest.setRef(new HashMap<String, Object>(){{
-            put("enable",false);
-        }});
-//        modelApiRequest.setRef(new HashMap<String, Object>(){{
-//            put("enable",true);
-//            put("search_query","历史");
-//
-//        }});
+        // 关闭搜索示例
+        //  modelApiRequest.setRef(new HashMap<String, Object>(){{
+        //    put("enable",false);
+        // }});
+        // 开启搜索示例
+        // modelApiRequest.setRef(new HashMap<String, Object>(){{
+        //    put("enable",true);
+        //    put("search_query","历史");
+        //  }});
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         modelApiRequest.setRequestId(requestId);
         return modelApiRequest;
@@ -227,14 +237,15 @@ public class V3OkHttpClientTest {
         List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
         prompts.add(prompt);
         modelApiRequest.setPrompt(prompts);
-        modelApiRequest.setRef(new HashMap<String, Object>(){{
-            put("enable",false);
-        }});
-//        modelApiRequest.setRef(new HashMap<String, Object>(){{
-//            put("enable",true);
-//            put("search_query","历史");
-//
-//        }});
+        // 关闭搜索示例
+        //  modelApiRequest.setRef(new HashMap<String, Object>(){{
+        //    put("enable",false);
+        // }});
+        // 开启搜索示例
+        // modelApiRequest.setRef(new HashMap<String, Object>(){{
+        //    put("enable",true);
+        //    put("search_query","历史");
+        //  }});
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         modelApiRequest.setRequestId(requestId);
         return modelApiRequest;

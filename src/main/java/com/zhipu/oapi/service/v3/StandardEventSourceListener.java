@@ -47,8 +47,10 @@ public class StandardEventSourceListener extends ModelEventSourceListener {
             this.meta = gson.fromJson(meta, SseMeta.class);
         }
         if (this.isIncremental()) {
+            logger.info("data:{}", data);
             outputText += data;
         } else {
+            logger.info("data:{}", data);
             outputText = data;
         }
     }

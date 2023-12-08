@@ -101,7 +101,7 @@ public class ClientV3 {
             pathParams.put("model", request.getModelId());
             pathParams.put("invoke_method", Constants.invokeMethodAsync);
             paramsMap.put("return_type", request.getReturnType());
-            if(!request.getRef().isEmpty()){
+            if(request.getRef()!=null && !request.getRef().isEmpty()){
                 paramsMap.put("ref", request.getRef());
             }
             rawReq.setPathParams(pathParams);
@@ -146,7 +146,7 @@ public class ClientV3 {
             paramsMap.put("sseFormat", ModelConstants.sseFormat);
         }
         rawReq.setBody(paramsMap);
-       if(!request.getRef().isEmpty()){
+       if(request.getRef()!=null && !request.getRef().isEmpty()){
           paramsMap.put("ref", request.getRef());
        }
         // sse info
@@ -195,7 +195,7 @@ public class ClientV3 {
         paramsMap.put("temperature", request.getTemperature());
         paramsMap.put("top_p", request.getTopP());
         paramsMap.put("return_type", request.getReturnType());
-        if(!request.getRef().isEmpty()){
+        if(request.getRef()!=null && !request.getRef().isEmpty()){
             paramsMap.put("ref", request.getRef());
         }
 
