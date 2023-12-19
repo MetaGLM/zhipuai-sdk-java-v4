@@ -14,6 +14,7 @@ Java），让开发者更便捷的调用智谱开放API
 - 支持returnType参数配置
 - 支持ref参数配置
 - 流式返回内容打印
+- 支持maxToken参数配置
 ## 安装
 
 - 运行环境：JDK1.8+
@@ -22,7 +23,7 @@ Java），让开发者更便捷的调用智谱开放API
         <dependency>
             <groupId>cn.bigmodel.openapi</groupId>
             <artifactId>oapi-java-sdk</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.5</version>
         </dependency>
 ```
 
