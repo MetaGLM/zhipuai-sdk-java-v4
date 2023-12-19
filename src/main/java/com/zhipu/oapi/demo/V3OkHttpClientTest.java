@@ -187,6 +187,8 @@ public class V3OkHttpClientTest {
         //    put("enable",true);
         //    put("search_query","历史");
         //  }});
+        // maxToken设置
+        // modelApiRequest.setMaxTokens(1024);
         ModelApiRequest.Prompt prompt = new ModelApiRequest.Prompt(ModelConstants.roleUser, "tell me something about C Ronaldo in English");
         List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
         prompts.add(prompt);
@@ -222,6 +224,8 @@ public class V3OkHttpClientTest {
         //    put("enable",true);
         //    put("search_query","历史");
         //  }});
+        // maxToken设置
+        // modelApiRequest.setMaxTokens(1024);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         modelApiRequest.setRequestId(requestId);
         return modelApiRequest;
@@ -246,6 +250,8 @@ public class V3OkHttpClientTest {
         //    put("enable",true);
         //    put("search_query","历史");
         //  }});
+        // maxToken设置
+        // modelApiRequest.setMaxTokens(1024);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         modelApiRequest.setRequestId(requestId);
         return modelApiRequest;
