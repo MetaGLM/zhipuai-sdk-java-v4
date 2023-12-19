@@ -28,6 +28,16 @@ public class ModelApiRequest {
     // 用于控制每次返回内容的类型，空或者没有此字段时默认按照json_string返回
     private String returnType;
 
+    private Integer maxTokens;
+
+    public Integer getMaxTokens(){
+        return maxTokens;
+    }
+
+    public void setMaxTokens(Integer maxTokens){
+        this.maxTokens = maxTokens;
+    }
+
     private Map<String, Object> ref;
 
     public Map<String, Object> getRef(){

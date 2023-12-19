@@ -104,6 +104,9 @@ public class ClientV3 {
             if(request.getRef()!=null && !request.getRef().isEmpty()){
                 paramsMap.put("ref", request.getRef());
             }
+            if (request.getMaxTokens() != null && request.getMaxTokens() > 0) {
+                paramsMap.put("max_tokens", request.getMaxTokens());
+            }
             rawReq.setPathParams(pathParams);
             rawReq.setConfigV3(config);
             String token = GlobalTokenManager.getTokenManagerV3().getToken(config);
@@ -149,6 +152,9 @@ public class ClientV3 {
        if(request.getRef()!=null && !request.getRef().isEmpty()){
           paramsMap.put("ref", request.getRef());
        }
+        if (request.getMaxTokens() != null && request.getMaxTokens() > 0) {
+            paramsMap.put("max_tokens", request.getMaxTokens());
+        }
         // sse info
         // TODO: listener放到config更合适
         rawReq.setSseListener(request.getSseListener());
@@ -198,7 +204,9 @@ public class ClientV3 {
         if(request.getRef()!=null && !request.getRef().isEmpty()){
             paramsMap.put("ref", request.getRef());
         }
-
+        if (request.getMaxTokens() != null && request.getMaxTokens() > 0) {
+            paramsMap.put("max_tokens", request.getMaxTokens());
+        }
         rawReq.setBody(paramsMap);
 
 
