@@ -128,7 +128,7 @@ public class ConfigV3 {
 
     public void setApiSecretKey(String apiSecretKey) {
         this.apiSecretKey = apiSecretKey;
-        String[] arrStr = apiSecretKey.split(".");
+        String[] arrStr = apiSecretKey.split("\\.");
         if (arrStr.length != 2) {
             throw new RuntimeException("invalid apiSecretKey");
         }
