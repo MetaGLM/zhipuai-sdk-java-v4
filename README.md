@@ -6,16 +6,7 @@ Java），让开发者更便捷的调用智谱开放API
 ## 简介
 - <font color="red">**java sdk仍在开发测试阶段，有bug请留言联系**</font>
 - 对所有接口进行了类型封装，无需查阅API文档即可完成接入
-- 初始化client并调用成员函数，无需关注http调用过程的各种细节，所见即所得
-- 默认缓存token
-- 支持主流http client实现，已支持apache httpclient、okhttpclient
-- 添加同步调用、去除自定义okhttp sse listener实现（meta解析优化）
-- 修复同步调用500问题
-- 支持returnType参数配置
-- 支持ref参数配置
-- 流式返回内容打印
-- 支持maxToken参数配置
-- 修复apiSecretKey分割bug
+
 ## 安装
 
 - 运行环境：JDK1.8+
@@ -24,7 +15,7 @@ Java），让开发者更便捷的调用智谱开放API
         <dependency>
             <groupId>cn.bigmodel.openapi</groupId>
             <artifactId>oapi-java-sdk</artifactId>
-            <version>1.0.6</version>
+            <version>V4-1.0.0</version>
         </dependency>
 ```
 
@@ -37,10 +28,10 @@ Java），让开发者更便捷的调用智谱开放API
 ### 创建Client
 
 ```
-    //ClientV3 client = new ClientV3.Builder("{Your ApiKey}", "Your ApiSecret")
+    //ClientV4 client = new ClientV4.Builder("{Your ApiKey}", "Your ApiSecret")
     //            .httpTransport(new ApacheHttpClientTransport())// 传输层默认使用okhttpclient，如果需要修改位其他http client（如apache），可以在这里指定。注意apache不支持sse调用
     //            .build();
-    ClientV3 client = new ClientV3.Builder("{Your ApiSecretKey}")
+    ClientV4 client = new ClientV4.Builder("{Your ApiSecretKey}")
                 .httpTransport(new ApacheHttpClientTransport())// 传输层默认使用okhttpclient，如果需要修改位其他http client（如apache），可以在这里指定。注意apache不支持sse调用
                 .build();       
 ```
@@ -48,29 +39,41 @@ Java），让开发者更便捷的调用智谱开放API
 ### sse调用
 ```
         // 建议直接查看demo包代码，这里更新可能不及时
-        ModelApiRequest modelApiRequest = new ModelApiRequest();
-        modelApiRequest.setModelId(Constants.ModelChatGLM6B);
-        modelApiRequest.setInvokeMethod(Constants.invokeMethodSse);
-        // 可自定义sse listener
-        StandardEventSourceListener listener = new StandardEventSourceListener();
-        listener.setIncremental(false);
-        modelApiRequest.setSseListener(listener);
-        modelApiRequest.setIncremental(false);
-        // 构建prompt
-        ModelApiRequest.Prompt prompt = new ModelApiRequest.Prompt(ModelConstants.roleUser, "tell me something about C Ronaldo in English");
-        List<ModelApiRequest.Prompt> prompts = new ArrayList<>();
-        prompts.add(prompt);
-        modelApiRequest.setPrompt(prompts);
-        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
-        modelApiRequest.setRequestId(requestId);
-        
-        ModelApiResponse sseModelApiResp = client.invokeModelApi(sseModelApiRequest);
-        System.out.println(String.format("call model api finished, method: %s", sseModelApiRequest.getInvokeMethod()));
-        System.out.println(String.format("invoke api code: %d", sseModelApiResp.getCode()));
-        System.out.println("model output:");
-        System.out.println(sseModelApiResp.getData().getChoices().get(0).getContent());
-        System.out.println("usage:");
-        String usage = new Gson().toJson(sseModelApiResp.getData().getUsage(), Usage.class);
-        System.out.println(usage);
-        System.out.println("task_id: " + sseModelApiResp.getData().getTaskId());
+         List<ChatMessage> messages = new ArrayList<>();
+         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGPT和你哪个更强大");
+         messages.add(chatMessage);
+         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+         List<ChatTool> chatToolList = new ArrayList<>();
+         ChatTool chatTool = new ChatTool();
+         chatTool.setType(ChatToolType.FUNCTION.value());
+         ChatFunctionParameters chatFunctionParameters = new ChatFunctionParameters();
+         chatFunctionParameters.setType("object");
+         Map<String,Object> properties = new HashMap<>();
+         properties.put("location",new HashMap<String,Object>(){{
+             put("type","string");
+             put("description","城市，如：北京");
+         }});
+         properties.put("unit",new HashMap<String,Object>(){{
+             put("type","string");
+             put("enum",new ArrayList<String>(){{add("celsius");add("fahrenheit");}});
+         }});
+         chatFunctionParameters.setProperties(properties);
+         ChatFunction chatFunction = ChatFunction.builder()
+                 .name("get_weather")
+                 .description("Get the current weather of a location")
+                 .parameters(chatFunctionParameters)
+                 .build();
+         chatTool.setFunction(chatFunction);
+         chatToolList.add(chatTool);
+
+         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                 .model(Constants.ModelChatGLM4)
+                 .stream(Boolean.TRUE)
+                 .messages(messages)
+                 .requestId(requestId)
+                 .tools(chatToolList)
+                 .toolChoice("auto")
+                 .build();
+         ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+         System.out.println("model output:"+ JSON.toJSONString(sseModelApiResp))
 ```

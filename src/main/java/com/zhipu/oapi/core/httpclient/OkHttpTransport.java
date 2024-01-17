@@ -5,19 +5,22 @@ import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.core.request.RawRequest;
 import com.zhipu.oapi.core.response.RawResponse;
 import com.zhipu.oapi.service.TaskStatus;
-import com.zhipu.oapi.service.v3.Choice;
-import com.zhipu.oapi.service.v3.ModelApiResponse;
-import com.zhipu.oapi.service.v3.ModelConstants;
-import com.zhipu.oapi.service.v3.SseMeta;
+import com.zhipu.oapi.service.v4.ChatApiService;
+import com.zhipu.oapi.service.v4.ChatMessageAccumulator;
+import com.zhipu.oapi.service.v4.Choice;
+import com.zhipu.oapi.service.v4.ModelData;
+import io.reactivex.Flowable;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import okhttp3.internal.sse.RealEventSource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+
+@Slf4j
 public class OkHttpTransport extends BaseHttpTransport {
 
     private OkHttpClient okHttpClient;
@@ -64,6 +67,8 @@ public class OkHttpTransport extends BaseHttpTransport {
         return resp;
     }
 
+
+
     /**
      * sse调用只会返回输出结果
      * @param request
@@ -72,50 +77,47 @@ public class OkHttpTransport extends BaseHttpTransport {
      */
     @Override
     public RawResponse sseExecute(RawRequest request) throws Exception {
-
-        // headers
-        String token = request.getToken();
-        Map<String, String> headers = new HashMap<>();
-        headers.put(Constants.authHeaderKey, token);
-        headers.put(Constants.CONTENT_TYPE, Constants.JSON_CONTENT_TYPE);
-        headers.put(Constants.USER_AGENT, Constants.DEFAULT_USER_AGENT);
-        headers.put(Constants.ACCEPT, Constants.SSE_CONTENT_TYPE);
-        // url
-        String url = request.getReqUrl();
-        // body
-        Map<String, Object> body = request.getBody();
-        String reqBodyStr = new Gson().toJson(body);
-        RequestBody formBody = RequestBody.create(Constants.jsonMediaType, reqBodyStr);
-        // connect sse
-        Request okHttpReq = new Request.Builder()
-                .url(url)
-                .post(formBody)
-                .headers(Headers.of(headers))
-                .build();
-        RealEventSource eventSource = new RealEventSource(okHttpReq, request.getSseListener());
-        eventSource.connect(okHttpClient);
-        CountDownLatch countDownLatch=request.getSseListener().getCountDownLatch();
-        countDownLatch.await();
-        // get result
-        String output = request.getSseListener().getOutputText();
+        ChatApiService service = new ChatApiService(request.getToken());
         RawResponse resp = new RawResponse();
+        Flowable<ModelData> flowable;
+        Map<String, Object> data = new HashMap<>();
+        data.put("request_id", request.getBody().get("request_id"));
+        try {
+            flowable = service.streamChatCompletion(request.getBody());
+        } catch (Exception e) {
+            System.out.println("streamChatCompletion error:" + e.getMessage());
+            resp.setStatusCode(500);
+            resp.setSuccess(false);
+            data.put("task_status", TaskStatus.FAIL);
+            resp.setBody(new Gson().toJson(data));
+            return resp;
+        }
+        AtomicBoolean isFirst = new AtomicBoolean(true);
+        ChatMessageAccumulator chatMessageAccumulator = service.mapStreamToAccumulator(flowable)
+                .doOnNext(accumulator -> {
+                    {
+                        if (isFirst.getAndSet(false)) {
+                            System.out.print("Response: ");
+                        }
+                        if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
+                            System.out.print(accumulator.getDelta().getContent());
+                        }
+                    }
+                })
+                .doOnComplete(System.out::println)
+                .lastElement()
+                .blockingGet();
         resp.setSuccess(true);
         resp.setStatusCode(200);
-        Map<String, Object> data = new HashMap<>();
-        Choice choice = new Choice(ModelConstants.roleUser, output);
+        Choice choice = new Choice("stop", 0L, chatMessageAccumulator.getDelta());
         List<Choice> choices = new ArrayList<>();
         choices.add(choice);
         data.put("choices", choices);
         data.put("task_status", TaskStatus.SUCCESS);
-        // get meta
-        SseMeta meta = request.getSseListener().getMeta();
-        if (meta != null) {
-            data.put("request_id", meta.getRequestId());
-            data.put("task_id", meta.getTaskId());
-            data.put("usage", meta.getUsage());
-        }
-
+        data.put("usage", chatMessageAccumulator.getUsage());
         resp.setBody(new Gson().toJson(data));
         return resp;
     }
+
+
 }

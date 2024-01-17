@@ -1,5 +1,7 @@
 package com.zhipu.oapi.core.httpclient;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.core.response.RawResponse;
@@ -16,16 +18,14 @@ public abstract class BaseHttpTransport implements IHttpTransport{
 
     protected RawResponse extractResp(Map<String, Object> resultMap) {
         RawResponse resp = new RawResponse();
-        Double code = (Double) resultMap.get(Constants.resultKeyStatusCode);
-        resp.setStatusCode(code.intValue());
-        if (code.intValue() == 200) {
-            Gson gson = new Gson();
-            String data = gson.toJson(resultMap.get("data"));
-            resp.setBody(data);
+        if (!resultMap.containsKey(Constants.resultKeyError)) {
+            resp.setBody(JSON.toJSONString(resultMap));
+            resp.setStatusCode(200);
             resp.setSuccess(true);
         } else {
-            String msg = (String) resultMap.get(Constants.resultKeyMsg);
-            resp.setMsg(msg);
+            Map<String,Object> error = (Map) resultMap.get(Constants.resultKeyError);
+            resp.setMsg(error.get("message").toString());
+            resp.setStatusCode(Integer.parseInt(error.get("code").toString()));
             resp.setSuccess(false);
         }
         return resp;

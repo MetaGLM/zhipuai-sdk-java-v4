@@ -3,10 +3,7 @@ package com.zhipu.oapi.core.request;
 import java.util.*;
 
 import com.zhipu.oapi.core.Config;
-import com.zhipu.oapi.core.ConfigV3;
-import com.zhipu.oapi.service.v3.ModelEventSourceListener;
 import com.zhipu.oapi.utils.StringUtils;
-import okhttp3.sse.EventSourceListener;
 
 public class RawRequest {
     private int statusCode;
@@ -17,10 +14,10 @@ public class RawRequest {
     private String reqUrl;
     private String httpMethod;
     private Config config;
-    private ConfigV3 configV3;
+
     private String token;
     private Map<String, String> pathParams = new HashMap<>();
-    private ModelEventSourceListener sseListener;
+
 
     public int getStatusCode() {
         return statusCode;
@@ -95,13 +92,6 @@ public class RawRequest {
         this.config = config;
     }
 
-    public ConfigV3 getConfigV3() {
-        return configV3;
-    }
-
-    public void setConfigV3(ConfigV3 configV3) {
-        this.configV3 = configV3;
-    }
 
     public String getToken() {
         return token;
@@ -119,11 +109,4 @@ public class RawRequest {
         this.pathParams = pathParams;
     }
 
-    public ModelEventSourceListener getSseListener() {
-        return sseListener;
-    }
-
-    public void setSseListener(ModelEventSourceListener sseListener) {
-        this.sseListener = sseListener;
-    }
 }
