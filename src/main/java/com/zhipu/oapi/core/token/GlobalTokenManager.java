@@ -15,14 +15,17 @@ public class GlobalTokenManager {
         globalTokenManager = tokenManager;
     }
 
-    // v3 token
-    private static volatile TokenManagerV3 globalTokenManagerV3 = new TokenManagerV3(
+
+
+    private static volatile TokenManagerV4 globalTokenManagerV4 = new TokenManagerV4(
             LocalCache.getInstance());
 
-    public static TokenManagerV3 getTokenManagerV3() {
-        return globalTokenManagerV3;
+
+
+    public static TokenManagerV4 getTokenManagerV4() {
+        return globalTokenManagerV4;
     }
 
-    public static void setTokenManager(TokenManagerV3 tokenManager) {
-        globalTokenManagerV3 = tokenManager;
+    public static void setTokenManager(TokenManagerV4 tokenManager) {
+        globalTokenManagerV4 = tokenManager;
     }}
