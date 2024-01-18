@@ -10,6 +10,10 @@ import java.util.Map;
 
 public class ApiTokenUtil {
 
+    public static void main(String[] args) {
+        System.out.println(generateClientToken("120dd8b9ce50a9dd7b0583909dd49822.N3VMdpTH7RqkHIFT"));
+    }
+
     public static String generateClientToken(String apikey) {
         String[] apiKeyParts = apikey.split("\\.");
         String api_key = apiKeyParts[0];
@@ -61,8 +65,5 @@ public class ApiTokenUtil {
         return token;
     }
 
-    public static void main(String[] args) {
-        System.out.println(generateClientToken("120dd8b9ce50a9dd7b0583909dd49822.N3VMdpTH7RqkHIFT"));
-//        System.out.println(generateClientPartnerToken("b15d9625baaca11f0227f29b2117d86f.gIF50rW4eNK170T1"));
-    }
+
 }

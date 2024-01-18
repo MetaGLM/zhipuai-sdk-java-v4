@@ -5,18 +5,20 @@ import com.google.gson.Gson;
 import com.zhipu.oapi.core.ConfigV4;
 import com.zhipu.oapi.core.cache.ICache;
 import com.zhipu.oapi.core.cache.LocalCache;
-import com.zhipu.oapi.core.httpclient.IHttpTransport;
 import com.zhipu.oapi.core.httpclient.OkHttpTransport;
 import com.zhipu.oapi.core.request.RawRequest;
 import com.zhipu.oapi.core.response.RawResponse;
 import com.zhipu.oapi.core.token.GlobalTokenManager;
 import com.zhipu.oapi.core.token.TokenManager;
-import com.zhipu.oapi.service.TaskStatus;
-import com.zhipu.oapi.service.v4.*;
-import com.zhipu.oapi.service.v4.ChatApiService;
-import com.zhipu.oapi.service.v4.ChatCompletionAsyncResult;
-import com.zhipu.oapi.service.v4.ChatCompletionRequest;
-import com.zhipu.oapi.service.v4.ChatCompletionResult;
+import com.zhipu.oapi.service.v4.model.*;
+import com.zhipu.oapi.service.v4.api.ChatApiService;
+import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
+import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
+import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
+import com.zhipu.oapi.service.v4.file.*;
+import com.zhipu.oapi.service.v4.image.CreateImageRequest;
+import com.zhipu.oapi.service.v4.image.ImageApiResponse;
+import com.zhipu.oapi.service.v4.image.ImageResult;
 import com.zhipu.oapi.utils.OkHttps;
 import com.zhipu.oapi.utils.StringUtils;
 import org.slf4j.Logger;
@@ -73,6 +75,8 @@ public class ClientV4 {
         paramsMap.put("tool_choice", request.getToolChoice());
         paramsMap.put("temperature", request.getTemperature());
         paramsMap.put("top_p", request.getTopP());
+        paramsMap.put("sensitive_word_check", request.getSensitiveWordCheck());
+        paramsMap.put("do_sample", request.getDoSample());
         rawReq.setBody(paramsMap);
         // token
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
@@ -104,6 +108,8 @@ public class ClientV4 {
         paramsMap.put("tool_choice", request.getToolChoice());
         paramsMap.put("temperature", request.getTemperature());
         paramsMap.put("top_p", request.getTopP());
+        paramsMap.put("sensitive_word_check", request.getSensitiveWordCheck());
+        paramsMap.put("do_sample", request.getDoSample());
         // token
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
         ChatApiService service = new ChatApiService(token);
@@ -138,6 +144,8 @@ public class ClientV4 {
         paramsMap.put("tool_choice", request.getToolChoice());
         paramsMap.put("temperature", request.getTemperature());
         paramsMap.put("top_p", request.getTopP());
+        paramsMap.put("sensitive_word_check", request.getSensitiveWordCheck());
+        paramsMap.put("do_sample", request.getDoSample());
         rawReq.setBody(paramsMap);
         // token
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
@@ -186,6 +194,30 @@ public class ClientV4 {
         return resp;
     }
 
+    public ImageApiResponse createImage(CreateImageRequest createImageRequest) {
+        ImageApiResponse imageApiResponse = new ImageApiResponse();
+        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService chatApiService = new ChatApiService(token);
+        Map<String, Object> request = new HashMap<>();
+        request.put("prompt", createImageRequest.getPrompt());
+        request.put("model", createImageRequest.getModel());
+        try {
+            ImageResult image = chatApiService.createImage(request);
+            if (image != null) {
+                imageApiResponse.setMsg("调用成功");
+                imageApiResponse.setCode(200);
+                imageApiResponse.setSuccess(true);
+                imageApiResponse.setData(image);
+            }
+        } catch (Exception e) {
+            logger.error("createImageResult:", e);
+            imageApiResponse.setCode(500);
+            imageApiResponse.setSuccess(false);
+            imageApiResponse.setMsg("调用失败，异常:" + e.getMessage());
+        }
+        return imageApiResponse;
+    }
+
     private String validateParams(ChatCompletionRequest request) {
         if (request == null) {
             return "request can not be null";
@@ -200,6 +232,67 @@ public class ClientV4 {
             return "model can not be empty";
         }
         return null;
+    }
+
+    public EmbeddingApiResponse invokeEmbeddingsApi(EmbeddingRequest embeddingRequest) {
+        EmbeddingApiResponse embeddingApiResponse = new EmbeddingApiResponse();
+        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(token);
+        try {
+            EmbeddingResult embeddingResult = service.createEmbeddings(embeddingRequest);
+            if (embeddingResult != null) {
+                embeddingApiResponse.setCode(200);
+                embeddingApiResponse.setMsg("调用成功");
+                embeddingApiResponse.setSuccess(true);
+                embeddingApiResponse.setData(embeddingResult);
+            }
+        } catch (Exception e) {
+            logger.error("createEmbeddings:", e);
+            embeddingApiResponse.setCode(500);
+            embeddingApiResponse.setSuccess(false);
+            embeddingApiResponse.setMsg("调用失败，异常:" + e.getMessage());
+        }
+        return embeddingApiResponse;
+    }
+
+    public FileApiResponse invokeUploadFileApi(String purpose, String filePath) {
+        FileApiResponse fileApiResponse = new FileApiResponse();
+        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(token);
+        try {
+            File file = service.uploadFile(purpose, filePath);
+            if (file != null) {
+                fileApiResponse.setCode(500);
+                fileApiResponse.setSuccess(false);
+                fileApiResponse.setMsg("调用成功");
+                fileApiResponse.setData(file);
+            }
+        } catch (Exception e) {
+            fileApiResponse.setCode(500);
+            fileApiResponse.setSuccess(false);
+            fileApiResponse.setMsg("调用失败,异常:" + e.getMessage());
+        }
+        return fileApiResponse;
+    }
+
+    public QueryFileApiResponse queryFilesApi(QueryFilesRequest queryFilesRequest) {
+        QueryFileApiResponse queryFileApiResponse = new QueryFileApiResponse();
+        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(token);
+        try {
+            QueryFileResult queryFileResult = service.queryFileList(queryFilesRequest);
+            if(queryFileResult!=null){
+                queryFileApiResponse.setCode(500);
+                queryFileApiResponse.setSuccess(false);
+                queryFileApiResponse.setMsg("调用成功");
+                queryFileApiResponse.setData(queryFileResult);
+            }
+        } catch (Exception e) {
+            queryFileApiResponse.setCode(500);
+            queryFileApiResponse.setSuccess(false);
+            queryFileApiResponse.setMsg("调用失败,异常:" + e.getMessage());
+        }
+        return queryFileApiResponse;
     }
 
     public static final class Builder {
@@ -231,10 +324,6 @@ public class ClientV4 {
             return this;
         }
 
-        public Builder httpTransport(IHttpTransport httpTransport) {
-            config.setHttpTransport(httpTransport);
-            return this;
-        }
 
         public Builder devMode(boolean devMode) {
             config.setDevMode(devMode);
@@ -277,7 +366,6 @@ public class ClientV4 {
     public void setConfig(ConfigV4 config) {
         this.config = config;
     }
-
 
 
 }
