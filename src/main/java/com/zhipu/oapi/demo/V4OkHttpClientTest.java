@@ -3,59 +3,150 @@ package com.zhipu.oapi.demo;
 import com.alibaba.fastjson.JSON;
 import com.zhipu.oapi.ClientV4;
 import com.zhipu.oapi.Constants;
-import com.zhipu.oapi.core.httpclient.OkHttpTransport;
-import com.zhipu.oapi.service.v4.*;
-import okhttp3.OkHttpClient;
+import com.zhipu.oapi.service.v4.model.*;
+import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
+import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
+import com.zhipu.oapi.service.v4.file.FileApiResponse;
+import com.zhipu.oapi.service.v4.file.QueryFileApiResponse;
+import com.zhipu.oapi.service.v4.file.QueryFilesRequest;
+import com.zhipu.oapi.service.v4.image.CreateImageRequest;
+import com.zhipu.oapi.service.v4.image.ImageApiResponse;
 
-import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 
 
 public class V4OkHttpClientTest {
 
-
-
-    // 请先填写自己的apiKey再调用demo查看效果
-    public static OkHttpClient getInstance() {
-        OkHttpClient okHttpClient=new OkHttpClient.Builder()//构建器
-                .proxy(Proxy.NO_PROXY) //来屏蔽系统代理
-                .retryOnConnectionFailure(true)
-                .connectTimeout(300, TimeUnit.SECONDS)//连接超时
-                .writeTimeout(300, TimeUnit.SECONDS)//写入超时
-                .readTimeout(300, TimeUnit.SECONDS)//读取超时
-                .build();
-        okHttpClient.dispatcher().setMaxRequestsPerHost(200); //设置最大并发请求数，避免等待延迟
-        okHttpClient.dispatcher().setMaxRequests(200);
-        return okHttpClient;
-    }
-
-    private static ClientV4 client = new ClientV4.Builder(TestConstants.onlineKeyV3, TestConstants.onlineSecretV3)
-        .httpTransport(new OkHttpTransport(getInstance()))
-        //.devMode(true)
-        .build();
+    private static final ClientV4 client = new ClientV4.Builder(Constants.onlineKeyV3, Constants.onlineSecretV3).build();
 
     // 请自定义自己的业务id
     private static final String requestIdTemplate = "mycompany-%d";
 
     public static void main(String[] args) throws Exception {
         System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
-
         // 1. sse-invoke调用模型，使用标准Listener，直接返回结果
-        testSseInvoke();
+//        testSseInvoke();
 
         // 2. invoke调用模型,直接返回结果
-          testInvoke();
+//          testInvoke();
 
         // 3. 异步调用
 //         String taskId = testAsyncInvoke();
         // 4.异步查询
-         testQueryResult("559916980273155058305988497333548975");
+//         testQueryResult("559916980273155058305988497333548975");
 
+         // 5.文生图
+//          testCreateImage();
+
+        // 6. 图生文
+//          testImageToWord();
+
+        // 7. 向量模型
+//          testEmbeddings();
+
+        // 8.微调-上传微调数据集
+//          testUploadFile();
+
+        // 9.微调-查询上传文件列表
+//          testQueryUploadFileList();
+
+        // 10.微调-创建微调任务事件
+//          testCreateFineTuningJob();
+
+        // 11.微调-查询微调任务
+//          testQueryFineTuningJobs();
+
+        // 12.微调-查询个人微调任务
+//          testQueryFineTuningJobs();
+
+        // 13.微调-调用微调模型（参考模型调用接口，并替换成要调用模型的编码model）
+    }
+
+    /**
+     * 查询微调任务
+     */
+    private static void testQueryFineTuningJobs() {
+
+    }
+
+    /**
+     * 创建微调任务
+     */
+    private static void testCreateFineTuningJob() {
+
+    }
+
+    /**
+     * 微调文件上传列表查询
+     */
+    private static void testQueryUploadFileList() {
+      QueryFilesRequest queryFilesRequest = new QueryFilesRequest();
+      QueryFileApiResponse queryFileApiResponse = client.queryFilesApi(queryFilesRequest);
+      System.out.println("model output:"+ JSON.toJSONString(queryFileApiResponse));
+    }
+
+
+    /**
+     * 微调上传数据集
+     */
+    private static void testUploadFile() {
+        String filePath = "/Users/wujianguo/Downloads/transaction-data.jsonl";
+        String purpose = "fine-tune";
+        FileApiResponse fileApiResponse = client.invokeUploadFileApi(purpose,filePath);
+        System.out.println("model output:"+JSON.toJSONString(fileApiResponse));
+    }
+
+    private static void testEmbeddings() {
+        EmbeddingRequest embeddingRequest = new EmbeddingRequest();
+        embeddingRequest.setInput("hello world");
+        embeddingRequest.setModel(Constants.ModelEmbedding2);
+        EmbeddingApiResponse apiResponse = client.invokeEmbeddingsApi(embeddingRequest);
+        System.out.println("model output:"+JSON.toJSONString(apiResponse));
+    }
+
+    /**
+     * 图生文
+     */
+    private static void testImageToWord() {
+        List<ChatMessage> messages = new ArrayList<>();
+        List<Map<String,Object>> contentList = new ArrayList<>();
+        Map<String,Object> textMap = new HashMap<>();
+        textMap.put("type","text");
+        textMap.put("text","图里有什么");
+        Map<String,Object> typeMap = new HashMap<>();
+        typeMap.put("type","image_url");
+        Map<String,Object> urlMap = new HashMap<>();
+        urlMap.put("url","https://cdn.bigmodel.cn/enterpriseAc/3f328152-e15c-420c-803d-6684a9f551df.jpeg?attname=24.jpeg");
+        typeMap.put("image_url",urlMap);
+        contentList.add(textMap);
+        contentList.add(typeMap);
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), contentList);
+        messages.add(chatMessage);
+        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+
+
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                .model(Constants.ModelChatGLM4V)
+                .stream(Boolean.FALSE)
+                .invokeMethod(Constants.invokeMethod)
+                .messages(messages)
+                .requestId(requestId)
+                .build();
+        ModelApiResponse modelApiResponse = client.invokeModelApi(chatCompletionRequest);
+        System.out.println("model output:"+ JSON.toJSONString(modelApiResponse));
+
+    }
+
+    private static void testCreateImage() {
+        CreateImageRequest createImageRequest = new CreateImageRequest();
+        createImageRequest.setModel(Constants.ModelCogView);
+        createImageRequest.setPrompt("画一个温顺可爱的小狗");
+        ImageApiResponse imageApiResponse = client.createImage(createImageRequest);
+        System.out.println("imageApiResponse:"+JSON.toJSONString(imageApiResponse));
     }
 
 
@@ -67,6 +158,7 @@ public class V4OkHttpClientTest {
          ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGPT和你哪个更强大");
          messages.add(chatMessage);
          String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+         // 函数调用参数构建部分
          List<ChatTool> chatToolList = new ArrayList<>();
          ChatTool chatTool = new ChatTool();
          chatTool.setType(ChatToolType.FUNCTION.value());
@@ -111,6 +203,7 @@ public class V4OkHttpClientTest {
         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGPT和你哪个更强大");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+        // 函数调用参数构建部分
         List<ChatTool> chatToolList = new ArrayList<>();
         ChatTool chatTool = new ChatTool();
         chatTool.setType(ChatToolType.FUNCTION.value());
@@ -156,6 +249,7 @@ public class V4OkHttpClientTest {
         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGPT和你哪个更强大");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+        // 函数调用参数构建部分
         List<ChatTool> chatToolList = new ArrayList<>();
         ChatTool chatTool = new ChatTool();
         chatTool.setType(ChatToolType.FUNCTION.value());

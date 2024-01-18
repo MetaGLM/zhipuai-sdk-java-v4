@@ -6,6 +6,14 @@ public class Constants {
 
     public static final String ModelChatGLM4 = "GLM-4";
 
+    public static final String ModelCogView = "cogview";
+
+    public static final String ModelChatGLM4V = "glm-4v";
+
+    public static final String ModelEmbedding2 = "embedding-2";
+
+    public static final String ModelChatGLM3TURBO= "glm-3-turbo";
+
     // invoke methods
     public static final String invokeMethodAsync = "async-invoke";
     public static final String invokeMethodSse = "sse-invoke";
@@ -31,4 +39,9 @@ public class Constants {
     public static final String RETURN_TYPE_JSON = "json_string";
     // 返回原始对文本内容
     public static final String RETURN_TYPE_TEXT = "text";
+
+    public static final String onlineKeyV3 = "120dd8b9ce50a9dd7b0583909dd49822";
+
+    public static final String onlineSecretV3 = "N3VMdpTH7RqkHIFT";
+
 }
