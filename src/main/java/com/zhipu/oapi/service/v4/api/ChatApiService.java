@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.zhipu.oapi.service.v4.fine_turning.FineTuningEvent;
+import com.zhipu.oapi.service.v4.fine_turning.FineTuningJob;
+import com.zhipu.oapi.service.v4.fine_turning.FineTuningJobRequest;
+import com.zhipu.oapi.service.v4.fine_turning.PersonalFineTuningJob;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
@@ -21,6 +25,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 public class ChatApiService {
 
     private static final String BASE_URL = "https://open.bigmodel.cn/";
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(10);
+    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);
     private static final ObjectMapper mapper = defaultObjectMapper();
 
     private final ChatApi api;
@@ -101,6 +106,20 @@ public class ChatApiService {
         return execute(api.queryFileList(queryFilesRequest.getAfter(),queryFilesRequest.getPurpose(),queryFilesRequest.getOrder(),queryFilesRequest.getLimit()));
     }
 
+
+    public FineTuningEvent listFineTuningJobEvents(String fineTuningJobId) {
+        return execute(api.listFineTuningJobEvents(fineTuningJobId));
+    }
+
+    public FineTuningJob retrieveFineTuningJob(String fineTuningJobId) {
+        return execute(api.retrieveFineTuningJob(fineTuningJobId));
+    }
+
+
+    public PersonalFineTuningJob queryPersonalFineTuningJobs(Integer limit,String after) {
+        return execute(api.queryPersonalFineTuningJobs(limit,after));
+    }
+
     public ChatCompletionResult queryAsyncResult(String id) {
         return execute(api.queryAsyncResult(id));
     }
@@ -118,6 +137,11 @@ public class ChatApiService {
 
     public ImageResult createImage(Map<String,Object> request) {
         return execute(api.createImage(request));
+    }
+
+
+    public FineTuningJob createFineTuningJob(FineTuningJobRequest request) {
+        return execute(api.createFineTuningJob(request));
     }
 
     private Flowable<ModelData> stream(retrofit2.Call<ResponseBody> apiCall, Class<ModelData> cl) {

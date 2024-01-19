@@ -1,6 +1,10 @@
 package com.zhipu.oapi.service.v4.api;
 
 
+import com.zhipu.oapi.service.v4.fine_turning.FineTuningEvent;
+import com.zhipu.oapi.service.v4.fine_turning.FineTuningJob;
+import com.zhipu.oapi.service.v4.fine_turning.FineTuningJobRequest;
+import com.zhipu.oapi.service.v4.fine_turning.PersonalFineTuningJob;
 import com.zhipu.oapi.service.v4.model.ChatCompletionAsyncResult;
 import com.zhipu.oapi.service.v4.model.ChatCompletionResult;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
@@ -53,6 +57,22 @@ public interface ChatApi {
     @GET("/api/paas/v4/files")
     Single<QueryFileResult> queryFileList(@Query("after") String after
             , @Query("purpose") String purpose,@Query("order") String order,@Query("limit") Integer limit);
+
+
+    @POST("/api/paas/v4/fine_tuning/jobs")
+    Single<FineTuningJob> createFineTuningJob(@Body FineTuningJobRequest request);
+
+    @GET("/api/paas/v4/fine_tuning/jobs/{fine_tuning_job_id}/events")
+    Single<FineTuningEvent> listFineTuningJobEvents(@Path("fine_tuning_job_id") String fineTuningJobId);
+
+    @GET("/api/paas/v4/fine_tuning/jobs/{fine_tuning_job_id}")
+    Single<FineTuningJob> retrieveFineTuningJob(@Path("fine_tuning_job_id") String fineTuningJobId);
+
+
+    @GET("/api/paas/v4/fine_tuning/jobs")
+    Single<PersonalFineTuningJob> queryPersonalFineTuningJobs(@Query("limit") Integer limit
+            , @Query("after") String after);
+
 }
 
 

@@ -3,6 +3,7 @@ package com.zhipu.oapi.demo;
 import com.alibaba.fastjson.JSON;
 import com.zhipu.oapi.ClientV4;
 import com.zhipu.oapi.Constants;
+import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
@@ -54,30 +55,55 @@ public class V4OkHttpClientTest {
         // 9.微调-查询上传文件列表
 //          testQueryUploadFileList();
 
-        // 10.微调-创建微调任务事件
+        // 10.微调-创建微调任务
 //          testCreateFineTuningJob();
 
-        // 11.微调-查询微调任务
-//          testQueryFineTuningJobs();
+        // 11.微调-查询微调任务事件
+//          testQueryFineTuningJobsEvents();
 
-        // 12.微调-查询个人微调任务
-//          testQueryFineTuningJobs();
+        // 12.微调-查询微调任务
+//        testRetrieveFineTuningJobs();
 
-        // 13.微调-调用微调模型（参考模型调用接口，并替换成要调用模型的编码model）
+        // 13.微调-查询个人微调任务
+//          testQueryPersonalFineTuningJobs();
+
+        // 14.微调-调用微调模型（参考模型调用接口，并替换成要调用模型的编码model）
+    }
+
+    private static void testQueryPersonalFineTuningJobs() {
+        QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest = new QueryPersonalFineTuningJobRequest();
+        queryPersonalFineTuningJobRequest.setLimit(1);
+        QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = client.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest);
+        System.out.println("model output:"+JSON.toJSONString(queryPersonalFineTuningJobApiResponse));
+
+    }
+
+    private static void testQueryFineTuningJobsEvents() {
+       String fineTuningJobId  = "ftjob-20240119114544390-zkgjb";
+       QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = client.queryFineTuningJobsEvents(fineTuningJobId);
+       System.out.println("model output:"+JSON.toJSONString(queryFineTuningEventApiResponse));
     }
 
     /**
      * 查询微调任务
      */
-    private static void testQueryFineTuningJobs() {
-
+    private static void testRetrieveFineTuningJobs() {
+        String fineTuningJobId  = "ftjob-20240119114544390-zkgjb";
+        QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.retrieveFineTuningJobs(fineTuningJobId);
+        System.out.println("model output:"+JSON.toJSONString(queryFineTuningJobApiResponse));
     }
 
     /**
      * 创建微调任务
      */
     private static void testCreateFineTuningJob() {
-
+        FineTuningJobRequest request = new FineTuningJobRequest();
+        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+        request.setRequestId(requestId);
+        request.setModel("chatglm3-6b");
+        request.setTraining_file("file-20240118082608327-kp8qr");
+        CreateFineTuningJobApiResponse createFineTuningJobApiResponse = client.createFineTuningJob(request);
+        System.out.println("model output:" + JSON.toJSONString(createFineTuningJobApiResponse));
     }
 
     /**

@@ -35,10 +35,6 @@ public class Constants {
     public static final String resultKeyError = "error";
     public static final String resultKeySuccess = "success";
     public static final String resultKeyData = "data";
-    // 返回标准对JSON字符串
-    public static final String RETURN_TYPE_JSON = "json_string";
-    // 返回原始对文本内容
-    public static final String RETURN_TYPE_TEXT = "text";
 
     public static final String onlineKeyV3 = "120dd8b9ce50a9dd7b0583909dd49822";
 
