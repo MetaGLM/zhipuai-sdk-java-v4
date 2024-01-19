@@ -10,6 +10,7 @@ import com.zhipu.oapi.core.request.RawRequest;
 import com.zhipu.oapi.core.response.RawResponse;
 import com.zhipu.oapi.core.token.GlobalTokenManager;
 import com.zhipu.oapi.core.token.TokenManager;
+import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.api.ChatApiService;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
@@ -294,6 +295,89 @@ public class ClientV4 {
         }
         return queryFileApiResponse;
     }
+
+    public CreateFineTuningJobApiResponse createFineTuningJob(FineTuningJobRequest request) {
+        CreateFineTuningJobApiResponse createFineTuningJobApiResponse = new CreateFineTuningJobApiResponse();
+        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(token);
+        FineTuningJob fineTuningJob = null;
+        try {
+            fineTuningJob = service.createFineTuningJob(request);
+            if(fineTuningJob!=null){
+                createFineTuningJobApiResponse.setMsg("调用成功");
+                createFineTuningJobApiResponse.setData(fineTuningJob);
+                createFineTuningJobApiResponse.setSuccess(true);
+                createFineTuningJobApiResponse.setCode(200);
+            }
+        } catch (Exception e) {
+            createFineTuningJobApiResponse.setCode(500);
+            createFineTuningJobApiResponse.setSuccess(false);
+            createFineTuningJobApiResponse.setMsg("调用失败，异常:"+e.getMessage());
+        }
+        return createFineTuningJobApiResponse;
+    }
+
+    public QueryFineTuningEventApiResponse queryFineTuningJobsEvents(String fineTuningJobId) {
+        QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = new QueryFineTuningEventApiResponse();
+        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(token);
+        try {
+            FineTuningEvent fineTuningEvent = service.listFineTuningJobEvents(fineTuningJobId);
+            if(fineTuningEvent!=null){
+                queryFineTuningEventApiResponse.setSuccess(true);
+                queryFineTuningEventApiResponse.setData(fineTuningEvent);
+                queryFineTuningEventApiResponse.setCode(200);
+                queryFineTuningEventApiResponse.setMsg("调用成功");
+            }
+        } catch (Exception e) {
+            queryFineTuningEventApiResponse.setCode(500);
+            queryFineTuningEventApiResponse.setMsg("调用失败，异常:"+e.getMessage());
+            queryFineTuningEventApiResponse.setSuccess(false);
+        }
+        return queryFineTuningEventApiResponse;
+    }
+
+    public QueryFineTuningJobApiResponse retrieveFineTuningJobs(String fineTuningJobId) {
+        QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = new QueryFineTuningJobApiResponse();
+        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(token);
+        try {
+            FineTuningJob fineTuningJob = service.retrieveFineTuningJob(fineTuningJobId);
+            if(fineTuningJob!=null){
+                queryFineTuningJobApiResponse.setSuccess(true);
+                queryFineTuningJobApiResponse.setData(fineTuningJob);
+                queryFineTuningJobApiResponse.setCode(200);
+                queryFineTuningJobApiResponse.setMsg("调用成功");
+            }
+        } catch (Exception e) {
+            queryFineTuningJobApiResponse.setCode(500);
+            queryFineTuningJobApiResponse.setMsg("调用失败，异常:"+e.getMessage());
+            queryFineTuningJobApiResponse.setSuccess(false);
+        }
+
+        return queryFineTuningJobApiResponse;
+    }
+
+    public QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobs(QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest) {
+        QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = new QueryPersonalFineTuningJobApiResponse();
+        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(token);
+        try {
+            PersonalFineTuningJob personalFineTuningJob = service.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest.getLimit(), queryPersonalFineTuningJobRequest.getAfter());
+            if(personalFineTuningJob!=null){
+                queryPersonalFineTuningJobApiResponse.setSuccess(true);
+                queryPersonalFineTuningJobApiResponse.setData(personalFineTuningJob);
+                queryPersonalFineTuningJobApiResponse.setMsg("调用成功");
+                queryPersonalFineTuningJobApiResponse.setCode(200);
+            }
+        } catch (Exception e) {
+            queryPersonalFineTuningJobApiResponse.setCode(500);
+            queryPersonalFineTuningJobApiResponse.setMsg("调用失败,异常:"+e.getMessage());
+            queryPersonalFineTuningJobApiResponse.setSuccess(false);
+        }
+        return queryPersonalFineTuningJobApiResponse;
+    }
+
 
     public static final class Builder {
         private ConfigV4 config = new ConfigV4();
