@@ -9,8 +9,6 @@ import java.util.Map;
 /**
  * Log probabilities of different token options
  * Returned if { } is greater than zero
- *
- * https://beta.openai.com/docs/api-reference/create-completion
  */
 @Data
 public class LogProbResult {

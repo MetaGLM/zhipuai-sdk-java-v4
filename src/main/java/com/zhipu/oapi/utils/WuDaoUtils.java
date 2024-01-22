@@ -32,6 +32,12 @@ public class WuDaoUtils {
 		return resultMap;
 	}
 
+	public static void main(String[] args) {
+		String timestamp = String.valueOf(System.currentTimeMillis());
+		String encrypt = RSAUtil.encrypt(timestamp, "c21lEFUg1MxMKpJp");
+		System.out.println(encrypt);
+	}
+
 	/**
 	 * 引擎请求
 	 *

@@ -6,8 +6,6 @@ import java.util.List;
 
 /**
  * Creates an embedding vector representing the input text.
- *
- * https://beta.openai.com/docs/api-reference/embeddings/create
  */
 @Builder
 @NoArgsConstructor
@@ -33,7 +31,7 @@ public class EmbeddingRequest {
     String input;
 
     /**
-     * A unique identifier representing your end-user, which will help OpenAI to monitor and detect abuse.
+     * A unique identifier representing your end-user, which will help ZhiPuAI to monitor and detect abuse.
      */
     String user;
 }

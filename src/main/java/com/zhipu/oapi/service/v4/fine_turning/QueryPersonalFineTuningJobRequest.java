@@ -6,7 +6,6 @@ import lombok.*;
 
 /**
  * Request to create a fine tuning job
- * https://platform.openai.com/docs/api-reference/fine-tuning/create
  */
 @Builder
 @NoArgsConstructor

@@ -30,7 +30,7 @@ public class V4OkHttpClientTest {
     public static void main(String[] args) throws Exception {
         System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
         // 1. sse-invoke调用模型，使用标准Listener，直接返回结果
-//        testSseInvoke();
+        testSseInvoke();
 
         // 2. invoke调用模型,直接返回结果
 //          testInvoke();

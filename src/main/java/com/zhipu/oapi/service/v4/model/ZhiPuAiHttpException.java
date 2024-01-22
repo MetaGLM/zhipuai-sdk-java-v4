@@ -1,6 +1,6 @@
 package com.zhipu.oapi.service.v4.model;
 
-public class OpenAiHttpException extends RuntimeException {
+public class ZhiPuAiHttpException extends RuntimeException {
 
     /**
      * HTTP status code
@@ -8,7 +8,7 @@ public class OpenAiHttpException extends RuntimeException {
     public final int statusCode;
 
     /**
-     * OpenAI error code, for example "invalid_api_key"
+     * ZhiPuAI error code, for example "invalid_api_key"
      */
     public final String code;
 
@@ -16,12 +16,11 @@ public class OpenAiHttpException extends RuntimeException {
     public final String param;
 
     /**
-     * OpenAI error type, for example "invalid_request_error"
-     * https://platform.openai.com/docs/guides/error-codes/python-library-error-types
+     * ZhiPuAI error type, for example "invalid_request_error"
      */
     public final String type;
 
-    public OpenAiHttpException(OpenAiError error, Exception parent, int statusCode) {
+    public ZhiPuAiHttpException(ZhiPuAiError error, Exception parent, int statusCode) {
         super(error.error.message, parent);
         this.statusCode = statusCode;
         this.code = error.error.code;

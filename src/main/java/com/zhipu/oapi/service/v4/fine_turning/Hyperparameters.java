@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * Hyperparameters for a fine-tuning job
- * https://platform.openai.com/docs/api-reference/fine-tuning/object#hyperparameters
  */
 @Builder
 @NoArgsConstructor

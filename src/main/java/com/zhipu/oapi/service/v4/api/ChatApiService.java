@@ -43,8 +43,6 @@ public class ChatApiService {
 
     /**
      * Creates a new ChatApiService that wraps ChatApi
-     *
-     * @param token OpenAi token string "sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
      */
     public ChatApiService(final String token) {
         this(token, DEFAULT_TIMEOUT);
@@ -52,8 +50,7 @@ public class ChatApiService {
 
     /**
      * Creates a new ChatApiService that wraps ChatApi
-     *
-     * @param token   OpenAi token string "sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+     * @param token
      * @param timeout http read timeout, Duration.ZERO means no timeout
      */
     public ChatApiService(final String token, final Duration timeout) {
@@ -75,10 +72,10 @@ public class ChatApiService {
                 }
                 String errorBody = e.response().errorBody().string();
 
-                OpenAiError error = mapper.readValue(errorBody, OpenAiError.class);
-                throw new OpenAiHttpException(error, e, e.code());
+                ZhiPuAiError error = mapper.readValue(errorBody, ZhiPuAiError.class);
+                throw new ZhiPuAiHttpException(error, e, e.code());
             } catch (IOException ex) {
-                // couldn't parse OpenAI error
+                // couldn't parse ZhiPuAiError error
                 throw e;
             }
         }

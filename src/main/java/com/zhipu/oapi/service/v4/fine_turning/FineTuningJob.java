@@ -7,7 +7,6 @@ import java.util.List;
 
 /**
  * Fine-tuning job
- * https://platform.openai.com/docs/api-reference/fine-tuning/object
  */
 @Data
 public class FineTuningJob {

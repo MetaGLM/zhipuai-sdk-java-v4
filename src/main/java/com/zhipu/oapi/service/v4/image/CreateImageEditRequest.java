@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 /**
- * A request for OpenAi to edit an image based on a prompt
  * All fields except prompt are optional
- *
- * https://beta.openai.com/docs/api-reference/images/create-edit
  */
 @Builder
 @NoArgsConstructor
@@ -43,7 +40,7 @@ public class CreateImageEditRequest {
     String responseFormat;
 
     /**
-     * A unique identifier representing your end-user, which will help OpenAI to monitor and detect abuse.
+     * A unique identifier representing your end-user, which will help ZhiPuAI to monitor and detect abuse.
      */
     String user;
 }
