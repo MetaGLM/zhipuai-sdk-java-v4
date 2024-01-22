@@ -7,10 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * A request for OpenAi to create a variation of an image
+ * A request for ZhiPuAi to create a variation of an image
  * All fields are optional
- *
- * https://beta.openai.com/docs/api-reference/images/create-variation
  */
 @Builder
 @NoArgsConstructor
@@ -40,7 +38,7 @@ public class CreateImageVariationRequest {
     String responseFormat;
 
     /**
-     * A unique identifier representing your end-user, which will help OpenAI to monitor and detect abuse.
+     * A unique identifier representing your end-user, which will help ZhiPuAI to monitor and detect abuse.
      */
     String user;
 }

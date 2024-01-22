@@ -46,11 +46,11 @@ public class ResponseBodyCallback implements Callback<ResponseBody> {
                 if (errorBody == null) {
                     throw e;
                 } else {
-                    OpenAiError error = mapper.readValue(
+                    ZhiPuAiError error = mapper.readValue(
                             errorBody.string(),
-                            OpenAiError.class
+                            ZhiPuAiError.class
                     );
-                    throw new OpenAiHttpException(error, e, e.code());
+                    throw new ZhiPuAiHttpException(error, e, e.code());
                 }
             }
 

@@ -7,8 +7,6 @@ import java.util.List;
 
 /**
  * An object representing an event in the lifecycle of a fine-tuning job
- *
- * https://platform.openai.com/docs/api-reference/fine-tuning/list-events
  */
 @Data
 public class FineTuningEvent {

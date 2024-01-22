@@ -7,8 +7,6 @@ import java.util.List;
 
 /**
  * An object containing a response from the answer api
- *
- * https://beta.openai.com/docs/api-reference/embeddings/create
  */
 @Data
 public class EmbeddingResult {

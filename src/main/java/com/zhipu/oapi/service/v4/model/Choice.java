@@ -12,8 +12,7 @@ import lombok.NoArgsConstructor;
 public class Choice {
 
     @SerializedName("finish_reason")
-    private String finish_reason;
-
+    private String finishReason;
     @SerializedName("index")
     private Long index;
 
@@ -24,8 +23,8 @@ public class Choice {
     private Delta delta;
 
 
-    public Choice(String finish_reason, Long index, Delta delta) {
-        this.finish_reason =finish_reason;
+    public Choice(String finishReason, Long index, Delta delta) {
+        this.finishReason =finishReason;
         this.index = index;
         this.delta =delta;
     }

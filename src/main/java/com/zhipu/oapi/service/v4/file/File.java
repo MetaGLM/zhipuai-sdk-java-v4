@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
- * A file uploaded to OpenAi
- *
- * https://beta.openai.com/docs/api-reference/files
+ * A file uploaded to ZhiPuAi
+
  */
 @Data
 public class File {
