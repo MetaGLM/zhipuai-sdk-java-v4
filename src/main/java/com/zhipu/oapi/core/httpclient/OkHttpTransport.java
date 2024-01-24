@@ -1,5 +1,6 @@
 package com.zhipu.oapi.core.httpclient;
 
+import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.core.request.RawRequest;
@@ -99,6 +100,9 @@ public class OkHttpTransport extends BaseHttpTransport {
                         if (isFirst.getAndSet(false)) {
                             System.out.print("Response: ");
                         }
+                        if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
+                            System.out.println(JSON.toJSONString(accumulator.getDelta().getTool_calls()));
+                        }
                         if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
                             System.out.print(accumulator.getDelta().getContent());
                         }
@@ -109,7 +113,7 @@ public class OkHttpTransport extends BaseHttpTransport {
                 .blockingGet();
         resp.setSuccess(true);
         resp.setStatusCode(200);
-        Choice choice = new Choice("stop", 0L, chatMessageAccumulator.getDelta());
+        Choice choice = new Choice(chatMessageAccumulator.getChoice().getFinishReason(), 0L, chatMessageAccumulator.getDelta());
         List<Choice> choices = new ArrayList<>();
         choices.add(choice);
         data.put("choices", choices);

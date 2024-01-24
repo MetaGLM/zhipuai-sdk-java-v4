@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 public class ChatFunctionCall {
 
     /**
-     * The name of the function being called
+     * 模型生成的应调用函数的名称
      */
     String name;
 
     /**
-     * The arguments of the call produced by the model, represented as a JsonNode for easy manipulation.
+     * 模型生成的 JSON 格式的函数调用参数。请注意，模型生成的 JSON 并不总是有效的，可能会出现函数模式未定义的参数。在调用函数之前，请在代码中验证参数
      */
-    JsonNode arguments;
+    Object arguments;
 
 }

@@ -103,7 +103,7 @@ public class ChatMessageAccumulator {
      * @return the function call from the accumulated message.
      */
     public ChatFunctionCall getAccumulatedChatFunctionCall() {
-        return getAccumulatedMessage().getFunctionCall();
+        return getAccumulatedMessage().getTool_calls().get(0).getFunction();
     }
 
 
