@@ -78,6 +78,8 @@ public class ClientV4 {
         paramsMap.put("top_p", request.getTopP());
         paramsMap.put("sensitive_word_check", request.getSensitiveWordCheck());
         paramsMap.put("do_sample", request.getDoSample());
+        paramsMap.put("max_tokens", request.getMaxTokens());
+        paramsMap.put("stop", request.getStop());
         rawReq.setBody(paramsMap);
         // token
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
@@ -111,6 +113,8 @@ public class ClientV4 {
         paramsMap.put("top_p", request.getTopP());
         paramsMap.put("sensitive_word_check", request.getSensitiveWordCheck());
         paramsMap.put("do_sample", request.getDoSample());
+        paramsMap.put("max_tokens", request.getMaxTokens());
+        paramsMap.put("stop", request.getStop());
         // token
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
         ChatApiService service = new ChatApiService(token);
@@ -147,6 +151,8 @@ public class ClientV4 {
         paramsMap.put("top_p", request.getTopP());
         paramsMap.put("sensitive_word_check", request.getSensitiveWordCheck());
         paramsMap.put("do_sample", request.getDoSample());
+        paramsMap.put("max_tokens", request.getMaxTokens());
+        paramsMap.put("stop", request.getStop());
         rawReq.setBody(paramsMap);
         // token
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
