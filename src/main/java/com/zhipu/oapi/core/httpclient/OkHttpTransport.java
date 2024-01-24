@@ -115,6 +115,8 @@ public class OkHttpTransport extends BaseHttpTransport {
         data.put("choices", choices);
         data.put("task_status", TaskStatus.SUCCESS);
         data.put("usage", chatMessageAccumulator.getUsage());
+        data.put("id", chatMessageAccumulator.getId());
+        data.put("created", chatMessageAccumulator.getCreated());
         resp.setBody(new Gson().toJson(data));
         return resp;
     }
