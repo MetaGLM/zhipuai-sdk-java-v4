@@ -4,6 +4,8 @@ package com.zhipu.oapi.service.v4.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
@@ -15,8 +17,8 @@ public class ChatMessage {
 
     String name;
 
-    @JsonProperty("function_call")
-    ChatFunctionCall functionCall;
+    @JsonProperty("tool_calls")
+    List<ToolCalls> tool_calls;
 
 
     public ChatMessage(String role, Object content) {
