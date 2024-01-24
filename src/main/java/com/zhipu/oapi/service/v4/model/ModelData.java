@@ -26,6 +26,8 @@ public final class ModelData {
     private Long created;
     @SerializedName("model")
     private String model;
+    @SerializedName("id")
+    private String id;
 
 
 

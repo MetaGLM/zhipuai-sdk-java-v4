@@ -1,5 +1,7 @@
 package com.zhipu.oapi.service.v4.model;
 
+import java.nio.file.LinkOption;
+
 /**
  * Class that accumulates chat messages and provides utility methods for
  * handling message chunks and function calls within a chat stream. This
@@ -18,6 +20,10 @@ public class ChatMessageAccumulator {
 
     private final Usage usage;
 
+    private final Long created;
+
+    private final String id;
+
     /**
      * Constructor that initializes the message chunk and accumulated message.
      *
@@ -29,11 +35,13 @@ public class ChatMessageAccumulator {
 //        this.accumulatedMessage = accumulatedMessage;
 //    }
 
-    public ChatMessageAccumulator(Delta delta, ChatMessage accumulatedMessage,Choice choice,Usage usage) {
+    public ChatMessageAccumulator(Delta delta, ChatMessage accumulatedMessage, Choice choice, Usage usage, Long created,String id) {
         this.delta = delta;
         this.accumulatedMessage = accumulatedMessage;
         this.choice = choice;
         this.usage = usage;
+        this.created = created;
+        this.id = id;
     }
 
 
@@ -73,6 +81,10 @@ public class ChatMessageAccumulator {
     public Usage getUsage() {
         return usage;
     }
+
+    public String getId() { return id; }
+
+    public Long getCreated(){return created;}
 
     /**
      * Retrieves the function call from the message chunk.
