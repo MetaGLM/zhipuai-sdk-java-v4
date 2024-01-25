@@ -28,7 +28,8 @@ public final class ModelData {
     private String model;
     @SerializedName("id")
     private String id;
-
+    @SerializedName("error")
+    private ChatError error;
 
 
 }

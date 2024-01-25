@@ -50,6 +50,9 @@ public class ResponseBodyCallback implements Callback<ResponseBody> {
                             errorBody.string(),
                             ZhiPuAiError.class
                     );
+                    String message = error.getError().getMessage();
+                    message+="-"+error.getError().getCode();
+                    error.getError().setMessage(message);
                     throw new ZhiPuAiHttpException(error, e, e.code());
                 }
             }
@@ -61,12 +64,8 @@ public class ResponseBodyCallback implements Callback<ResponseBody> {
 
             while (!emitter.isCancelled() && (line = reader.readLine()) != null) {
                 if (line.startsWith("data:")) {
-                    try {
                         String data = line.substring(5).trim();
                         sse = new SSE(data);
-                    } catch (Exception e) {
-                        System.out.println("异常"+e.getMessage());
-                    }
                 } else if (line.equals("") && sse != null) {
                     if (sse.isDone()) {
                         if (emitDone) {

@@ -24,6 +24,7 @@ public class ChatMessageAccumulator {
 
     private final String id;
 
+
     /**
      * Constructor that initializes the message chunk and accumulated message.
      *
