@@ -38,7 +38,7 @@ public class V4OkHttpClientTest {
         // 3. 异步调用
 //         String taskId = testAsyncInvoke();
         // 4.异步查询
-//         testQueryResult("559916980273155058305988497333548975");
+//         testQueryResult("559916980273155058313808636349114967");
 
          // 5.文生图
 //          testCreateImage();

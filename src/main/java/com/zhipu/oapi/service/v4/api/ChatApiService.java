@@ -74,6 +74,9 @@ public class ChatApiService {
                 String errorBody = e.response().errorBody().string();
 
                 ZhiPuAiError error = mapper.readValue(errorBody, ZhiPuAiError.class);
+                String message = error.getError().getMessage();
+                message+="-"+error.getError().getCode();
+                error.getError().setMessage(message);
                 throw new ZhiPuAiHttpException(error, e, e.code());
             } catch (IOException ex) {
                 // couldn't parse ZhiPuAiError error
@@ -212,6 +215,7 @@ public class ChatApiService {
 
     public Flowable<ChatMessageAccumulator> mapStreamToAccumulator(Flowable<ModelData> flowable) {
         return flowable.map(chunk -> {
+            System.out.println("chunk:"+JSON.toJSONString(chunk));
             return new ChatMessageAccumulator(chunk.getChoices().get(0).getDelta(), null,chunk.getChoices().get(0),chunk.getUsage(),chunk.getCreated(),chunk.getId());
         });
     }

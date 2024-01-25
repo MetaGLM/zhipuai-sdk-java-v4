@@ -96,8 +96,9 @@ public class ClientV4 {
             return resp;
         } catch (Exception e) {
             logger.error("sse invoke model fail!", e);
-            resp.setCode(500);
-            resp.setMsg("调用失败，异常:" + e.getMessage());
+            String[] error = e.getMessage().split("-");
+            resp.setCode(error.length == 2 ? Integer.parseInt(error[1]) : 500);
+            resp.setMsg("调用失败，异常:" + error[0]);
         }
         return resp;
     }
@@ -132,8 +133,9 @@ public class ClientV4 {
             return resp;
         } catch (Exception e) {
             logger.error("invoke model fail!", e);
-            resp.setCode(500);
-            resp.setMsg("调用失败，异常:" + e.getMessage());
+            String[] error = e.getMessage().split("-");
+            resp.setCode(error.length == 2 ? Integer.parseInt(error[1]) : 500);
+            resp.setMsg("调用失败，异常:" + error[0]);
         }
         return resp;
     }
@@ -173,8 +175,9 @@ public class ClientV4 {
             }
         } catch (Exception e) {
             logger.error("async invoke model fail!", e);
-            resp.setCode(500);
-            resp.setMsg("调用失败，异常:" + e.getMessage());
+            String[] error = e.getMessage().split("-");
+            resp.setCode(error.length == 2 ? Integer.parseInt(error[1]) : 500);
+            resp.setMsg("调用失败，异常:" + error[0]);
         }
         return resp;
 
@@ -195,8 +198,9 @@ public class ClientV4 {
             }
         } catch (Exception e) {
             logger.error("query result fail", e);
-            resp.setCode(500);
-            resp.setMsg("调用失败，异常:" + e.getMessage());
+            String[] error = e.getMessage().split("-");
+            resp.setCode(error.length == 2 ? Integer.parseInt(error[1]) : 500);
+            resp.setMsg("调用失败，异常:" + error[0]);
             return resp;
         }
         return resp;
@@ -219,9 +223,9 @@ public class ClientV4 {
             }
         } catch (Exception e) {
             logger.error("createImageResult:", e);
-            imageApiResponse.setCode(500);
-            imageApiResponse.setSuccess(false);
-            imageApiResponse.setMsg("调用失败，异常:" + e.getMessage());
+            String[] error = e.getMessage().split("-");
+            imageApiResponse.setCode(error.length == 2 ? Integer.parseInt(error[1]) : 500);
+            imageApiResponse.setMsg("调用失败，异常:" + error[0]);
         }
         return imageApiResponse;
     }
@@ -256,9 +260,10 @@ public class ClientV4 {
             }
         } catch (Exception e) {
             logger.error("createEmbeddings:", e);
-            embeddingApiResponse.setCode(500);
+            String[] error = e.getMessage().split("-");
+            embeddingApiResponse.setCode(error.length == 2 ? Integer.parseInt(error[1]) : 500);
+            embeddingApiResponse.setMsg("调用失败，异常:" + error[0]);
             embeddingApiResponse.setSuccess(false);
-            embeddingApiResponse.setMsg("调用失败，异常:" + e.getMessage());
         }
         return embeddingApiResponse;
     }
@@ -270,15 +275,16 @@ public class ClientV4 {
         try {
             File file = service.uploadFile(purpose, filePath);
             if (file != null) {
-                fileApiResponse.setCode(500);
-                fileApiResponse.setSuccess(false);
+                fileApiResponse.setCode(200);
+                fileApiResponse.setSuccess(true);
                 fileApiResponse.setMsg("调用成功");
                 fileApiResponse.setData(file);
             }
         } catch (Exception e) {
-            fileApiResponse.setCode(500);
+            String[] error = e.getMessage().split("-");
+            fileApiResponse.setCode(error.length == 2 ? Integer.parseInt(error[1]) : 500);
+            fileApiResponse.setMsg("调用失败，异常:" + error[0]);
             fileApiResponse.setSuccess(false);
-            fileApiResponse.setMsg("调用失败,异常:" + e.getMessage());
         }
         return fileApiResponse;
     }
@@ -289,16 +295,17 @@ public class ClientV4 {
         ChatApiService service = new ChatApiService(token);
         try {
             QueryFileResult queryFileResult = service.queryFileList(queryFilesRequest);
-            if(queryFileResult!=null){
-                queryFileApiResponse.setCode(500);
-                queryFileApiResponse.setSuccess(false);
+            if (queryFileResult != null) {
+                queryFileApiResponse.setCode(200);
+                queryFileApiResponse.setSuccess(true);
                 queryFileApiResponse.setMsg("调用成功");
                 queryFileApiResponse.setData(queryFileResult);
             }
         } catch (Exception e) {
-            queryFileApiResponse.setCode(500);
+            String[] error = e.getMessage().split("-");
+            queryFileApiResponse.setCode(error.length == 2 ? Integer.parseInt(error[1]) : 500);
+            queryFileApiResponse.setMsg("调用失败，异常:" + error[0]);
             queryFileApiResponse.setSuccess(false);
-            queryFileApiResponse.setMsg("调用失败,异常:" + e.getMessage());
         }
         return queryFileApiResponse;
     }
@@ -310,16 +317,17 @@ public class ClientV4 {
         FineTuningJob fineTuningJob = null;
         try {
             fineTuningJob = service.createFineTuningJob(request);
-            if(fineTuningJob!=null){
+            if (fineTuningJob != null) {
                 createFineTuningJobApiResponse.setMsg("调用成功");
                 createFineTuningJobApiResponse.setData(fineTuningJob);
                 createFineTuningJobApiResponse.setSuccess(true);
                 createFineTuningJobApiResponse.setCode(200);
             }
         } catch (Exception e) {
-            createFineTuningJobApiResponse.setCode(500);
+            String[] error = e.getMessage().split("-");
+            createFineTuningJobApiResponse.setCode(error.length == 2 ? Integer.parseInt(error[1]) : 500);
+            createFineTuningJobApiResponse.setMsg("调用失败，异常:" + error[0]);
             createFineTuningJobApiResponse.setSuccess(false);
-            createFineTuningJobApiResponse.setMsg("调用失败，异常:"+e.getMessage());
         }
         return createFineTuningJobApiResponse;
     }
@@ -330,15 +338,16 @@ public class ClientV4 {
         ChatApiService service = new ChatApiService(token);
         try {
             FineTuningEvent fineTuningEvent = service.listFineTuningJobEvents(fineTuningJobId);
-            if(fineTuningEvent!=null){
+            if (fineTuningEvent != null) {
                 queryFineTuningEventApiResponse.setSuccess(true);
                 queryFineTuningEventApiResponse.setData(fineTuningEvent);
                 queryFineTuningEventApiResponse.setCode(200);
                 queryFineTuningEventApiResponse.setMsg("调用成功");
             }
         } catch (Exception e) {
-            queryFineTuningEventApiResponse.setCode(500);
-            queryFineTuningEventApiResponse.setMsg("调用失败，异常:"+e.getMessage());
+            String[] error = e.getMessage().split("-");
+            queryFineTuningEventApiResponse.setCode(error.length == 2 ? Integer.parseInt(error[1]) : 500);
+            queryFineTuningEventApiResponse.setMsg("调用失败，异常:" + error[0]);
             queryFineTuningEventApiResponse.setSuccess(false);
         }
         return queryFineTuningEventApiResponse;
@@ -350,15 +359,16 @@ public class ClientV4 {
         ChatApiService service = new ChatApiService(token);
         try {
             FineTuningJob fineTuningJob = service.retrieveFineTuningJob(fineTuningJobId);
-            if(fineTuningJob!=null){
+            if (fineTuningJob != null) {
                 queryFineTuningJobApiResponse.setSuccess(true);
                 queryFineTuningJobApiResponse.setData(fineTuningJob);
                 queryFineTuningJobApiResponse.setCode(200);
                 queryFineTuningJobApiResponse.setMsg("调用成功");
             }
         } catch (Exception e) {
-            queryFineTuningJobApiResponse.setCode(500);
-            queryFineTuningJobApiResponse.setMsg("调用失败，异常:"+e.getMessage());
+            String[] error = e.getMessage().split("-");
+            queryFineTuningJobApiResponse.setCode(error.length == 2 ? Integer.parseInt(error[1]) : 500);
+            queryFineTuningJobApiResponse.setMsg("调用失败，异常:" + error[0]);
             queryFineTuningJobApiResponse.setSuccess(false);
         }
 
@@ -371,15 +381,16 @@ public class ClientV4 {
         ChatApiService service = new ChatApiService(token);
         try {
             PersonalFineTuningJob personalFineTuningJob = service.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest.getLimit(), queryPersonalFineTuningJobRequest.getAfter());
-            if(personalFineTuningJob!=null){
+            if (personalFineTuningJob != null) {
                 queryPersonalFineTuningJobApiResponse.setSuccess(true);
                 queryPersonalFineTuningJobApiResponse.setData(personalFineTuningJob);
                 queryPersonalFineTuningJobApiResponse.setMsg("调用成功");
                 queryPersonalFineTuningJobApiResponse.setCode(200);
             }
         } catch (Exception e) {
-            queryPersonalFineTuningJobApiResponse.setCode(500);
-            queryPersonalFineTuningJobApiResponse.setMsg("调用失败,异常:"+e.getMessage());
+            String[] error = e.getMessage().split("-");
+            queryPersonalFineTuningJobApiResponse.setCode(error.length == 2 ? Integer.parseInt(error[1]) : 500);
+            queryPersonalFineTuningJobApiResponse.setMsg("调用失败，异常:" + error[0]);
             queryPersonalFineTuningJobApiResponse.setSuccess(false);
         }
         return queryPersonalFineTuningJobApiResponse;

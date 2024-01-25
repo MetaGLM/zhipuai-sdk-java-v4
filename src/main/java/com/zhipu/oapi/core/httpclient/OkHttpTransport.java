@@ -11,6 +11,8 @@ import com.zhipu.oapi.service.v4.model.ChatMessageAccumulator;
 import com.zhipu.oapi.service.v4.model.Choice;
 import com.zhipu.oapi.service.v4.model.ModelData;
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
@@ -84,7 +86,7 @@ public class OkHttpTransport extends BaseHttpTransport {
         Map<String, Object> data = new HashMap<>();
         data.put("request_id", request.getBody().get("request_id"));
         try {
-            flowable = service.streamChatCompletion(request.getBody());
+            flowable  = service.streamChatCompletion(request.getBody());
         } catch (Exception e) {
             System.out.println("streamChatCompletion error:" + e.getMessage());
             resp.setStatusCode(500);
