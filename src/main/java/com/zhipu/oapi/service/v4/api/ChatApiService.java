@@ -75,7 +75,7 @@ public class ChatApiService {
 
                 ZhiPuAiError error = mapper.readValue(errorBody, ZhiPuAiError.class);
                 String message = error.getError().getMessage();
-                message+="-"+error.getError().getCode();
+                message+="-"+error.getError().getCode()+"-"+e.code();
                 error.getError().setMessage(message);
                 throw new ZhiPuAiHttpException(error, e, e.code());
             } catch (IOException ex) {

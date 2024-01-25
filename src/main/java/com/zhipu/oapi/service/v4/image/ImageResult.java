@@ -1,5 +1,6 @@
 package com.zhipu.oapi.service.v4.image;
 
+import com.zhipu.oapi.service.v4.model.ChatError;
 import lombok.Data;
 
 import java.util.List;
@@ -19,4 +20,6 @@ public class ImageResult {
      * List of image results.
      */
     List<Image> data;
+
+    ChatError error;
 }

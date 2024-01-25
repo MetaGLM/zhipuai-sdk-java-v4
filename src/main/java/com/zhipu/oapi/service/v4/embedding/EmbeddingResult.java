@@ -1,5 +1,6 @@
 package com.zhipu.oapi.service.v4.embedding;
 
+import com.zhipu.oapi.service.v4.model.ChatError;
 import com.zhipu.oapi.service.v4.model.Usage;
 import lombok.Data;
 
@@ -30,4 +31,6 @@ public class EmbeddingResult {
      * The API usage for this request
      */
     Usage usage;
+
+    ChatError error;
 }

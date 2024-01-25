@@ -11,7 +11,7 @@ public class ChatError {
 
 
 
-    private String code;
+    private Integer code;
 
 
     private String message;

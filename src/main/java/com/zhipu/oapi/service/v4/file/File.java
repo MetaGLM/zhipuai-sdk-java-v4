@@ -1,6 +1,7 @@
 package com.zhipu.oapi.service.v4.file;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.zhipu.oapi.service.v4.model.ChatError;
 import lombok.Data;
 
 /**
@@ -52,4 +53,6 @@ public class File {
      */
     @JsonProperty("status_details")
     String statusDetails;
+
+    ChatError error;
 }
