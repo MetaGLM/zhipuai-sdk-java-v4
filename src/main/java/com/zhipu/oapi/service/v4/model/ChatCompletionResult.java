@@ -40,4 +40,11 @@ public class ChatCompletionResult {
      */
     Usage usage;
 
+    private String task_status;
+
+    /**
+     * 用户在客户端请求时提交的任务编号或者平台生成的任务编号
+     */
+    String request_id;
+
 }
