@@ -170,7 +170,7 @@ public class V4OkHttpClientTest {
     private static void testCreateImage() {
         CreateImageRequest createImageRequest = new CreateImageRequest();
         createImageRequest.setModel(Constants.ModelCogView);
-        createImageRequest.setPrompt("画一个温顺可爱的小狗");
+//        createImageRequest.setPrompt("画一个温顺可爱的小狗");
         ImageApiResponse imageApiResponse = client.createImage(createImageRequest);
         System.out.println("imageApiResponse:"+JSON.toJSONString(imageApiResponse));
     }

@@ -1,6 +1,7 @@
 package com.zhipu.oapi.service.v4.fine_turning;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.zhipu.oapi.service.v4.model.ChatError;
 import lombok.Data;
 
 import java.util.List;
@@ -91,5 +92,5 @@ public class FineTuningJob {
     String requestId;
 
 
-    private Object error;
+    private ChatError error;
 }

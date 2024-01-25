@@ -42,7 +42,6 @@ public class ResponseBodyCallback implements Callback<ResponseBody> {
             if (!response.isSuccessful()) {
                 HttpException e = new HttpException(response);
                 ResponseBody errorBody = response.errorBody();
-
                 if (errorBody == null) {
                     throw e;
                 } else {
@@ -51,7 +50,7 @@ public class ResponseBodyCallback implements Callback<ResponseBody> {
                             ZhiPuAiError.class
                     );
                     String message = error.getError().getMessage();
-                    message+="-"+error.getError().getCode();
+                    message+="-"+error.getError().getCode()+"-"+e.code();
                     error.getError().setMessage(message);
                     throw new ZhiPuAiHttpException(error, e, e.code());
                 }
