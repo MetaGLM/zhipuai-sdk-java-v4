@@ -215,6 +215,9 @@ public class ClientV4 {
                 resp.setMsg("调用成功");
                 ModelData modelData = new ModelData();
                 BeanUtil.copyProperties(chatCompletionResult, modelData);
+                modelData.setModel(chatCompletionResult.getModel());
+                modelData.setRequestId(chatCompletionResult.getRequest_id());
+                modelData.setTaskStatus(TaskStatus.valueOf(chatCompletionResult.getTask_status()));
                 resp.setData(modelData);
             }
         } catch (Exception e) {
