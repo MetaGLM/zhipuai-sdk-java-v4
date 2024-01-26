@@ -181,7 +181,8 @@ public class V4OkHttpClientTest {
      */
      private static void testSseInvoke() {
          List<ChatMessage> messages = new ArrayList<>();
-         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGPT和你哪个更强大");
+         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "您好，北京天气怎么样");
+//         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGPT和你哪个更强大");
          messages.add(chatMessage);
          String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
          // 函数调用参数构建部分

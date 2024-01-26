@@ -103,7 +103,7 @@ public class OkHttpTransport extends BaseHttpTransport {
                             System.out.print("Response: ");
                         }
                         if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
-                            System.out.println(JSON.toJSONString(accumulator.getDelta().getTool_calls()));
+                            System.out.println(accumulator.getDelta().getTool_calls().toString());
                         }
                         if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
                             System.out.print(accumulator.getDelta().getContent());
@@ -119,7 +119,6 @@ public class OkHttpTransport extends BaseHttpTransport {
         List<Choice> choices = new ArrayList<>();
         choices.add(choice);
         data.put("choices", choices);
-        data.put("task_status", TaskStatus.SUCCESS);
         data.put("usage", chatMessageAccumulator.getUsage());
         data.put("id", chatMessageAccumulator.getId());
         data.put("created", chatMessageAccumulator.getCreated());

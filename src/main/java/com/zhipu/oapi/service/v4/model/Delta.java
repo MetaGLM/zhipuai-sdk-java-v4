@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class Delta {
 
     private String content;
 
-    @JsonProperty("tool_calls")
-    List<ToolCalls> tool_calls;
+
+    private List<ToolCalls> tool_calls;
 
 }
