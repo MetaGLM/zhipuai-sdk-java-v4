@@ -1,15 +1,19 @@
 package com.zhipu.oapi.service.v4.model;
 
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class ToolCalls {
-
 
 
     private ChatFunctionCall function;

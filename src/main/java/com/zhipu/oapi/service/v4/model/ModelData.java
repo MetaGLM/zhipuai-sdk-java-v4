@@ -18,10 +18,13 @@ public final class ModelData {
     @SerializedName("usage")
     private Usage usage;
     @SerializedName("task_id")
+    @JsonProperty("task_id")
     private String taskId;
     @SerializedName("request_id")
+    @JsonProperty("request_id")
     private String requestId;
     @SerializedName("task_status")
+    @JsonProperty("task_status")
     private TaskStatus taskStatus;
     @SerializedName("created")
     private Long created;

@@ -1,9 +1,11 @@
 package com.zhipu.oapi.service.v4.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.IOException;
 
 @Data
 @AllArgsConstructor
@@ -19,5 +21,7 @@ public class ChatFunctionCall {
      * 模型生成的 JSON 格式的函数调用参数。请注意，模型生成的 JSON 并不总是有效的，可能会出现函数模式未定义的参数。在调用函数之前，请在代码中验证参数
      */
     Object arguments;
+
+
 
 }

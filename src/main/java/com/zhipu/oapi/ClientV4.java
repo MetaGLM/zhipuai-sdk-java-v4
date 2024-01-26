@@ -2,6 +2,7 @@ package com.zhipu.oapi;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.zhipu.oapi.core.ConfigV4;
 import com.zhipu.oapi.core.cache.ICache;
@@ -90,8 +91,8 @@ public class ClientV4 {
             RawResponse rawResp = this.getConfig().getHttpTransport().sseExecute(rawReq);
             resp.setCode(rawResp.getStatusCode());
             resp.setMsg(rawResp.getMsg());
-            Gson gson = new Gson();
-            ModelData data = gson.fromJson(new String(rawResp.getBody()), ModelData.class);
+            ObjectMapper objectMapper = new ObjectMapper();
+            ModelData data = objectMapper.readValue(rawResp.getBody(), ModelData.class);
             resp.setData(data);
             return resp;
         } catch (Exception e) {
@@ -213,8 +214,10 @@ public class ClientV4 {
             if (chatCompletionResult != null) {
                 resp.setCode(200);
                 resp.setMsg("调用成功");
-                ModelData modelData = new ModelData();
+                resp.setSuccess(true);
+                ModelData modelData = new ModelData();;
                 BeanUtil.copyProperties(chatCompletionResult, modelData);
+                modelData.setCreated(null);
                 modelData.setModel(chatCompletionResult.getModel());
                 modelData.setRequestId(chatCompletionResult.getRequest_id());
                 modelData.setTaskStatus(TaskStatus.valueOf(chatCompletionResult.getTask_status()));

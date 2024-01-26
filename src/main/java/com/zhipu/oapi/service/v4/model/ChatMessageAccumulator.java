@@ -1,6 +1,7 @@
 package com.zhipu.oapi.service.v4.model;
 
 import java.nio.file.LinkOption;
+import java.util.Map;
 
 /**
  * Class that accumulates chat messages and provides utility methods for

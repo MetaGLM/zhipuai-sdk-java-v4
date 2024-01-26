@@ -6,6 +6,7 @@ import com.zhipu.oapi.service.v4.fine_turning.FineTuningJob;
 import com.zhipu.oapi.service.v4.fine_turning.FineTuningJobRequest;
 import com.zhipu.oapi.service.v4.fine_turning.PersonalFineTuningJob;
 import com.zhipu.oapi.service.v4.model.ChatCompletionAsyncResult;
+import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
 import com.zhipu.oapi.service.v4.model.ChatCompletionResult;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
