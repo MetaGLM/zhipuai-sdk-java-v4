@@ -102,9 +102,9 @@ public class OkHttpTransport extends BaseHttpTransport {
                         if (isFirst.getAndSet(false)) {
                             System.out.print("Response: ");
                         }
-                        if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
-                            System.out.println(accumulator.getDelta().getTool_calls().toString());
-                        }
+//                        if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
+//                            System.out.println(JSON.toJSONString(accumulator.getDelta().getTool_calls()));
+//                        }
                         if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
                             System.out.print(accumulator.getDelta().getContent());
                         }

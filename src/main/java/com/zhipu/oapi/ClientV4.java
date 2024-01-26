@@ -97,7 +97,7 @@ public class ClientV4 {
             return resp;
         } catch (Exception e) {
             logger.error("sse invoke model fail!", e);
-            String[] error = e.getMessage().split("-");
+            String[] error = e.getMessage().split("&");
             resp.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
             resp.setMsg("调用失败，异常:" + error[0]);
             resp.setSuccess(false);
@@ -141,7 +141,7 @@ public class ClientV4 {
             return resp;
         } catch (Exception e) {
             logger.error("invoke model fail!", e);
-            String[] error = e.getMessage().split("-");
+            String[] error = e.getMessage().split("&");
             resp.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
             resp.setMsg("调用失败，异常:" + error[0]);
             resp.setSuccess(false);
@@ -190,7 +190,7 @@ public class ClientV4 {
             }
         } catch (Exception e) {
             logger.error("async invoke model fail!", e);
-            String[] error = e.getMessage().split("-");
+            String[] error = e.getMessage().split("&");
             resp.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
             resp.setMsg("调用失败，异常:" + error[0]);
             resp.setSuccess(false);
@@ -225,7 +225,7 @@ public class ClientV4 {
             }
         } catch (Exception e) {
             logger.error("query result fail", e);
-            String[] error = e.getMessage().split("-");
+            String[] error = e.getMessage().split("&");
             resp.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
             resp.setMsg("调用失败，异常:" + error[0]);
             resp.setSuccess(false);
@@ -257,7 +257,7 @@ public class ClientV4 {
             }
         } catch (Exception e) {
             logger.error("createImageResult:", e);
-            String[] error = e.getMessage().split("-");
+            String[] error = e.getMessage().split("&");
             imageApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
             imageApiResponse.setMsg("调用失败，异常:" + error[0]);
             imageApiResponse.setSuccess(false);
@@ -301,7 +301,7 @@ public class ClientV4 {
             }
         } catch (Exception e) {
             logger.error("createEmbeddings:", e);
-            String[] error = e.getMessage().split("-");
+            String[] error = e.getMessage().split("&");
             embeddingApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
             embeddingApiResponse.setMsg("调用失败，异常:" + error[0]);
             embeddingApiResponse.setSuccess(false);
@@ -328,7 +328,7 @@ public class ClientV4 {
                 fileApiResponse.setData(file);
             }
         } catch (Exception e) {
-            String[] error = e.getMessage().split("-");
+            String[] error = e.getMessage().split("&");
             fileApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
             fileApiResponse.setMsg("调用失败，异常:" + error[0]);
             fileApiResponse.setSuccess(false);
@@ -355,7 +355,7 @@ public class ClientV4 {
                 queryFileApiResponse.setData(queryFileResult);
             }
         } catch (Exception e) {
-            String[] error = e.getMessage().split("-");
+            String[] error = e.getMessage().split("&");
             queryFileApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
             queryFileApiResponse.setMsg("调用失败，异常:" + error[0]);
             queryFileApiResponse.setSuccess(false);
@@ -383,7 +383,7 @@ public class ClientV4 {
                 createFineTuningJobApiResponse.setCode(200);
             }
         } catch (Exception e) {
-            String[] error = e.getMessage().split("-");
+            String[] error = e.getMessage().split("&");
             createFineTuningJobApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
             createFineTuningJobApiResponse.setMsg("调用失败，异常:" + error[0]);
             createFineTuningJobApiResponse.setSuccess(false);
@@ -410,7 +410,7 @@ public class ClientV4 {
                 queryFineTuningEventApiResponse.setMsg("调用成功");
             }
         } catch (Exception e) {
-            String[] error = e.getMessage().split("-");
+            String[] error = e.getMessage().split("&");
             queryFineTuningEventApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
             queryFineTuningEventApiResponse.setMsg("调用失败，异常:" + error[0]);
             queryFineTuningEventApiResponse.setSuccess(false);
@@ -437,7 +437,7 @@ public class ClientV4 {
                 queryFineTuningJobApiResponse.setMsg("调用成功");
             }
         } catch (Exception e) {
-            String[] error = e.getMessage().split("-");
+            String[] error = e.getMessage().split("&");
             queryFineTuningJobApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
             queryFineTuningJobApiResponse.setMsg("调用失败，异常:" + error[0]);
             queryFineTuningJobApiResponse.setSuccess(false);
@@ -465,7 +465,7 @@ public class ClientV4 {
                 queryPersonalFineTuningJobApiResponse.setCode(200);
             }
         } catch (Exception e) {
-            String[] error = e.getMessage().split("-");
+            String[] error = e.getMessage().split("&");
             queryPersonalFineTuningJobApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
             queryPersonalFineTuningJobApiResponse.setMsg("调用失败，异常:" + error[0]);
             queryPersonalFineTuningJobApiResponse.setSuccess(false);

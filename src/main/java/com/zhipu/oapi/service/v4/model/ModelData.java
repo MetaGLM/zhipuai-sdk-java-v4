@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public final class ModelData {
     @SerializedName("choices")
+    @JsonProperty("choices")
     private List<Choice> choices;
     @SerializedName("usage")
     private Usage usage;
