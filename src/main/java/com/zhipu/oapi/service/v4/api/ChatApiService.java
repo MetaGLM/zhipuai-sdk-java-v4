@@ -23,7 +23,6 @@ import okhttp3.*;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.HttpException;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.IOException;
@@ -79,7 +78,7 @@ public class ChatApiService {
 
                 ZhiPuAiError error = mapper.readValue(errorBody, ZhiPuAiError.class);
                 String message = error.getError().getMessage();
-                message+="-"+error.getError().getCode()+"-"+e.code();
+                message+="&"+error.getError().getCode()+"&"+e.code();
                 error.getError().setMessage(message);
                 throw new ZhiPuAiHttpException(error, e, e.code());
             } catch (IOException ex) {
@@ -212,14 +211,15 @@ public class ChatApiService {
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(JacksonConverterFactory.create(mapper))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
     }
 
     public Flowable<ChatMessageAccumulator> mapStreamToAccumulator(Flowable<ModelData> flowable) {
         return flowable.map(chunk -> {
-//            System.out.println("chunk:"+chunk);
+            String jsonString = mapper.writeValueAsString(chunk);
+            System.out.println("chunk"+JSON.toJSONString(jsonString));
             return new ChatMessageAccumulator(chunk.getChoices().get(0).getDelta(), null,chunk.getChoices().get(0),chunk.getUsage(),chunk.getCreated(),chunk.getId());
         });
     }

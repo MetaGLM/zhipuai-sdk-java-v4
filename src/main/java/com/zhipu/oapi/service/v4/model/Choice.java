@@ -16,12 +16,15 @@ public class Choice {
     @JsonProperty("finish_reason")
     private String finishReason;
     @SerializedName("index")
+    @JsonProperty("index")
     private Long index;
 
     @SerializedName("message")
+    @JsonProperty("message")
     private ChatMessage message;
 
     @SerializedName("delta")
+    @JsonProperty("delta")
     private Delta delta;
 
 

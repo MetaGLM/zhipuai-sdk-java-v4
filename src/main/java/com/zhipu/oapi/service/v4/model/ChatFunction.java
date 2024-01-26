@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.function.Function;
 
 @NoArgsConstructor
@@ -19,15 +20,13 @@ public class ChatFunction {
 
     private String description;
 
-    @JsonProperty("parameters")
-    private Class<?> parametersClass;
-
     private ChatFunctionParameters parameters;
 
     private Retrieval retrieval;
 
-    private Ref ref;
+    private WebSearch web_search;
 
+    private List<String> required;
 
     @JsonIgnore
     private Function<Object, Object> executor;
@@ -39,15 +38,15 @@ public class ChatFunction {
     public static class Builder {
         private String name;
         private String description;
-        private Class<?> parametersClass;
 
         private Retrieval retrieval;
 
-        private Ref ref;
+        private WebSearch web_search;
 
         private ChatFunctionParameters parameters;
 
-        private Function<Object, Object> executor;
+
+        private List<String> required;
 
         public Builder name(String name) {
             this.name = name;
@@ -64,13 +63,14 @@ public class ChatFunction {
             return this;
         }
 
-        public Builder parameters(Class<?>  parametersClass) {
-            this.parametersClass = parametersClass;
+        public Builder required(List<String> required) {
+            this.required = required;
             return this;
         }
 
-        public Builder ref(Ref ref) {
-            this.ref = ref;
+
+        public Builder webSearch(WebSearch webSearch) {
+            this.web_search = webSearch;
             return this;
         }
 
@@ -79,21 +79,15 @@ public class ChatFunction {
             return this;
         }
 
-        public <T> Builder executor(Class<T> requestClass, Function<T, Object> executor) {
-            this.parametersClass = requestClass;
-            this.executor = (Function<Object, Object>) executor;
-            return this;
-        }
 
         public ChatFunction build() {
             ChatFunction chatFunction = new ChatFunction();
             chatFunction.setName(name);
             chatFunction.setDescription(description);
-            chatFunction.setParametersClass(parametersClass);
             chatFunction.setParameters(parameters);
-            chatFunction.setExecutor(executor);
-            chatFunction.setRef(ref);
+            chatFunction.setWeb_search(web_search);
             chatFunction.setRetrieval(retrieval);
+            chatFunction.setRequired(required);
             return chatFunction;
         }
     }

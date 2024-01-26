@@ -30,7 +30,7 @@ public class V4OkHttpClientTest {
     public static void main(String[] args) throws Exception {
         System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
         // 1. sse-invoke调用模型，使用标准Listener，直接返回结果
-        testSseInvoke();
+//        testSseInvoke();
 
         // 2. invoke调用模型,直接返回结果
 //          testInvoke();
@@ -59,7 +59,7 @@ public class V4OkHttpClientTest {
 //          testCreateFineTuningJob();
 
         // 11.微调-查询微调任务事件
-//          testQueryFineTuningJobsEvents();
+          testQueryFineTuningJobsEvents();
 
         // 12.微调-查询微调任务
 //        testRetrieveFineTuningJobs();
@@ -79,7 +79,7 @@ public class V4OkHttpClientTest {
     }
 
     private static void testQueryFineTuningJobsEvents() {
-       String fineTuningJobId  = "ftjob-20240119114544390-zkgjb";
+       String fineTuningJobId  = "ftjob-20240119114544390-zkgj";
        QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = client.queryFineTuningJobsEvents(fineTuningJobId);
        System.out.println("model output:"+JSON.toJSONString(queryFineTuningEventApiResponse));
     }
@@ -181,8 +181,8 @@ public class V4OkHttpClientTest {
      */
      private static void testSseInvoke() {
          List<ChatMessage> messages = new ArrayList<>();
-         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "您好，北京天气怎么样");
-//         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGPT和你哪个更强大");
+//         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "您好，北京天气怎么样");
+         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "你能帮我查询2024年1月1日从北京南站到上海的火车票吗？");
          messages.add(chatMessage);
          String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
          // 函数调用参数构建部分
@@ -192,19 +192,28 @@ public class V4OkHttpClientTest {
          ChatFunctionParameters chatFunctionParameters = new ChatFunctionParameters();
          chatFunctionParameters.setType("object");
          Map<String,Object> properties = new HashMap<>();
-         properties.put("location",new HashMap<String,Object>(){{
+         properties.put("departure",new HashMap<String,Object>(){{
              put("type","string");
-             put("description","城市，如：北京");
+             put("description","出发城市或车站");
          }});
-         properties.put("unit",new HashMap<String,Object>(){{
+         properties.put("destination",new HashMap<String,Object>(){{
              put("type","string");
-             put("enum",new ArrayList<String>(){{add("celsius");add("fahrenheit");}});
+             put("description","目的地城市或车站");
          }});
+         properties.put("date",new HashMap<String,Object>(){{
+             put("type","string");
+             put("description","要查询的车次日期");
+         }});
+         List<String> required = new ArrayList<>();
+         required.add("departure");
+         required.add("destination");
+         required.add("date");
          chatFunctionParameters.setProperties(properties);
          ChatFunction chatFunction = ChatFunction.builder()
-                 .name("get_weather")
-                 .description("Get the current weather of a location")
+                 .name("query_train_info")
+                 .description("根据用户提供的信息，查询对应的车次")
                  .parameters(chatFunctionParameters)
+                 .required(required)
                  .build();
          chatTool.setFunction(chatFunction);
          chatToolList.add(chatTool);

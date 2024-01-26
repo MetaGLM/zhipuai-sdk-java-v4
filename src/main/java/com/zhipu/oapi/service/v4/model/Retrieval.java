@@ -1,5 +1,8 @@
 package com.zhipu.oapi.service.v4.model;
 
+import lombok.Data;
+
+@Data
 public class Retrieval {
 
 
