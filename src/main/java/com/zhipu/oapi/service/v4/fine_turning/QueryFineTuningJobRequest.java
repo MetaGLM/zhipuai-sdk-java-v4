@@ -20,7 +20,7 @@ public class QueryFineTuningJobRequest {
 
     private Integer limit;
 
-    private Integer after;
+    private String after;
 
 
 

@@ -13,7 +13,7 @@ import java.util.List;
 public class EmbeddingResult {
 
     /**
-     * The GPTmodel used for generating embeddings
+     * The GLMmodel used for generating embeddings
      */
     String model;
 

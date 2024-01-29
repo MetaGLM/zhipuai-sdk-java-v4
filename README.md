@@ -40,7 +40,7 @@ Java），让开发者更便捷的调用智谱开放API
 ```
         // 建议直接查看demo包代码，这里更新可能不及时
          List<ChatMessage> messages = new ArrayList<>();
-         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGPT和你哪个更强大");
+         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
          messages.add(chatMessage);
          String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
          List<ChatTool> chatToolList = new ArrayList<>();

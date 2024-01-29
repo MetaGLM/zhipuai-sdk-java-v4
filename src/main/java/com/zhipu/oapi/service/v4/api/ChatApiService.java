@@ -111,11 +111,11 @@ public class ChatApiService {
     }
 
 
-    public FineTuningEvent listFineTuningJobEvents(String fineTuningJobId,Integer limit,Integer after) {
+    public FineTuningEvent listFineTuningJobEvents(String fineTuningJobId,Integer limit,String after) {
         return execute(api.listFineTuningJobEvents(fineTuningJobId,limit,after));
     }
 
-    public FineTuningJob retrieveFineTuningJob(String fineTuningJobId,Integer limit,Integer after) {
+    public FineTuningJob retrieveFineTuningJob(String fineTuningJobId,Integer limit,String after) {
         return execute(api.retrieveFineTuningJob(fineTuningJobId,limit,after));
     }
 

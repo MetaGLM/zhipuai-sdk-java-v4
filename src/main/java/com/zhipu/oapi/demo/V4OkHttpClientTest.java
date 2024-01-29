@@ -29,7 +29,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class V4OkHttpClientTest {
 
-    private static final ClientV4 client = new ClientV4.Builder(Constants.onlineKeyV4, Constants.onlineSecretV4).build();
+    private static final String API_KEY = "120dd8b9ce50a9dd7b0583909dd49822";
+
+    private static final String API_SECRET = "N3VMdpTH7RqkHIFT";
+
+    private static final ClientV4 client = new ClientV4.Builder(API_KEY,API_SECRET).build();
 
     private static final ObjectMapper mapper = defaultObjectMapper();
 
@@ -103,7 +107,7 @@ public class V4OkHttpClientTest {
         QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
         queryFineTuningJobRequest.setJobId("ftjob-20240119114544390-zkgjb");
 //        queryFineTuningJobRequest.setLimit(1);
-//        queryFineTuningJobRequest.setAfter(1);
+//        queryFineTuningJobRequest.setAfter("1");
         QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = client.queryFineTuningJobsEvents(queryFineTuningJobRequest);
         System.out.println("model output:" + JSON.toJSONString(queryFineTuningEventApiResponse));
     }
@@ -115,7 +119,7 @@ public class V4OkHttpClientTest {
         QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
         queryFineTuningJobRequest.setJobId("ftjob-20240119114544390-zkgjb");
 //        queryFineTuningJobRequest.setLimit(1);
-//        queryFineTuningJobRequest.setAfter(1);
+//        queryFineTuningJobRequest.setAfter("1");
         QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.retrieveFineTuningJobs(queryFineTuningJobRequest);
         System.out.println("model output:" + JSON.toJSONString(queryFineTuningJobApiResponse));
     }
@@ -208,7 +212,7 @@ public class V4OkHttpClientTest {
      */
     private static void testSseInvoke() {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGPT和你哪个更强大");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
 //         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "你能帮我查询2024年1月1日从北京南站到上海的火车票吗？");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
@@ -301,7 +305,7 @@ public class V4OkHttpClientTest {
      */
     private static void testInvoke() {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGPT和你哪个更强大");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         // 函数调用参数构建部分
@@ -353,7 +357,7 @@ public class V4OkHttpClientTest {
      */
     private static String testAsyncInvoke() {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGPT和你哪个更强大");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatLM和你哪个更强大");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         // 函数调用参数构建部分

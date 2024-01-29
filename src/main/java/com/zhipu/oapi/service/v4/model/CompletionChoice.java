@@ -24,7 +24,7 @@ public class CompletionChoice {
     LogProbResult logprobs;
 
     /**
-     * The reason why GPT stopped generating, for example "length".
+     * The reason why GLM stopped generating, for example "length".
      */
     String finish_reason;
 }

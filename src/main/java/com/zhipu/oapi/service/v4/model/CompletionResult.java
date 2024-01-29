@@ -25,7 +25,7 @@ public class CompletionResult {
     long created;
 
     /**
-     * The GPT model used.
+     * The GLM model used.
      */
     String model;
 
