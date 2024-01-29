@@ -111,12 +111,12 @@ public class ChatApiService {
     }
 
 
-    public FineTuningEvent listFineTuningJobEvents(String fineTuningJobId) {
-        return execute(api.listFineTuningJobEvents(fineTuningJobId));
+    public FineTuningEvent listFineTuningJobEvents(String fineTuningJobId,Integer limit,Integer after) {
+        return execute(api.listFineTuningJobEvents(fineTuningJobId,limit,after));
     }
 
-    public FineTuningJob retrieveFineTuningJob(String fineTuningJobId) {
-        return execute(api.retrieveFineTuningJob(fineTuningJobId));
+    public FineTuningJob retrieveFineTuningJob(String fineTuningJobId,Integer limit,Integer after) {
+        return execute(api.retrieveFineTuningJob(fineTuningJobId,limit,after));
     }
 
 

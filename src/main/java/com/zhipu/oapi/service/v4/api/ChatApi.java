@@ -64,10 +64,10 @@ public interface ChatApi {
     Single<FineTuningJob> createFineTuningJob(@Body FineTuningJobRequest request);
 
     @GET("/api/paas/v4/fine_tuning/jobs/{fine_tuning_job_id}/events")
-    Single<FineTuningEvent> listFineTuningJobEvents(@Path("fine_tuning_job_id") String fineTuningJobId);
+    Single<FineTuningEvent> listFineTuningJobEvents(@Path("fine_tuning_job_id") String fineTuningJobId,@Query("limit") Integer limit,@Query("after") Integer after);
 
     @GET("/api/paas/v4/fine_tuning/jobs/{fine_tuning_job_id}")
-    Single<FineTuningJob> retrieveFineTuningJob(@Path("fine_tuning_job_id") String fineTuningJobId);
+    Single<FineTuningJob> retrieveFineTuningJob(@Path("fine_tuning_job_id") String fineTuningJobId,@Query("limit") Integer limit,@Query("after") Integer after);
 
 
     @GET("/api/paas/v4/fine_tuning/jobs")

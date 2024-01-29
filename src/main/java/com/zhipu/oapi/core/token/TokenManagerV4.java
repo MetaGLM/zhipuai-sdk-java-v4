@@ -17,7 +17,7 @@ public class TokenManagerV4 {
 
     private static final Logger logger = LoggerFactory.getLogger(TokenManagerV4.class);
     private ICache cache;
-    private static final String tokenV3KeyPrefix = "zhipu_oapi_token_v3";
+    private static final String tokenV4KeyPrefix = "zhipu_oapi_token_v4";
 
     public TokenManagerV4(ICache cache) {
         this.cache = cache;
@@ -63,6 +63,6 @@ public class TokenManagerV4 {
     }
 
     private String genTokenCacheKey(String apiKey) {
-        return String.format("%s-%s", tokenV3KeyPrefix, apiKey);
+        return String.format("%s-%s", tokenV4KeyPrefix, apiKey);
     }
 }

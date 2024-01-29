@@ -2,6 +2,8 @@ package com.zhipu.oapi.demo;
 
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -27,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class V4OkHttpClientTest {
 
-    private static final ClientV4 client = new ClientV4.Builder(Constants.onlineKeyV3, Constants.onlineSecretV3).build();
+    private static final ClientV4 client = new ClientV4.Builder(Constants.onlineKeyV4, Constants.onlineSecretV4).build();
 
     private static final ObjectMapper mapper = defaultObjectMapper();
 
@@ -52,14 +54,14 @@ public class V4OkHttpClientTest {
         testSseInvoke();
 
         // 2. invoke调用模型,直接返回结果
-//          testInvoke();
+//        testInvoke();
 
         // 3. 异步调用
 //         String taskId = testAsyncInvoke();
         // 4.异步查询
 //         testQueryResult(taskId);
 
-         // 5.文生图
+        // 5.文生图
 //          testCreateImage();
 
         // 6. 图生文
@@ -93,23 +95,29 @@ public class V4OkHttpClientTest {
         QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest = new QueryPersonalFineTuningJobRequest();
         queryPersonalFineTuningJobRequest.setLimit(1);
         QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = client.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest);
-        System.out.println("model output:"+JSON.toJSONString(queryPersonalFineTuningJobApiResponse));
+        System.out.println("model output:" + JSON.toJSONString(queryPersonalFineTuningJobApiResponse));
 
     }
 
     private static void testQueryFineTuningJobsEvents() {
-       String fineTuningJobId  = "ftjob-20240119114544390-zkgj";
-       QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = client.queryFineTuningJobsEvents(fineTuningJobId);
-       System.out.println("model output:"+JSON.toJSONString(queryFineTuningEventApiResponse));
+        QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
+        queryFineTuningJobRequest.setJobId("ftjob-20240119114544390-zkgjb");
+//        queryFineTuningJobRequest.setLimit(1);
+//        queryFineTuningJobRequest.setAfter(1);
+        QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = client.queryFineTuningJobsEvents(queryFineTuningJobRequest);
+        System.out.println("model output:" + JSON.toJSONString(queryFineTuningEventApiResponse));
     }
 
     /**
      * 查询微调任务
      */
     private static void testRetrieveFineTuningJobs() {
-        String fineTuningJobId  = "ftjob-20240119114544390-zkgjb";
-        QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.retrieveFineTuningJobs(fineTuningJobId);
-        System.out.println("model output:"+JSON.toJSONString(queryFineTuningJobApiResponse));
+        QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
+        queryFineTuningJobRequest.setJobId("ftjob-20240119114544390-zkgjb");
+//        queryFineTuningJobRequest.setLimit(1);
+//        queryFineTuningJobRequest.setAfter(1);
+        QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.retrieveFineTuningJobs(queryFineTuningJobRequest);
+        System.out.println("model output:" + JSON.toJSONString(queryFineTuningJobApiResponse));
     }
 
     /**
@@ -129,9 +137,9 @@ public class V4OkHttpClientTest {
      * 微调文件上传列表查询
      */
     private static void testQueryUploadFileList() {
-      QueryFilesRequest queryFilesRequest = new QueryFilesRequest();
-      QueryFileApiResponse queryFileApiResponse = client.queryFilesApi(queryFilesRequest);
-      System.out.println("model output:"+ JSON.toJSONString(queryFileApiResponse));
+        QueryFilesRequest queryFilesRequest = new QueryFilesRequest();
+        QueryFileApiResponse queryFileApiResponse = client.queryFilesApi(queryFilesRequest);
+        System.out.println("model output:" + JSON.toJSONString(queryFileApiResponse));
     }
 
 
@@ -141,8 +149,8 @@ public class V4OkHttpClientTest {
     private static void testUploadFile() {
         String filePath = "/Users/wujianguo/Downloads/transaction-data.jsonl";
         String purpose = "fine-tune";
-        FileApiResponse fileApiResponse = client.invokeUploadFileApi(purpose,filePath);
-        System.out.println("model output:"+JSON.toJSONString(fileApiResponse));
+        FileApiResponse fileApiResponse = client.invokeUploadFileApi(purpose, filePath);
+        System.out.println("model output:" + JSON.toJSONString(fileApiResponse));
     }
 
     private static void testEmbeddings() {
@@ -150,7 +158,7 @@ public class V4OkHttpClientTest {
         embeddingRequest.setInput("hello world");
         embeddingRequest.setModel(Constants.ModelEmbedding2);
         EmbeddingApiResponse apiResponse = client.invokeEmbeddingsApi(embeddingRequest);
-        System.out.println("model output:"+JSON.toJSONString(apiResponse));
+        System.out.println("model output:" + JSON.toJSONString(apiResponse));
     }
 
     /**
@@ -158,15 +166,15 @@ public class V4OkHttpClientTest {
      */
     private static void testImageToWord() {
         List<ChatMessage> messages = new ArrayList<>();
-        List<Map<String,Object>> contentList = new ArrayList<>();
-        Map<String,Object> textMap = new HashMap<>();
-        textMap.put("type","text");
-        textMap.put("text","图里有什么");
-        Map<String,Object> typeMap = new HashMap<>();
-        typeMap.put("type","image_url");
-        Map<String,Object> urlMap = new HashMap<>();
-        urlMap.put("url","https://cdn.bigmodel.cn/enterpriseAc/3f328152-e15c-420c-803d-6684a9f551df.jpeg?attname=24.jpeg");
-        typeMap.put("image_url",urlMap);
+        List<Map<String, Object>> contentList = new ArrayList<>();
+        Map<String, Object> textMap = new HashMap<>();
+        textMap.put("type", "text");
+        textMap.put("text", "图里有什么");
+        Map<String, Object> typeMap = new HashMap<>();
+        typeMap.put("type", "image_url");
+        Map<String, Object> urlMap = new HashMap<>();
+        urlMap.put("url", "https://cdn.bigmodel.cn/enterpriseAc/3f328152-e15c-420c-803d-6684a9f551df.jpeg?attname=24.jpeg");
+        typeMap.put("image_url", urlMap);
         contentList.add(textMap);
         contentList.add(typeMap);
         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), contentList);
@@ -182,7 +190,7 @@ public class V4OkHttpClientTest {
                 .requestId(requestId)
                 .build();
         ModelApiResponse modelApiResponse = client.invokeModelApi(chatCompletionRequest);
-        System.out.println("model output:"+ JSON.toJSONString(modelApiResponse));
+        System.out.println("model output:" + JSON.toJSONString(modelApiResponse));
 
     }
 
@@ -191,62 +199,62 @@ public class V4OkHttpClientTest {
         createImageRequest.setModel(Constants.ModelCogView);
 //        createImageRequest.setPrompt("画一个温顺可爱的小狗");
         ImageApiResponse imageApiResponse = client.createImage(createImageRequest);
-        System.out.println("imageApiResponse:"+JSON.toJSONString(imageApiResponse));
+        System.out.println("imageApiResponse:" + JSON.toJSONString(imageApiResponse));
     }
 
 
     /**
      * sse调用
      */
-     private static void testSseInvoke() {
-         List<ChatMessage> messages = new ArrayList<>();
-         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "您好，北京天气怎么样");
+    private static void testSseInvoke() {
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGPT和你哪个更强大");
 //         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "你能帮我查询2024年1月1日从北京南站到上海的火车票吗？");
-         messages.add(chatMessage);
-         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
-         // 函数调用参数构建部分
-         List<ChatTool> chatToolList = new ArrayList<>();
-         ChatTool chatTool = new ChatTool();
-         chatTool.setType(ChatToolType.FUNCTION.value());
-         ChatFunctionParameters chatFunctionParameters = new ChatFunctionParameters();
-         chatFunctionParameters.setType("object");
-         Map<String,Object> properties = new HashMap<>();
-         properties.put("departure",new HashMap<String,Object>(){{
-             put("type","string");
-             put("description","出发城市或车站");
-         }});
-         properties.put("destination",new HashMap<String,Object>(){{
-             put("type","string");
-             put("description","目的地城市或车站");
-         }});
-         properties.put("date",new HashMap<String,Object>(){{
-             put("type","string");
-             put("description","要查询的车次日期");
-         }});
-         List<String> required = new ArrayList<>();
-         required.add("departure");
-         required.add("destination");
-         required.add("date");
-         chatFunctionParameters.setProperties(properties);
-         ChatFunction chatFunction = ChatFunction.builder()
-                 .name("query_train_info")
-                 .description("根据用户提供的信息，查询对应的车次")
-                 .parameters(chatFunctionParameters)
-                 .required(required)
-                 .build();
-         chatTool.setFunction(chatFunction);
-         chatToolList.add(chatTool);
+        messages.add(chatMessage);
+        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+        // 函数调用参数构建部分
+        List<ChatTool> chatToolList = new ArrayList<>();
+        ChatTool chatTool = new ChatTool();
+        chatTool.setType(ChatToolType.FUNCTION.value());
+        ChatFunctionParameters chatFunctionParameters = new ChatFunctionParameters();
+        chatFunctionParameters.setType("object");
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("departure", new HashMap<String, Object>() {{
+            put("type", "string");
+            put("description", "出发城市或车站");
+        }});
+        properties.put("destination", new HashMap<String, Object>() {{
+            put("type", "string");
+            put("description", "目的地城市或车站");
+        }});
+        properties.put("date", new HashMap<String, Object>() {{
+            put("type", "string");
+            put("description", "要查询的车次日期");
+        }});
+        List<String> required = new ArrayList<>();
+        required.add("departure");
+        required.add("destination");
+        required.add("date");
+        chatFunctionParameters.setProperties(properties);
+        ChatFunction chatFunction = ChatFunction.builder()
+                .name("query_train_info")
+                .description("根据用户提供的信息，查询对应的车次")
+                .parameters(chatFunctionParameters)
+                .required(required)
+                .build();
+        chatTool.setFunction(chatFunction);
+        chatToolList.add(chatTool);
 
-         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                 .model(Constants.ModelChatGLM4)
-                 .stream(Boolean.TRUE)
-                 .messages(messages)
-                 .requestId(requestId)
-                 .tools(chatToolList)
-                 .toolChoice("auto")
-                 .build();
-         ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
-         if(sseModelApiResp.isSuccess()){
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                .model(Constants.ModelChatGLM4)
+                .stream(Boolean.TRUE)
+                .messages(messages)
+                .requestId(requestId)
+                .tools(chatToolList)
+                .toolChoice("auto")
+                .build();
+        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        if (sseModelApiResp.isSuccess()) {
             AtomicBoolean isFirst = new AtomicBoolean(true);
             ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
                     .doOnNext(accumulator -> {
@@ -256,7 +264,7 @@ public class V4OkHttpClientTest {
                             }
                             if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
                                 String jsonString = mapper.writeValueAsString(accumulator.getDelta().getTool_calls());
-                                System.out.println("tool_calls: "+jsonString);
+                                System.out.println("tool_calls: " + jsonString);
                             }
                             if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
                                 System.out.print(accumulator.getDelta().getContent());
@@ -270,23 +278,24 @@ public class V4OkHttpClientTest {
             Choice choice = new Choice(chatMessageAccumulator.getChoice().getFinishReason(), 0L, chatMessageAccumulator.getDelta());
             List<Choice> choices = new ArrayList<>();
             choices.add(choice);
-             ModelData data = new ModelData();
-             data.setChoices(choices);
-             data.setUsage(chatMessageAccumulator.getUsage());
-             data.setId(chatMessageAccumulator.getId());
-             data.setCreated(chatMessageAccumulator.getCreated());
-             data.setRequestId(chatCompletionRequest.getRequestId());
-             sseModelApiResp.setFlowable(null);
-             sseModelApiResp.setData(data);
+            ModelData data = new ModelData();
+            data.setChoices(choices);
+            data.setUsage(chatMessageAccumulator.getUsage());
+            data.setId(chatMessageAccumulator.getId());
+            data.setCreated(chatMessageAccumulator.getCreated());
+            data.setRequestId(chatCompletionRequest.getRequestId());
+            sseModelApiResp.setFlowable(null);
+            sseModelApiResp.setData(data);
         }
-         System.out.println("model output:"+ JSON.toJSONString(sseModelApiResp));
-     }
+        System.out.println("model output:" + JSON.toJSONString(sseModelApiResp));
+    }
 
     public static Flowable<ChatMessageAccumulator> mapStreamToAccumulator(Flowable<ModelData> flowable) {
         return flowable.map(chunk -> {
-            return new ChatMessageAccumulator(chunk.getChoices().get(0).getDelta(), null,chunk.getChoices().get(0),chunk.getUsage(),chunk.getCreated(),chunk.getId());
+            return new ChatMessageAccumulator(chunk.getChoices().get(0).getDelta(), null, chunk.getChoices().get(0), chunk.getUsage(), chunk.getCreated(), chunk.getId());
         });
     }
+
     /**
      * 同步调用
      */
@@ -301,14 +310,17 @@ public class V4OkHttpClientTest {
         chatTool.setType(ChatToolType.FUNCTION.value());
         ChatFunctionParameters chatFunctionParameters = new ChatFunctionParameters();
         chatFunctionParameters.setType("object");
-        Map<String,Object> properties = new HashMap<>();
-        properties.put("location",new HashMap<String,Object>(){{
-            put("type","string");
-            put("description","城市，如：北京");
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("location", new HashMap<String, Object>() {{
+            put("type", "string");
+            put("description", "城市，如：北京");
         }});
-        properties.put("unit",new HashMap<String,Object>(){{
-            put("type","string");
-            put("enum",new ArrayList<String>(){{add("celsius");add("fahrenheit");}});
+        properties.put("unit", new HashMap<String, Object>() {{
+            put("type", "string");
+            put("enum", new ArrayList<String>() {{
+                add("celsius");
+                add("fahrenheit");
+            }});
         }});
         chatFunctionParameters.setProperties(properties);
         ChatFunction chatFunction = ChatFunction.builder()
@@ -328,13 +340,16 @@ public class V4OkHttpClientTest {
                 .toolChoice("auto")
                 .build();
         ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        System.out.println("model output:"+ JSON.toJSONString(invokeModelApiResp));
+        try {
+            System.out.println("model output:" + mapper.writeValueAsString(invokeModelApiResp));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
 
     /**
      * 异步调用
-     *
      */
     private static String testAsyncInvoke() {
         List<ChatMessage> messages = new ArrayList<>();
@@ -347,14 +362,17 @@ public class V4OkHttpClientTest {
         chatTool.setType(ChatToolType.FUNCTION.value());
         ChatFunctionParameters chatFunctionParameters = new ChatFunctionParameters();
         chatFunctionParameters.setType("object");
-        Map<String,Object> properties = new HashMap<>();
-        properties.put("location",new HashMap<String,Object>(){{
-            put("type","string");
-            put("description","城市，如：北京");
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("location", new HashMap<String, Object>() {{
+            put("type", "string");
+            put("description", "城市，如：北京");
         }});
-        properties.put("unit",new HashMap<String,Object>(){{
-            put("type","string");
-            put("enum",new ArrayList<String>(){{add("celsius");add("fahrenheit");}});
+        properties.put("unit", new HashMap<String, Object>() {{
+            put("type", "string");
+            put("enum", new ArrayList<String>() {{
+                add("celsius");
+                add("fahrenheit");
+            }});
         }});
         chatFunctionParameters.setProperties(properties);
         ChatFunction chatFunction = ChatFunction.builder()
@@ -374,20 +392,25 @@ public class V4OkHttpClientTest {
                 .toolChoice("auto")
                 .build();
         ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        System.out.println("model output:"+ JSON.toJSONString(invokeModelApiResp));
+        System.out.println("model output:" + JSON.toJSONString(invokeModelApiResp));
         return invokeModelApiResp.getData().getTaskId();
     }
 
 
     /**
      * 查询异步结果
+     *
      * @param taskId
      */
     private static void testQueryResult(String taskId) {
         QueryModelResultRequest request = new QueryModelResultRequest();
         request.setTaskId(taskId);
         QueryModelResultResponse queryResultResp = client.queryModelResult(request);
-        System.out.println("model output:"+JSON.toJSONString(queryResultResp));
+        try {
+            System.out.println("model output:" + mapper.writeValueAsString(queryResultResp));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 }
 

@@ -36,8 +36,8 @@ public class Constants {
     public static final String resultKeySuccess = "success";
     public static final String resultKeyData = "data";
 
-    public static final String onlineKeyV3 = "120dd8b9ce50a9dd7b0583909dd49822";
+    public static final String onlineKeyV4 = "120dd8b9ce50a9dd7b0583909dd49822";
 
-    public static final String onlineSecretV3 = "N3VMdpTH7RqkHIFT";
+    public static final String onlineSecretV4 = "N3VMdpTH7RqkHIFT";
 
 }

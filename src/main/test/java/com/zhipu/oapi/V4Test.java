@@ -2,6 +2,11 @@ package com.zhipu.oapi;
 
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.file.FileApiResponse;
@@ -9,21 +14,36 @@ import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.image.CreateImageRequest;
 import com.zhipu.oapi.service.v4.image.ImageApiResponse;
 import com.zhipu.oapi.service.v4.model.*;
+import io.reactivex.Flowable;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class V4Test {
 
-    private static final ClientV4 client = new ClientV4.Builder(Constants.onlineKeyV3, Constants.onlineSecretV3).build();
+    private static final ClientV4 client = new ClientV4.Builder(Constants.onlineKeyV4, Constants.onlineSecretV4).build();
 
     // 请自定义自己的业务id
     private static final String requestIdTemplate = "mycompany-%d";
 
+    private static final ObjectMapper mapper = defaultObjectMapper();
+
+
+    public static ObjectMapper defaultObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+        mapper.addMixIn(ChatFunction.class, ChatFunctionMixIn.class);
+        mapper.addMixIn(ChatCompletionRequest.class, ChatCompletionRequestMixIn.class);
+        mapper.addMixIn(ChatFunctionCall.class, ChatFunctionCallMixIn.class);
+        return mapper;
+    }
 
     /**
      * sse-V4：function调用
@@ -67,7 +87,40 @@ public class V4Test {
                 .toolChoice("auto")
                 .build();
         ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        System.out.println("model output:"+ JSON.toJSONString(sseModelApiResp));
+        if (sseModelApiResp.isSuccess()) {
+            AtomicBoolean isFirst = new AtomicBoolean(true);
+            ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
+                    .doOnNext(accumulator -> {
+                        {
+                            if (isFirst.getAndSet(false)) {
+                                System.out.print("Response: ");
+                            }
+                            if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
+                                String jsonString = mapper.writeValueAsString(accumulator.getDelta().getTool_calls());
+                                System.out.println("tool_calls: " + jsonString);
+                            }
+                            if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
+                                System.out.print(accumulator.getDelta().getContent());
+                            }
+                        }
+                    })
+                    .doOnComplete(System.out::println)
+                    .lastElement()
+                    .blockingGet();
+
+            Choice choice = new Choice(chatMessageAccumulator.getChoice().getFinishReason(), 0L, chatMessageAccumulator.getDelta());
+            List<Choice> choices = new ArrayList<>();
+            choices.add(choice);
+            ModelData data = new ModelData();
+            data.setChoices(choices);
+            data.setUsage(chatMessageAccumulator.getUsage());
+            data.setId(chatMessageAccumulator.getId());
+            data.setCreated(chatMessageAccumulator.getCreated());
+            data.setRequestId(chatCompletionRequest.getRequestId());
+            sseModelApiResp.setFlowable(null);
+            sseModelApiResp.setData(data);
+        }
+        System.out.println("model output:" + JSON.toJSONString(sseModelApiResp));
     }
 
 
@@ -133,7 +186,11 @@ public class V4Test {
                 .toolChoice("auto")
                 .build();
         ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        System.out.println("model output:"+ JSON.toJSONString(invokeModelApiResp));
+        try {
+            System.out.println("model output:" + mapper.writeValueAsString(invokeModelApiResp));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -272,8 +329,11 @@ public class V4Test {
      */
     @Test
     public void testRetrieveFineTuningJobs(){
-        String fineTuningJobId  = "ftjob-20240119114544390-zkgjb";
-        QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.retrieveFineTuningJobs(fineTuningJobId);
+        QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
+        queryFineTuningJobRequest.setJobId("ftjob-20240119114544390-zkgjb");
+//        queryFineTuningJobRequest.setLimit(1);
+//        queryFineTuningJobRequest.setAfter(1);
+        QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.retrieveFineTuningJobs(queryFineTuningJobRequest);
         System.out.println("model output:"+JSON.toJSONString(queryFineTuningJobApiResponse));
     }
 
@@ -340,4 +400,9 @@ public class V4Test {
         System.out.println("model output:"+JSON.toJSONString(queryResultResp));
     }
 
+    public static Flowable<ChatMessageAccumulator> mapStreamToAccumulator(Flowable<ModelData> flowable) {
+        return flowable.map(chunk -> {
+            return new ChatMessageAccumulator(chunk.getChoices().get(0).getDelta(), null, chunk.getChoices().get(0), chunk.getUsage(), chunk.getCreated(), chunk.getId());
+        });
+    }
 }
