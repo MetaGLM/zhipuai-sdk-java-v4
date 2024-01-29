@@ -15,10 +15,10 @@ public class ChatMessage {
     private String role;
     private Object content;
 
-    String name;
+    private String name;
 
     @JsonProperty("tool_calls")
-    List<ToolCalls> tool_calls;
+    private List<ToolCalls> tool_calls;
 
     private String tool_call_id;
 
