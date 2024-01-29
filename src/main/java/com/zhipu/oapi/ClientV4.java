@@ -262,6 +262,12 @@ public class ClientV4 {
         if (request == null) {
             return "request can not be null";
         }
+        if(StringUtils.isEmpty(config.getApiKey())){
+            return "apikey can not be empty";
+        }
+        if(StringUtils.isEmpty(config.getApiSecret())){
+            return "apiSecret can not be empty";
+        }
         if (!request.getStream() && StringUtils.isEmpty(request.getInvokeMethod())) {
             return "invoke method can not be empty";
         }

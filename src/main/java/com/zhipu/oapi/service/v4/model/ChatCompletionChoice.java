@@ -21,7 +21,7 @@ public class ChatCompletionChoice {
     ChatMessage message;
 
     /**
-     * The reason why GPT stopped generating, for example "length".
+     * The reason why GLM stopped generating, for example "length".
      */
     @JsonProperty("finish_reason")
     String finishReason;
