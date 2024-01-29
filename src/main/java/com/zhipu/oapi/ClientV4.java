@@ -91,9 +91,10 @@ public class ClientV4 {
             RawResponse rawResp = this.getConfig().getHttpTransport().sseExecute(rawReq);
             resp.setCode(rawResp.getStatusCode());
             resp.setMsg(rawResp.getMsg());
-            ObjectMapper objectMapper = new ObjectMapper();
-            ModelData data = objectMapper.readValue(rawResp.getBody(), ModelData.class);
-            resp.setData(data);
+            resp.setSuccess(rawResp.isSuccess());
+            if(resp.isSuccess()){
+                resp.setFlowable(rawResp.getFlowable());
+            }
             return resp;
         } catch (Exception e) {
             logger.error("sse invoke model fail!", e);

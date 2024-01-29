@@ -1,11 +1,15 @@
 package com.zhipu.oapi.service.v4.model;
 
+import io.reactivex.Flowable;
+
 public class ModelApiResponse {
     private int code;
     private String msg;
     private boolean success;
 
     private ModelData data;
+
+    private Flowable<ModelData> flowable;
 
     public ModelApiResponse() {
     }
@@ -50,5 +54,14 @@ public class ModelApiResponse {
 
     public void setData(ModelData data) {
         this.data = data;
+    }
+
+
+    public Flowable<ModelData> getFlowable() {
+        return flowable;
+    }
+
+    public void setFlowable(Flowable<ModelData> flowable) {
+        this.flowable = flowable;
     }
 }

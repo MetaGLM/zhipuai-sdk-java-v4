@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.zhipu.oapi.Constants;
+import com.zhipu.oapi.service.v4.model.ModelData;
+import io.reactivex.Flowable;
 
 public class RawResponse {
     private int statusCode;
@@ -15,6 +17,7 @@ public class RawResponse {
     private String contentType;
     private Map<String, List<String>> headers = new HashMap<>();
     private String body;
+    private Flowable<ModelData> flowable;
 
     public int getStatusCode() {
         return statusCode;
@@ -65,5 +68,14 @@ public class RawResponse {
 
     public void setSuccess(boolean success) {
         this.success = success;
+    }
+
+
+    public Flowable<ModelData>  getFlowable() {
+        return flowable;
+    }
+
+    public void setFlowable(Flowable<ModelData>  flowable) {
+        this.flowable = flowable;
     }
 }
