@@ -30,21 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * v3接口client，API系统进行了重构，无法跟之前的兼容，因此重新实现Client层
- * 新的接口地址：open.bigmodel.cn/api/paas/v3/model-api/{model}/{invoke_method}
- * 文档地址：https://test.bigmodel.cn/doc/api#sdk（测试中）
- * 支持模型包括：只有语言模型支持sse，其他均为async调用，需要结合query接口一起使用
- * - chatGLM_6b_SSE
- * - article-model
- * - title-creation
- * - multilingual-code-generate
- * - codegeex-generate-block
- * - multilingual-code-translate
- * - text2image
- * 结果查询接口:maas.aminer.cn/api/paas/request-task/query-request-task-result/{taskOrderNo}
- * - 有新接口吗？
- */
+
 public class ClientV4 {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientV4.class);
@@ -398,12 +384,12 @@ public class ClientV4 {
         return createFineTuningJobApiResponse;
     }
 
-    public QueryFineTuningEventApiResponse queryFineTuningJobsEvents(String fineTuningJobId) {
+    public QueryFineTuningEventApiResponse queryFineTuningJobsEvents(QueryFineTuningJobRequest queryFineTuningJobRequest) {
         QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = new QueryFineTuningEventApiResponse();
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
         ChatApiService service = new ChatApiService(token);
         try {
-            FineTuningEvent fineTuningEvent = service.listFineTuningJobEvents(fineTuningJobId);
+            FineTuningEvent fineTuningEvent = service.listFineTuningJobEvents(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
             if (fineTuningEvent != null) {
                 queryFineTuningEventApiResponse.setSuccess(true);
                 queryFineTuningEventApiResponse.setData(fineTuningEvent);
@@ -425,12 +411,12 @@ public class ClientV4 {
         return queryFineTuningEventApiResponse;
     }
 
-    public QueryFineTuningJobApiResponse retrieveFineTuningJobs(String fineTuningJobId) {
+    public QueryFineTuningJobApiResponse retrieveFineTuningJobs(QueryFineTuningJobRequest queryFineTuningJobRequest) {
         QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = new QueryFineTuningJobApiResponse();
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
         ChatApiService service = new ChatApiService(token);
         try {
-            FineTuningJob fineTuningJob = service.retrieveFineTuningJob(fineTuningJobId);
+            FineTuningJob fineTuningJob = service.retrieveFineTuningJob(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
             if (fineTuningJob != null) {
                 queryFineTuningJobApiResponse.setSuccess(true);
                 queryFineTuningJobApiResponse.setData(fineTuningJob);
