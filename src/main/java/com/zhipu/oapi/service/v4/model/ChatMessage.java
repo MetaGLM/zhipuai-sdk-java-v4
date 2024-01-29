@@ -20,6 +20,8 @@ public class ChatMessage {
     @JsonProperty("tool_calls")
     List<ToolCalls> tool_calls;
 
+    private String tool_call_id;
+
 
     public ChatMessage(String role, Object content) {
         this.role = role;
@@ -33,5 +35,12 @@ public class ChatMessage {
         this.name = name;
     }
 
+
+    public ChatMessage(String role, Object content, String name,String tool_call_id) {
+        this.role = role;
+        this.content = content;
+        this.name = name;
+        this.tool_call_id = tool_call_id;
+    }
 
 }
