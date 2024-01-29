@@ -1,15 +1,16 @@
 package com.zhipu.oapi.core.httpclient;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.google.gson.Gson;
 import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.core.request.RawRequest;
 import com.zhipu.oapi.core.response.RawResponse;
-import com.zhipu.oapi.service.v4.model.TaskStatus;
+import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.api.ChatApiService;
-import com.zhipu.oapi.service.v4.model.ChatMessageAccumulator;
-import com.zhipu.oapi.service.v4.model.Choice;
-import com.zhipu.oapi.service.v4.model.ModelData;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -27,6 +28,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class OkHttpTransport extends BaseHttpTransport {
 
     private OkHttpClient okHttpClient;
+
+
+    private static final ObjectMapper mapper = defaultObjectMapper();
+
+
+    public static ObjectMapper defaultObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+        mapper.addMixIn(ChatFunction.class, ChatFunctionMixIn.class);
+        mapper.addMixIn(ChatCompletionRequest.class, ChatCompletionRequestMixIn.class);
+        mapper.addMixIn(ChatFunctionCall.class, ChatFunctionCallMixIn.class);
+        return mapper;
+    }
+
 
     public OkHttpTransport(OkHttpClient okHttpClient) {
         this.okHttpClient = okHttpClient;
@@ -102,9 +119,10 @@ public class OkHttpTransport extends BaseHttpTransport {
                         if (isFirst.getAndSet(false)) {
                             System.out.print("Response: ");
                         }
-//                        if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
-//                            System.out.println(JSON.toJSONString(accumulator.getDelta().getTool_calls()));
-//                        }
+                        if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
+                            String jsonString = mapper.writeValueAsString(accumulator.getDelta().getTool_calls());
+                            System.out.println("tool_calls: "+jsonString);
+                        }
                         if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
                             System.out.print(accumulator.getDelta().getContent());
                         }
