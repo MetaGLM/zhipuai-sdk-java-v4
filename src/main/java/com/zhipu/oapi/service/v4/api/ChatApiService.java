@@ -218,8 +218,6 @@ public class ChatApiService {
 
     public Flowable<ChatMessageAccumulator> mapStreamToAccumulator(Flowable<ModelData> flowable) {
         return flowable.map(chunk -> {
-            String jsonString = mapper.writeValueAsString(chunk);
-            System.out.println("chunk"+JSON.toJSONString(jsonString));
             return new ChatMessageAccumulator(chunk.getChoices().get(0).getDelta(), null,chunk.getChoices().get(0),chunk.getUsage(),chunk.getCreated(),chunk.getId());
         });
     }
