@@ -12,10 +12,14 @@ import lombok.NoArgsConstructor;
 @Data
 public class ChatTool {
 
-
     private String type;
 
     private ChatFunction function;
 
+
+    private Retrieval retrieval;
+
+
+    private WebSearch web_search;
 
 }
