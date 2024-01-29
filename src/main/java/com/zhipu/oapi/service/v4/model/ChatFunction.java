@@ -22,9 +22,6 @@ public class ChatFunction {
 
     private ChatFunctionParameters parameters;
 
-    private Retrieval retrieval;
-
-    private WebSearch web_search;
 
     private List<String> required;
 
@@ -39,9 +36,6 @@ public class ChatFunction {
         private String name;
         private String description;
 
-        private Retrieval retrieval;
-
-        private WebSearch web_search;
 
         private ChatFunctionParameters parameters;
 
@@ -69,24 +63,12 @@ public class ChatFunction {
         }
 
 
-        public Builder webSearch(WebSearch webSearch) {
-            this.web_search = webSearch;
-            return this;
-        }
-
-        public Builder retrieval(Retrieval retrieval) {
-            this.retrieval = retrieval;
-            return this;
-        }
-
 
         public ChatFunction build() {
             ChatFunction chatFunction = new ChatFunction();
             chatFunction.setName(name);
             chatFunction.setDescription(description);
             chatFunction.setParameters(parameters);
-            chatFunction.setWeb_search(web_search);
-            chatFunction.setRetrieval(retrieval);
             chatFunction.setRequired(required);
             return chatFunction;
         }
