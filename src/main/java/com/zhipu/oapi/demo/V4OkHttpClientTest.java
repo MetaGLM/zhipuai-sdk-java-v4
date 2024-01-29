@@ -29,9 +29,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class V4OkHttpClientTest {
 
-    private static final String API_KEY = "120dd8b9ce50a9dd7b0583909dd49822";
+    private static final String API_KEY = "";
 
-    private static final String API_SECRET = "N3VMdpTH7RqkHIFT";
+    private static final String API_SECRET = "";
 
     private static final ClientV4 client = new ClientV4.Builder(API_KEY,API_SECRET).build();
 
