@@ -15,7 +15,7 @@ Java），让开发者更便捷的调用智谱开放API
         <dependency>
             <groupId>cn.bigmodel.openapi</groupId>
             <artifactId>oapi-java-sdk</artifactId>
-            <version>V4-1.0.0</version>
+            <version>release-V4-2.0.0</version>
         </dependency>
 ```
 
