@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.zhipu.oapi.ClientV4;
 import com.zhipu.oapi.Constants;
+import com.zhipu.oapi.function.Functions;
+import com.zhipu.oapi.function.GetWeather;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.file.FileApiResponse;
@@ -55,10 +57,10 @@ public class V4OkHttpClientTest {
     public static void main(String[] args) throws Exception {
         System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
         // 1. sse-invoke调用模型，使用标准Listener，直接返回结果
-        testSseInvoke();
+        //testSseInvoke();
 
         // 2. invoke调用模型,直接返回结果
-//        testInvoke();
+        //testInvoke();
 
         // 3. 异步调用
 //         String taskId = testAsyncInvoke();
@@ -81,7 +83,7 @@ public class V4OkHttpClientTest {
 //          testQueryUploadFileList();
 
         // 10.微调-创建微调任务
-//          testCreateFineTuningJob();
+        //  testCreateFineTuningJob();
 
         // 11.微调-查询微调任务事件
 //          testQueryFineTuningJobsEvents();
@@ -90,9 +92,13 @@ public class V4OkHttpClientTest {
 //        testRetrieveFineTuningJobs();
 
         // 13.微调-查询个人微调任务
-//          testQueryPersonalFineTuningJobs();
+        //  testQueryPersonalFineTuningJobs();
 
         // 14.微调-调用微调模型（参考模型调用接口，并替换成要调用模型的编码model）
+
+
+        // 15. 同步且工具调用模型
+        testFunctionInvoke();
     }
 
     private static void testQueryPersonalFineTuningJobs() {
@@ -305,7 +311,7 @@ public class V4OkHttpClientTest {
      */
     private static void testInvoke() {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "作为运动处方开具师，我的情况是{糖尿病、高血压、35岁、男、码农},我在杭州，今天的温度怎么样？适合做什么运动");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         // 函数调用参数构建部分
@@ -414,6 +420,89 @@ public class V4OkHttpClientTest {
             System.out.println("model output:" + mapper.writeValueAsString(queryResultResp));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * V4-同步function调用
+     * function调用流程完整的message list:
+     * 1.user message     -杭州今天天气如何，我想跑步
+     * 2.assistant message-不知道天气，需要调用，用户编写的get_weather函数去查询天气，入参是“杭州”，tool_call_id=x
+     * 3.tool message     -用户自己 拼装的信息 【编写的get_weather函数返回结果（杭州下雨）+tool_call_id=x】
+     * 4.结合了function calling的最终回答-杭州今天下雨，不适合跑步
+     */
+    public static void testFunctionInvoke(){
+        // 初始化函数列表，暂时只添加获取天气的函数
+        GetWeather getWeather = new GetWeather();
+        HashMap<String, Functions> functions = new HashMap<>();
+        functions.put("get_weather", getWeather);
+
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "杭州今天天气如何，我想跑步");
+        // 1.user message
+        messages.add(chatMessage);
+        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+        // 函数调用参数构建部分
+        List<ChatTool> chatToolList = new ArrayList<>();
+        ChatTool chatTool = new ChatTool();
+        chatTool.setType(ChatToolType.FUNCTION.value());
+        ChatFunctionParameters chatFunctionParameters = new ChatFunctionParameters();
+        chatFunctionParameters.setType("object");
+        Map<String,Object> properties = new HashMap<>();
+        properties.put("location",new HashMap<String,Object>(){{
+            put("type","string");
+            put("description","城市，如：北京");
+        }});
+        properties.put("unit",new HashMap<String,Object>(){{
+            put("type","string");
+            put("enum",new ArrayList<String>(){{add("celsius");add("fahrenheit");}});
+        }});
+        chatFunctionParameters.setProperties(properties);
+        ChatFunction chatFunction = ChatFunction.builder()
+                .name("get_weather")
+                .description("Get the current weather of a location")
+                .parameters(chatFunctionParameters)
+                .build();
+        chatTool.setFunction(chatFunction);
+        chatToolList.add(chatTool);
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                .model(Constants.ModelChatGLM4)
+                .stream(Boolean.FALSE)
+                .invokeMethod(Constants.invokeMethod)
+                .messages(messages)
+                .requestId(requestId)
+                .tools(chatToolList)
+                .toolChoice("auto")
+                .build();
+        // 调用模型
+        ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        // 2.assistant message(first response)
+        // API报content和tool_call_id不能同时为null，所以这里先填一个字符串占位
+        messages.add(new ChatMessage(ChatMessageRole.ASSISTANT.value(),"空",invokeModelApiResp.getData().getChoices().get(0).getMessage().getTool_calls().get(0).getFunction().getName(),invokeModelApiResp.getData().getChoices().get(0).getMessage().getTool_calls().get(0).getId()));
+        // 如果触发方法调用
+        if (invokeModelApiResp.getData().getChoices().get(0).getFinishReason().equals(Constants.toolCalls)) {
+            // 获取函数对象
+            ChatFunctionCall chatFunctionCall = invokeModelApiResp.getData().getChoices().get(0).getMessage().getTool_calls().get(0).getFunction();
+            // 获取函数调用结果
+            String function_response = functions.get(chatFunctionCall.getName()).invoke(chatFunctionCall.getArguments());
+            // 将函数调用结果拼接到first response中
+            ChatMessage message = ChatMessage.builder()
+                    .role(ChatMessageRole.TOOL.value())
+                    .content(function_response)
+                    .name(chatFunctionCall.getName())
+                    .tool_call_id(invokeModelApiResp.getData().getChoices().get(0).getMessage().getTool_calls().get(0).getId())
+                    .build();
+            // 3.tool message
+            messages.add(message);
+            // 重新调用模型
+            chatCompletionRequest.setMessages(messages);
+            // 4.结合了function calling的最终回答
+            ModelApiResponse modelSecondApiResponse = client.invokeModelApi(chatCompletionRequest);
+            try {
+                System.out.println("model output:" + mapper.writeValueAsString(modelSecondApiResponse));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

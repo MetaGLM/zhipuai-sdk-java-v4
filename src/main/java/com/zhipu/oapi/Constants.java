@@ -20,6 +20,8 @@ public class Constants {
 
     public static final String invokeMethod = "invoke";
 
+    public static final String toolCalls = "tool_calls";
+
     // http keywords
     public static final String authHeaderKey = "Authorization";
     public static final String CONTENT_TYPE = "Content-Type";
