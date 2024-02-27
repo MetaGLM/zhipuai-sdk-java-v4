@@ -476,13 +476,14 @@ public class V4OkHttpClientTest {
                 .build();
         // 调用模型
         ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        ToolCalls toolCalls = invokeModelApiResp.getData().getChoices().get(0).getMessage().getTool_calls().get(0);
         // 2.assistant message(first response)
         // API报content和tool_call_id不能同时为null，所以这里先填一个字符串占位
-        messages.add(new ChatMessage(ChatMessageRole.ASSISTANT.value(),"空",invokeModelApiResp.getData().getChoices().get(0).getMessage().getTool_calls().get(0).getFunction().getName(),invokeModelApiResp.getData().getChoices().get(0).getMessage().getTool_calls().get(0).getId()));
+        messages.add(new ChatMessage(ChatMessageRole.ASSISTANT.value(),"空", toolCalls.getFunction().getName(), toolCalls.getId()));
         // 如果触发方法调用
         if (invokeModelApiResp.getData().getChoices().get(0).getFinishReason().equals(Constants.toolCalls)) {
             // 获取函数对象
-            ChatFunctionCall chatFunctionCall = invokeModelApiResp.getData().getChoices().get(0).getMessage().getTool_calls().get(0).getFunction();
+            ChatFunctionCall chatFunctionCall = toolCalls.getFunction();
             // 获取函数调用结果
             String function_response = functions.get(chatFunctionCall.getName()).invoke(chatFunctionCall.getArguments());
             // 将函数调用结果拼接到first response中
@@ -490,7 +491,7 @@ public class V4OkHttpClientTest {
                     .role(ChatMessageRole.TOOL.value())
                     .content(function_response)
                     .name(chatFunctionCall.getName())
-                    .tool_call_id(invokeModelApiResp.getData().getChoices().get(0).getMessage().getTool_calls().get(0).getId())
+                    .tool_call_id(toolCalls.getId())
                     .build();
             // 3.tool message
             messages.add(message);
