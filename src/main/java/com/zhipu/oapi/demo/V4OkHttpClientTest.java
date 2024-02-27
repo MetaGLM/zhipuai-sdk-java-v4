@@ -311,7 +311,7 @@ public class V4OkHttpClientTest {
      */
     private static void testInvoke() {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "作为运动处方开具师，我的情况是{糖尿病、高血压、35岁、男、码农},我在杭州，今天的温度怎么样？适合做什么运动");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         // 函数调用参数构建部分
