@@ -255,7 +255,7 @@ public class V4Test {
         Map<String,Object> typeMap = new HashMap<>();
         typeMap.put("type","image_url");
         Map<String,Object> urlMap = new HashMap<>();
-        urlMap.put("url","https://cdn.bigmodel.cn/enterpriseAc/3f328152-e15c-420c-803d-6684a9f551df.jpeg?attname=24.jpeg");
+        urlMap.put("url","https://sfile.chatglm.cn/testpath/275ae5b6-5390-51ca-a81a-60332d1a7cac_0.png");
         typeMap.put("image_url",urlMap);
         contentList.add(textMap);
         contentList.add(typeMap);
