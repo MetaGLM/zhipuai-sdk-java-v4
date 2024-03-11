@@ -26,11 +26,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class V4Test {
 
-    private static final String API_KEY = "";
+    private static final String API_SECRET_KEY = "";
 
-    private static final String API_SECRET = "";
 
-    private static final ClientV4 client = new ClientV4.Builder(API_KEY, API_SECRET).build();
+    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY).build();
 
     // 请自定义自己的业务id
     private static final String requestIdTemplate = "mycompany-%d";

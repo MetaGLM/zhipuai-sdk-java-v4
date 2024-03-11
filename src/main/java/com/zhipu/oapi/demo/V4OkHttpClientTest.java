@@ -29,11 +29,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class V4OkHttpClientTest {
 
-    private static final String API_KEY = "";
+    private static final String API_SECRET_KEY = "";
 
-    private static final String API_SECRET = "";
 
-    private static final ClientV4 client = new ClientV4.Builder(API_KEY,API_SECRET).build();
+    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY).build();
 
     private static final ObjectMapper mapper = defaultObjectMapper();
 
