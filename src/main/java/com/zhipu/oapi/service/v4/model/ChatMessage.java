@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
+@Builder
 public class ChatMessage {
 
 
