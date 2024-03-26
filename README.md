@@ -19,10 +19,13 @@ Java），让开发者更便捷的调用智谱开放API
         </dependency>
 ```
 
-## release-V4-2.0.1升级内容
+## 升级内容
+#### release-V4-2.0.1
 - 统一client4构造apikey入参
 - 延长token过期时间
+#### release-V4-2.0.2
 - readTimeOut时间设置为300s
+- 修改测试demo中apiKey命名
 
 ## 使用
 - 调用流程：
