@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 public class ChatApiService {
 
     private static final String BASE_URL = "https://open.bigmodel.cn/";
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);
+    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(300);
     private static final ObjectMapper mapper = defaultObjectMapper();
 
     private final ChatApi api;
