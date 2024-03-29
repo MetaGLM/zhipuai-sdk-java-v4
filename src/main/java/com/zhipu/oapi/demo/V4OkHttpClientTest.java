@@ -29,10 +29,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class V4OkHttpClientTest {
 
-    private static final String API_KEY = "";
-
-    private static final ClientV4 client = new ClientV4.Builder(API_KEY).build();
-
+    private static final String API_SECRET_KEY = "";
+    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY).build();
     private static final ObjectMapper mapper = defaultObjectMapper();
 
 
@@ -175,7 +173,7 @@ public class V4OkHttpClientTest {
         Map<String, Object> typeMap = new HashMap<>();
         typeMap.put("type", "image_url");
         Map<String, Object> urlMap = new HashMap<>();
-        urlMap.put("url", "https://cdn.bigmodel.cn/enterpriseAc/3f328152-e15c-420c-803d-6684a9f551df.jpeg?attname=24.jpeg");
+        urlMap.put("url", "https://sfile.chatglm.cn/testpath/275ae5b6-5390-51ca-a81a-60332d1a7cac_0.png");
         typeMap.put("image_url", urlMap);
         contentList.add(textMap);
         contentList.add(typeMap);

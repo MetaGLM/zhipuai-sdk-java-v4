@@ -19,6 +19,8 @@ public class TokenManagerV4 {
     private ICache cache;
     private static final String tokenV4KeyPrefix = "zhipu_oapi_token_v4";
 
+    private static final Long DELAY_EXPIRE_TIME = 5*60*1000L;
+
     public TokenManagerV4(ICache cache) {
         this.cache = cache;
     }
@@ -53,7 +55,7 @@ public class TokenManagerV4 {
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("api_key", config.getApiKey());
-        payload.put("exp", System.currentTimeMillis() + config.getExpireMillis());
+        payload.put("exp", System.currentTimeMillis() + config.getExpireMillis()+ DELAY_EXPIRE_TIME);
         payload.put("timestamp", Calendar.getInstance().getTimeInMillis());
         Map<String, Object> headerClaims = new HashMap<>();
         headerClaims.put("alg", "HS256");
