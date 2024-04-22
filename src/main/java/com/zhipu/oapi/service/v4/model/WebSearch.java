@@ -16,7 +16,7 @@ public class WebSearch {
      * 启用：true
      * 禁用：false
      */
-    private Boolean enable;
+    private Boolean search_result;
 
 
     /**

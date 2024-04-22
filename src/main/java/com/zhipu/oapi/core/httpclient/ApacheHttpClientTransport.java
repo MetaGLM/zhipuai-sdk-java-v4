@@ -1,6 +1,6 @@
 package com.zhipu.oapi.core.httpclient;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zhipu.oapi.core.request.RawRequest;
 import com.zhipu.oapi.core.response.RawResponse;
 import com.zhipu.oapi.utils.WuDaoUtils;
@@ -17,9 +17,7 @@ public class ApacheHttpClientTransport extends BaseHttpTransport {
     public RawResponse executePost(RawRequest request) throws Exception {
         Map<String, Object> resultMap = WuDaoUtils.executePost(request.getReqUrl(), request.getToken(), request.getBody());
         if (logger.isDebugEnabled()) {
-            Gson gson = new Gson();
-            String resultStr = gson.toJson(resultMap);
-            logger.debug("http transport result: %s", resultStr);
+            logger.debug("http transport result: {}", resultMap);
         }
         RawResponse resp = extractResp(resultMap);
         return resp;
@@ -29,9 +27,7 @@ public class ApacheHttpClientTransport extends BaseHttpTransport {
     public RawResponse executeGet(RawRequest request) throws Exception {
         Map<String, Object> resultMap = WuDaoUtils.executeGet(request.getReqUrl(), request.getToken(), request.getQueryStr());
         if (logger.isDebugEnabled()) {
-            Gson gson = new Gson();
-            String resultStr = gson.toJson(resultMap);
-            logger.debug("http transport result: %s", resultStr);
+            logger.debug("http transport result: {}", resultMap);
         }
         return extractResp(resultMap);
     }

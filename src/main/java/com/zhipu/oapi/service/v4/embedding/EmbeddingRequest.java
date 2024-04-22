@@ -1,23 +1,26 @@
 package com.zhipu.oapi.service.v4.embedding;
 
+import com.zhipu.oapi.service.v4.CommonRequest;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 /**
  * Creates an embedding vector representing the input text.
  */
-@Builder
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class EmbeddingRequest {
+public class EmbeddingRequest extends CommonRequest {
 
     /**
      * The name of the model to use.
      * Required if using the new v1/embeddings endpoint.
      */
-    String model;
+    private String model;
 
     /**
      * Input text to get embeddings for, encoded as a string or array of tokens.
@@ -28,10 +31,6 @@ public class EmbeddingRequest {
      * as we have observed inferior results when newlines are present.
      */
 
-    String input;
+    private String input;
 
-    /**
-     * A unique identifier representing your end-user, which will help ZhiPuAI to monitor and detect abuse.
-     */
-    String user;
 }

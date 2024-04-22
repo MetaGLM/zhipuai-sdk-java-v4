@@ -9,9 +9,9 @@ public class ConfigV4 {
 
     // api credentials
     // apiSecretKey = {apiKey}.{apiSecret}
-    private String apiSecretKey="120dd8b9ce50a9dd7b0583909dd49822.N3VMdpTH7RqkHIFT";
-    private String apiKey="120dd8b9ce50a9dd7b0583909dd49822";
-    private String apiSecret = "CwMTq2c3mGGQqs9U";
+    private String apiSecretKey="";
+    private String apiKey="";
+    private String apiSecret = "";
 
     // jwt config
     // jwt过期时间，默认30分钟

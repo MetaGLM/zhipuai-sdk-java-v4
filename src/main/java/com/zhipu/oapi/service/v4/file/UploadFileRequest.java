@@ -1,28 +1,26 @@
 package com.zhipu.oapi.service.v4.file;
 
-
 import com.zhipu.oapi.service.v4.CommonRequest;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 /**
- * 查询文件列表
+ * Create file upload request
+ *
  */
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class QueryFilesRequest extends CommonRequest {
-
-
+public class UploadFileRequest extends CommonRequest {
+    /**
+     * The purpose of the file
+     */
     private String purpose;
-
-    private Integer limit;
-
-    private String after;
-
-    private String order;
-
+    /**
+     * local file
+     */
+    private String filePath;
 
 }

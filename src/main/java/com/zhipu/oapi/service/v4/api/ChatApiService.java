@@ -1,17 +1,17 @@
 package com.zhipu.oapi.service.v4.api;
 
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.zhipu.oapi.Constants;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.zhipu.oapi.service.v4.deserialize.ChatCompletionDeserializer;
+import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
+import com.zhipu.oapi.service.v4.file.UploadFileRequest;
 import com.zhipu.oapi.service.v4.fine_turning.FineTuningEvent;
 import com.zhipu.oapi.service.v4.fine_turning.FineTuningJob;
 import com.zhipu.oapi.service.v4.fine_turning.FineTuningJobRequest;
 import com.zhipu.oapi.service.v4.fine_turning.PersonalFineTuningJob;
 import com.zhipu.oapi.service.v4.model.*;
-import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.file.QueryFileResult;
 import com.zhipu.oapi.service.v4.file.QueryFilesRequest;
@@ -27,10 +27,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -38,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ChatApiService {
 
-    private static final String BASE_URL = "https://open.bigmodel.cn/";
+    private static final String BASE_URL = "https://test.bigmodel.cn/";
     private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(300);
     private static final ObjectMapper mapper = defaultObjectMapper();
 
@@ -102,7 +99,7 @@ public class ChatApiService {
     }
 
 
-    public EmbeddingResult createEmbeddings(EmbeddingRequest request) {
+    public EmbeddingResult createEmbeddings( Map<String, Object> request) {
         return execute(api.createEmbeddings(request));
     }
 
@@ -129,12 +126,38 @@ public class ChatApiService {
     }
 
 
-    public com.zhipu.oapi.service.v4.file.File uploadFile(String purpose, String filepath) {
-        java.io.File file = new java.io.File(filepath);
+    public com.zhipu.oapi.service.v4.file.File uploadFile(UploadFileRequest request) throws JsonProcessingException {
+        java.io.File file = new java.io.File(request.getFilePath());
+        if(!file.exists()){
+            throw new RuntimeException("file not found");
+        }
         MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
         MultipartBody.Builder formBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
         formBodyBuilder.addPart(filePart);
-        formBodyBuilder.addFormDataPart("purpose", purpose);
+        formBodyBuilder.addFormDataPart("purpose", request.getPurpose());
+        if (request.getExtraJson()!=null){
+            for (String s : request.getExtraJson().keySet()) {
+                if(request.getExtraJson().get(s) instanceof String
+                        || request.getExtraJson().get(s) instanceof Number
+                        || request.getExtraJson().get(s) instanceof Boolean
+                        || request.getExtraJson().get(s) instanceof Character
+
+                ) {
+
+                    formBodyBuilder.addFormDataPart(s, request.getExtraJson().get(s).toString());
+                }else if(request.getExtraJson().get(s) instanceof Date) {
+                    Date date = (Date) request.getExtraJson().get(s);
+                    formBodyBuilder.addFormDataPart(s, String.valueOf(date.getTime()));
+                }else {
+
+                    formBodyBuilder.addFormDataPart(s, null,
+                            RequestBody.create(MediaType.parse("application/json"),
+                                    mapper.writeValueAsString(request.getExtraJson().get(s))));
+
+                }
+
+            }
+        }
         MultipartBody multipartBody = formBodyBuilder.build();
         return execute(api.uploadFile(multipartBody));
     }
@@ -196,6 +219,15 @@ public class ChatApiService {
         mapper.addMixIn(ChatFunction.class, ChatFunctionMixIn.class);
         mapper.addMixIn(ChatCompletionRequest.class, ChatCompletionRequestMixIn.class);
         mapper.addMixIn(ChatFunctionCall.class, ChatFunctionCallMixIn.class);
+        mapper.addMixIn(ChatFunctionCall.class, ChatFunctionCallMixIn.class);
+
+        SimpleModule module = new SimpleModule();
+
+//        module.addSerializer(ChatCompletionResult.class, serializer);
+        module.addDeserializer(ChatCompletionResult.class, new ChatCompletionDeserializer());
+        module.addDeserializer(ModelData.class, new ModelDataDeserializer());
+        mapper.registerModule(module);
+
         return mapper;
     }
 

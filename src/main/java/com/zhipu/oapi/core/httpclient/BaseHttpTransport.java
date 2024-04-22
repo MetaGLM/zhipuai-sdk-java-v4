@@ -1,8 +1,7 @@
 package com.zhipu.oapi.core.httpclient;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.core.response.RawResponse;
 
@@ -10,16 +9,26 @@ import java.util.Map;
 
 public abstract class BaseHttpTransport implements IHttpTransport{
 
+    protected static final ObjectMapper objectMapper = new ObjectMapper();
+
     protected RawResponse extractResp(String resultDataStr) {
-        Gson gson = new Gson();
-        Map<String, Object> resultMap = gson.fromJson(resultDataStr, Map.class);
+        Map<String, Object> resultMap = null;
+        try {
+            resultMap = objectMapper.readValue(resultDataStr, Map.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         return extractResp(resultMap);
     }
 
     protected RawResponse extractResp(Map<String, Object> resultMap) {
         RawResponse resp = new RawResponse();
         if (!resultMap.containsKey(Constants.resultKeyError)) {
-            resp.setBody(JSON.toJSONString(resultMap));
+            try {
+                resp.setBody(objectMapper.writeValueAsString(resultMap));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
             resp.setStatusCode(200);
             resp.setSuccess(true);
         } else {

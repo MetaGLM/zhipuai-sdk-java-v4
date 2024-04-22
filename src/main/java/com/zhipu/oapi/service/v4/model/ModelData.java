@@ -1,40 +1,154 @@
 package com.zhipu.oapi.service.v4.model;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public final class ModelData {
-    @SerializedName("choices")
+@Getter
+public final class ModelData extends ObjectNode {
     @JsonProperty("choices")
     private List<Choice> choices;
-    @SerializedName("usage")
     private Usage usage;
-    @SerializedName("task_id")
     @JsonProperty("task_id")
     private String taskId;
-    @SerializedName("request_id")
     @JsonProperty("request_id")
     private String requestId;
-    @SerializedName("task_status")
     @JsonProperty("task_status")
     private TaskStatus taskStatus;
-    @SerializedName("created")
     private Long created;
-    @SerializedName("model")
     private String model;
-    @SerializedName("id")
     private String id;
-    @SerializedName("error")
     private ChatError error;
 
 
+    public ModelData() {
+        super(JsonNodeFactory.instance);
+    }
+
+    public ModelData(ObjectNode objectNode) {
+        super(JsonNodeFactory.instance);
+        ObjectMapper objectMapper = new ObjectMapper();
+        if (objectNode.get("choices") != null) {
+            this.setChoices(objectMapper.convertValue(objectNode.get("choices"), new TypeReference<List<Choice>>() {
+            }));
+        } else {
+            this.setChoices(null);
+        }
+        if (objectNode.get("usage") != null) {
+            this.setUsage(objectMapper.convertValue(objectNode.get("usage"), Usage.class));
+        } else {
+            this.setUsage(null);
+        }
+        if (objectNode.get("task_id") != null) {
+            this.setTaskId(objectNode.get("task_id").asText());
+        } else {
+            this.setTaskId(null);
+        }
+        if (objectNode.get("request_id") != null) {
+            this.setRequestId(objectNode.get("request_id").asText());
+        } else {
+            this.setRequestId(null);
+        }
+        if(objectNode.get("task_status") != null) {
+            this.setTaskStatus(objectMapper.convertValue(objectNode.get("task_status"), TaskStatus.class));
+        } else {
+            this.setTaskStatus(null);
+        }
+        if(objectNode.get("created") != null) {
+            this.setCreated(objectNode.get("created").asLong());
+        } else {
+            this.setCreated(null);
+        }
+        if(objectNode.get("model") != null) {
+            this.setModel(objectNode.get("model").asText());
+        } else {
+            this.setModel(null);
+        }
+        if(objectNode.get("id") != null) {
+            this.setId(objectNode.get("id").asText());
+        } else {
+            this.setId(null);
+        }
+        if(objectNode.get("error") != null) {
+            this.setError(objectMapper.convertValue(objectNode.get("error"), ChatError.class));
+        } else {
+            this.setError(null);
+        }
+
+
+        Iterator<String> fieldNames = objectNode.fieldNames();
+
+        while(fieldNames.hasNext()) {
+            String fieldName = fieldNames.next();
+
+            JsonNode field = objectNode.get(fieldName);
+            this.put(fieldName, field);
+        }
+
+    }
+
+    public ModelData(JsonNodeFactory nc, Map<String, JsonNode> kids) {
+        super(nc, kids);
+    }
+
+
+    public void setChoices(List<Choice> choices) {
+        this.choices = choices;
+        this.putPOJO("choices", choices);
+    }
+
+    public void setUsage(Usage usage) {
+        this.usage = usage;
+        this.putPOJO("usage", usage);
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+        this.put("task_id", taskId);
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+        this.put("request_id", requestId);
+    }
+
+    public void setTaskStatus(TaskStatus taskStatus) {
+        this.taskStatus = taskStatus;
+        this.putPOJO("task_status", taskStatus);
+    }
+
+    public void setCreated(Long created) {
+        this.created = created;
+        this.put("created", created);
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+        this.put("model", model);
+    }
+
+    public void setId(String id) {
+        this.id = id;
+        this.put("id", id);
+    }
+
+    public void setError(ChatError error) {
+        this.error = error;
+        this.putPOJO("error", error);
+    }
 }

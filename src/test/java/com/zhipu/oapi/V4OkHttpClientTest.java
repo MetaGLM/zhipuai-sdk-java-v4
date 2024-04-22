@@ -1,19 +1,16 @@
-package com.zhipu.oapi.demo;
+package com.zhipu.oapi;
 
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.zhipu.oapi.ClientV4;
-import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.file.FileApiResponse;
 import com.zhipu.oapi.service.v4.file.QueryFileApiResponse;
 import com.zhipu.oapi.service.v4.file.QueryFilesRequest;
+import com.zhipu.oapi.service.v4.file.UploadFileRequest;
 import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.image.CreateImageRequest;
 import com.zhipu.oapi.service.v4.image.ImageApiResponse;
@@ -94,80 +91,85 @@ public class V4OkHttpClientTest {
         // 14.微调-调用微调模型（参考模型调用接口，并替换成要调用模型的编码model）
     }
 
-    private static void testQueryPersonalFineTuningJobs() {
+    private static void testQueryPersonalFineTuningJobs() throws JsonProcessingException {
         QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest = new QueryPersonalFineTuningJobRequest();
         queryPersonalFineTuningJobRequest.setLimit(1);
         QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = client.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest);
-        System.out.println("model output:" + JSON.toJSONString(queryPersonalFineTuningJobApiResponse));
+        System.out.println("model output:" + mapper.writeValueAsString(queryPersonalFineTuningJobApiResponse));
 
     }
 
-    private static void testQueryFineTuningJobsEvents() {
+    private static void testQueryFineTuningJobsEvents() throws JsonProcessingException {
         QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
         queryFineTuningJobRequest.setJobId("ftjob-20240119114544390-zkgjb");
 //        queryFineTuningJobRequest.setLimit(1);
 //        queryFineTuningJobRequest.setAfter("1");
         QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = client.queryFineTuningJobsEvents(queryFineTuningJobRequest);
-        System.out.println("model output:" + JSON.toJSONString(queryFineTuningEventApiResponse));
+        System.out.println("model output:" + mapper.writeValueAsString(queryFineTuningEventApiResponse));
     }
 
     /**
      * 查询微调任务
      */
-    private static void testRetrieveFineTuningJobs() {
+    private static void testRetrieveFineTuningJobs() throws JsonProcessingException {
         QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
         queryFineTuningJobRequest.setJobId("ftjob-20240119114544390-zkgjb");
 //        queryFineTuningJobRequest.setLimit(1);
 //        queryFineTuningJobRequest.setAfter("1");
         QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.retrieveFineTuningJobs(queryFineTuningJobRequest);
-        System.out.println("model output:" + JSON.toJSONString(queryFineTuningJobApiResponse));
+        System.out.println("model output:" + mapper.writeValueAsString(queryFineTuningJobApiResponse));
     }
 
     /**
      * 创建微调任务
      */
-    private static void testCreateFineTuningJob() {
+    private static void testCreateFineTuningJob() throws JsonProcessingException {
         FineTuningJobRequest request = new FineTuningJobRequest();
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         request.setRequestId(requestId);
         request.setModel("chatglm3-6b");
         request.setTraining_file("file-20240118082608327-kp8qr");
         CreateFineTuningJobApiResponse createFineTuningJobApiResponse = client.createFineTuningJob(request);
-        System.out.println("model output:" + JSON.toJSONString(createFineTuningJobApiResponse));
+        System.out.println("model output:" + mapper.writeValueAsString(createFineTuningJobApiResponse));
     }
 
     /**
      * 微调文件上传列表查询
      */
-    private static void testQueryUploadFileList() {
+    private static void testQueryUploadFileList() throws JsonProcessingException {
         QueryFilesRequest queryFilesRequest = new QueryFilesRequest();
         QueryFileApiResponse queryFileApiResponse = client.queryFilesApi(queryFilesRequest);
-        System.out.println("model output:" + JSON.toJSONString(queryFileApiResponse));
+        System.out.println("model output:" + mapper.writeValueAsString(queryFileApiResponse));
     }
 
 
     /**
      * 微调上传数据集
      */
-    private static void testUploadFile() {
+    private static void testUploadFile() throws JsonProcessingException {
         String filePath = "/Users/wujianguo/Downloads/transaction-data.jsonl";
         String purpose = "fine-tune";
-        FileApiResponse fileApiResponse = client.invokeUploadFileApi(purpose, filePath);
-        System.out.println("model output:" + JSON.toJSONString(fileApiResponse));
+        UploadFileRequest request = UploadFileRequest.builder()
+                .purpose(purpose)
+                .filePath(filePath)
+                .build();
+
+        FileApiResponse fileApiResponse = client.invokeUploadFileApi(request);
+        System.out.println("model output:" + mapper.writeValueAsString(fileApiResponse));
     }
 
-    private static void testEmbeddings() {
+    private static void testEmbeddings() throws JsonProcessingException {
         EmbeddingRequest embeddingRequest = new EmbeddingRequest();
         embeddingRequest.setInput("hello world");
         embeddingRequest.setModel(Constants.ModelEmbedding2);
         EmbeddingApiResponse apiResponse = client.invokeEmbeddingsApi(embeddingRequest);
-        System.out.println("model output:" + JSON.toJSONString(apiResponse));
+        System.out.println("model output:" + mapper.writeValueAsString(apiResponse));
     }
 
     /**
      * 图生文
      */
-    private static void testImageToWord() {
+    private static void testImageToWord() throws JsonProcessingException {
         List<ChatMessage> messages = new ArrayList<>();
         List<Map<String, Object>> contentList = new ArrayList<>();
         Map<String, Object> textMap = new HashMap<>();
@@ -193,23 +195,23 @@ public class V4OkHttpClientTest {
                 .requestId(requestId)
                 .build();
         ModelApiResponse modelApiResponse = client.invokeModelApi(chatCompletionRequest);
-        System.out.println("model output:" + JSON.toJSONString(modelApiResponse));
+        System.out.println("model output:" + mapper.writeValueAsString(modelApiResponse));
 
     }
 
-    private static void testCreateImage() {
+    private static void testCreateImage() throws JsonProcessingException {
         CreateImageRequest createImageRequest = new CreateImageRequest();
         createImageRequest.setModel(Constants.ModelCogView);
 //        createImageRequest.setPrompt("画一个温顺可爱的小狗");
         ImageApiResponse imageApiResponse = client.createImage(createImageRequest);
-        System.out.println("imageApiResponse:" + JSON.toJSONString(imageApiResponse));
+        System.out.println("imageApiResponse:" + mapper.writeValueAsString(imageApiResponse));
     }
 
 
     /**
      * sse调用
      */
-    private static void testSseInvoke() {
+    private static void testSseInvoke() throws JsonProcessingException {
         List<ChatMessage> messages = new ArrayList<>();
         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
 //         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "你能帮我查询2024年1月1日从北京南站到上海的火车票吗？");
@@ -290,7 +292,7 @@ public class V4OkHttpClientTest {
             sseModelApiResp.setFlowable(null);
             sseModelApiResp.setData(data);
         }
-        System.out.println("model output:" + JSON.toJSONString(sseModelApiResp));
+        System.out.println("model output:" + mapper.writeValueAsString(sseModelApiResp));
     }
 
     public static Flowable<ChatMessageAccumulator> mapStreamToAccumulator(Flowable<ModelData> flowable) {
@@ -354,7 +356,7 @@ public class V4OkHttpClientTest {
     /**
      * 异步调用
      */
-    private static String testAsyncInvoke() {
+    private static String testAsyncInvoke() throws JsonProcessingException {
         List<ChatMessage> messages = new ArrayList<>();
         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatLM和你哪个更强大");
         messages.add(chatMessage);
@@ -395,7 +397,7 @@ public class V4OkHttpClientTest {
                 .toolChoice("auto")
                 .build();
         ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        System.out.println("model output:" + JSON.toJSONString(invokeModelApiResp));
+        System.out.println("model output:" + mapper.writeValueAsString(invokeModelApiResp));
         return invokeModelApiResp.getData().getTaskId();
     }
 

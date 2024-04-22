@@ -1,11 +1,6 @@
 package com.zhipu.oapi.core.httpclient;
 
-import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.google.gson.Gson;
 import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.core.request.RawRequest;
 import com.zhipu.oapi.core.response.RawResponse;
@@ -32,14 +27,13 @@ public class OkHttpTransport extends BaseHttpTransport {
 
 
 
-
     public OkHttpTransport(OkHttpClient okHttpClient) {
         this.okHttpClient = okHttpClient;
     }
 
     @Override
     public RawResponse executePost(RawRequest request) throws Exception {
-        String reqBodyStr = new Gson().toJson(request.getBody());
+        String reqBodyStr =  objectMapper.writeValueAsString(request.getBody());
         RequestBody formBody = RequestBody.create(Constants.jsonMediaType, reqBodyStr);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.authHeaderKey, request.getToken());

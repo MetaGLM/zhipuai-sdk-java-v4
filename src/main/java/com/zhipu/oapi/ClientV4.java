@@ -1,9 +1,7 @@
 package com.zhipu.oapi;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.zhipu.oapi.core.ConfigV4;
 import com.zhipu.oapi.core.cache.ICache;
 import com.zhipu.oapi.core.cache.LocalCache;
@@ -37,6 +35,7 @@ public class ClientV4 {
 
     private ConfigV4 config;
 
+    private static final ObjectMapper mapper = ChatApiService.defaultObjectMapper();
     public ModelApiResponse invokeModelApi(ChatCompletionRequest request) {
         String paramMsg = validateParams(request);
         if (StringUtils.isNotEmpty(paramMsg)) {
@@ -57,6 +56,7 @@ public class ClientV4 {
         RawRequest rawReq = new RawRequest();
         Map<String, Object> paramsMap = new HashMap();
         paramsMap.put("request_id", request.getRequestId());
+        paramsMap.put("user_id", request.getUserId());
         paramsMap.put("messages", request.getMessages());
         paramsMap.put("model", request.getModel());
         paramsMap.put("stream", true);
@@ -68,6 +68,11 @@ public class ClientV4 {
         paramsMap.put("do_sample", request.getDoSample());
         paramsMap.put("max_tokens", request.getMaxTokens());
         paramsMap.put("stop", request.getStop());
+
+        if(request.getExtraJson() !=null){
+            paramsMap.putAll(request.getExtraJson());
+        }
+
         rawReq.setBody(paramsMap);
         // token
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
@@ -101,6 +106,7 @@ public class ClientV4 {
     private ModelApiResponse invoke(ChatCompletionRequest request) {
         Map<String, Object> paramsMap = new HashMap();
         paramsMap.put("request_id", request.getRequestId());
+        paramsMap.put("user_id", request.getUserId());
         paramsMap.put("messages", request.getMessages());
         paramsMap.put("model", request.getModel());
         paramsMap.put("stream", false);
@@ -112,6 +118,10 @@ public class ClientV4 {
         paramsMap.put("do_sample", request.getDoSample());
         paramsMap.put("max_tokens", request.getMaxTokens());
         paramsMap.put("stop", request.getStop());
+        if(request.getExtraJson() !=null){
+            paramsMap.putAll(request.getExtraJson());
+        }
+
         // token
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
         ChatApiService service = new ChatApiService(token);
@@ -121,8 +131,8 @@ public class ClientV4 {
             if (chatCompletionResult != null) {
                 resp.setCode(200);
                 resp.setMsg("调用成功");
-                ModelData modelData = new ModelData();
-                BeanUtil.copyProperties(chatCompletionResult, modelData);
+                ModelData modelData =mapper.convertValue(chatCompletionResult, ModelData.class);
+
                 resp.setData(modelData);
             }
             return resp;
@@ -147,6 +157,7 @@ public class ClientV4 {
         RawRequest rawReq = new RawRequest();
         Map<String, Object> paramsMap = new HashMap();
         paramsMap.put("request_id", request.getRequestId());
+        paramsMap.put("user_id", request.getUserId());
         paramsMap.put("messages", request.getMessages());
         paramsMap.put("model", request.getModel());
         paramsMap.put("stream", false);
@@ -158,6 +169,10 @@ public class ClientV4 {
         paramsMap.put("do_sample", request.getDoSample());
         paramsMap.put("max_tokens", request.getMaxTokens());
         paramsMap.put("stop", request.getStop());
+        if(request.getExtraJson() !=null){
+            paramsMap.putAll(request.getExtraJson());
+        }
+
         rawReq.setBody(paramsMap);
         // token
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
@@ -202,8 +217,8 @@ public class ClientV4 {
                 resp.setCode(200);
                 resp.setMsg("调用成功");
                 resp.setSuccess(true);
-                ModelData modelData = new ModelData();;
-                BeanUtil.copyProperties(chatCompletionResult, modelData);
+                ModelData modelData = mapper.convertValue(chatCompletionResult, ModelData.class);
+
                 modelData.setCreated(null);
                 modelData.setModel(chatCompletionResult.getModel());
                 modelData.setRequestId(chatCompletionResult.getRequest_id());
@@ -232,9 +247,14 @@ public class ClientV4 {
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
         ChatApiService chatApiService = new ChatApiService(token);
         Map<String, Object> request = new HashMap<>();
+        request.put("request_id", createImageRequest.getRequestId());
+        request.put("user_id", createImageRequest.getUserId());
         request.put("prompt", createImageRequest.getPrompt());
         request.put("model", createImageRequest.getModel());
         try {
+            if(createImageRequest.getExtraJson() !=null){
+                request.replaceAll((s, v) -> createImageRequest.getExtraJson().get(s));
+            }
             ImageResult image = chatApiService.createImage(request);
             if (image != null) {
                 imageApiResponse.setMsg("调用成功");
@@ -280,12 +300,20 @@ public class ClientV4 {
         return null;
     }
 
-    public EmbeddingApiResponse invokeEmbeddingsApi(EmbeddingRequest embeddingRequest) {
+    public EmbeddingApiResponse invokeEmbeddingsApi(EmbeddingRequest request) {
         EmbeddingApiResponse embeddingApiResponse = new EmbeddingApiResponse();
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
         ChatApiService service = new ChatApiService(token);
         try {
-            EmbeddingResult embeddingResult = service.createEmbeddings(embeddingRequest);
+            Map<String, Object> paramsMap = new HashMap();
+            paramsMap.put("request_id", request.getRequestId());
+            paramsMap.put("user_id", request.getUserId());
+            paramsMap.put("input", request.getInput());
+            paramsMap.put("model", request.getModel());
+            if(request.getExtraJson() !=null){
+                paramsMap.putAll(request.getExtraJson());
+            }
+            EmbeddingResult embeddingResult = service.createEmbeddings(paramsMap);
             if (embeddingResult != null) {
                 embeddingApiResponse.setCode(200);
                 embeddingApiResponse.setMsg("调用成功");
@@ -308,12 +336,12 @@ public class ClientV4 {
         return embeddingApiResponse;
     }
 
-    public FileApiResponse invokeUploadFileApi(String purpose, String filePath) {
+    public FileApiResponse invokeUploadFileApi(UploadFileRequest request) {
         FileApiResponse fileApiResponse = new FileApiResponse();
         String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
         ChatApiService service = new ChatApiService(token);
         try {
-            File file = service.uploadFile(purpose, filePath);
+            File file = service.uploadFile(request);
             if (file != null) {
                 fileApiResponse.setCode(200);
                 fileApiResponse.setSuccess(true);

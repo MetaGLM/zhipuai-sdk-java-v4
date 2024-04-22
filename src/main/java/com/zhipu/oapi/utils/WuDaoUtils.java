@@ -3,11 +3,10 @@ package com.zhipu.oapi.utils;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class WuDaoUtils {
-	public static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+	public static ObjectMapper objectMapper = new ObjectMapper();
 
 	/**
 	 * 获取鉴权token
@@ -26,9 +25,9 @@ public class WuDaoUtils {
 		paramsMap.put("encrypted", encrypt);
 		paramsMap.put("apiKey", apiKey);
 
-		String response = HttpUtilClient.sendPostJson(createTokenUrl, gson.toJson(paramsMap));
+		String response = HttpUtilClient.sendPostJson(createTokenUrl, objectMapper.writeValueAsString(paramsMap));
 		@SuppressWarnings("unchecked")
-		Map<String, Object> resultMap = gson.fromJson(response, Map.class);
+		Map<String, Object> resultMap = objectMapper.readValue(response, Map.class);
 		return resultMap;
 	}
 
@@ -51,9 +50,12 @@ public class WuDaoUtils {
 			throws Exception {
 		Map<String, String> header = new HashMap<>(1);
 		header.put("Authorization", authToken);
-		String response = HttpUtilClient.sendPostJson(engineUrl, gson.toJson(paramsMap), header);
+
+		String response = HttpUtilClient.sendPostJson(engineUrl,
+				objectMapper.writeValueAsString(paramsMap),
+				header);
 		@SuppressWarnings("unchecked")
-		Map<String, Object> resultMap = gson.fromJson(response, Map.class);
+		Map<String, Object> resultMap = objectMapper.readValue(response, Map.class);
 		return resultMap;
 	}
 
@@ -63,7 +65,7 @@ public class WuDaoUtils {
 		header.put("Authorization", authToken);
 		String response = HttpUtilClient.sendGet(url, paramsMap, header);
 		@SuppressWarnings("unchecked")
-		Map<String, Object> resultMap = gson.fromJson(response, Map.class);
+		Map<String, Object> resultMap = objectMapper.readValue(response, Map.class);
 		return resultMap;
 	}
 
