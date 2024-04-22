@@ -1,15 +1,12 @@
 package com.zhipu.oapi;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zhipu.oapi.core.ConfigV4;
 import com.zhipu.oapi.core.cache.ICache;
 import com.zhipu.oapi.core.cache.LocalCache;
-import com.zhipu.oapi.core.httpclient.OkHttpTransport;
-import com.zhipu.oapi.core.request.RawRequest;
 import com.zhipu.oapi.core.response.RawResponse;
 import com.zhipu.oapi.core.token.GlobalTokenManager;
-import com.zhipu.oapi.core.token.TokenManager;
+import com.zhipu.oapi.core.token.TokenManagerV4;
 import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.api.ChatApiService;
@@ -22,6 +19,9 @@ import com.zhipu.oapi.service.v4.image.ImageApiResponse;
 import com.zhipu.oapi.service.v4.image.ImageResult;
 import com.zhipu.oapi.utils.OkHttps;
 import com.zhipu.oapi.utils.StringUtils;
+import lombok.Getter;
+import lombok.Setter;
+import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,9 +33,13 @@ public class ClientV4 {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientV4.class);
 
+    private static final ObjectMapper mapper = ChatApiService.defaultObjectMapper();
+
+    @Setter
+    @Getter
     private ConfigV4 config;
 
-    private static final ObjectMapper mapper = ChatApiService.defaultObjectMapper();
+
     public ModelApiResponse invokeModelApi(ChatCompletionRequest request) {
         String paramMsg = validateParams(request);
         if (StringUtils.isNotEmpty(paramMsg)) {
@@ -53,8 +57,7 @@ public class ClientV4 {
 
 
     private ModelApiResponse sseInvoke(ChatCompletionRequest request) {
-        RawRequest rawReq = new RawRequest();
-        Map<String, Object> paramsMap = new HashMap();
+        Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("request_id", request.getRequestId());
         paramsMap.put("user_id", request.getUserId());
         paramsMap.put("messages", request.getMessages());
@@ -73,13 +76,9 @@ public class ClientV4 {
             paramsMap.putAll(request.getExtraJson());
         }
 
-        rawReq.setBody(paramsMap);
-        // token
-//        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        rawReq.setToken(config.getApiSecretKey());
         ModelApiResponse resp = new ModelApiResponse();
         try {
-            RawResponse rawResp = this.getConfig().getHttpTransport().sseExecute(rawReq);
+            RawResponse rawResp = this.getConfig().getChatApiService().sseExecute(paramsMap);
             resp.setCode(rawResp.getStatusCode());
             resp.setMsg(rawResp.getMsg());
             resp.setSuccess(rawResp.isSuccess());
@@ -104,7 +103,7 @@ public class ClientV4 {
     }
 
     private ModelApiResponse invoke(ChatCompletionRequest request) {
-        Map<String, Object> paramsMap = new HashMap();
+        Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("request_id", request.getRequestId());
         paramsMap.put("user_id", request.getUserId());
         paramsMap.put("messages", request.getMessages());
@@ -122,17 +121,12 @@ public class ClientV4 {
             paramsMap.putAll(request.getExtraJson());
         }
 
-        // token
-//        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(config.getApiSecretKey());
         ModelApiResponse resp = new ModelApiResponse();
         try {
-            ChatCompletionResult chatCompletionResult = service.createChatCompletion(paramsMap);
-            if (chatCompletionResult != null) {
+            ModelData modelData = config.getChatApiService().createChatCompletion(paramsMap);
+            if (modelData != null) {
                 resp.setCode(200);
                 resp.setMsg("调用成功");
-                ModelData modelData =mapper.convertValue(chatCompletionResult, ModelData.class);
-
                 resp.setData(modelData);
             }
             return resp;
@@ -154,8 +148,7 @@ public class ClientV4 {
 
 
     private ModelApiResponse asyncInvoke(ChatCompletionRequest request) {
-        RawRequest rawReq = new RawRequest();
-        Map<String, Object> paramsMap = new HashMap();
+        Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("request_id", request.getRequestId());
         paramsMap.put("user_id", request.getUserId());
         paramsMap.put("messages", request.getMessages());
@@ -173,21 +166,12 @@ public class ClientV4 {
             paramsMap.putAll(request.getExtraJson());
         }
 
-        rawReq.setBody(paramsMap);
-        // token
-//        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(config.getApiSecretKey());
         ModelApiResponse resp = new ModelApiResponse();
         try {
-            ChatCompletionAsyncResult chatCompletionAsyncResult = service.createChatCompletionAsync(rawReq.getBody());
-            if (chatCompletionAsyncResult != null) {
+            ModelData modelData = config.getChatApiService().createChatCompletionAsync(paramsMap);
+            if (modelData != null) {
                 resp.setCode(200);
                 resp.setMsg("调用成功");
-                ModelData modelData = new ModelData();
-                modelData.setModel(chatCompletionAsyncResult.getModel());
-                modelData.setTaskId(chatCompletionAsyncResult.getId());
-                modelData.setTaskStatus(TaskStatus.valueOf(chatCompletionAsyncResult.getTask_status()));
-                modelData.setRequestId(chatCompletionAsyncResult.getRequest_id());
                 resp.setData(modelData);
             }
         } catch (Exception e) {
@@ -209,20 +193,17 @@ public class ClientV4 {
 
     public QueryModelResultResponse queryModelResult(QueryModelResultRequest request) {
         QueryModelResultResponse resp = new QueryModelResultResponse();
-        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(config.getApiSecretKey());
+
         try {
-            ChatCompletionResult chatCompletionResult = service.queryAsyncResult(request.getTaskId());
-            if (chatCompletionResult != null) {
+            ModelData modelData = config.getChatApiService().queryAsyncResult(request.getTaskId());
+            if (modelData != null) {
                 resp.setCode(200);
                 resp.setMsg("调用成功");
                 resp.setSuccess(true);
-                ModelData modelData = mapper.convertValue(chatCompletionResult, ModelData.class);
-
                 modelData.setCreated(null);
-                modelData.setModel(chatCompletionResult.getModel());
-                modelData.setRequestId(chatCompletionResult.getRequest_id());
-                modelData.setTaskStatus(TaskStatus.valueOf(chatCompletionResult.getTask_status()));
+                modelData.setModel(modelData.getModel());
+                modelData.setRequestId(modelData.getRequestId());
+                modelData.setTaskStatus(modelData.getTaskStatus());
                 resp.setData(modelData);
             }
         } catch (Exception e) {
@@ -244,8 +225,7 @@ public class ClientV4 {
 
     public ImageApiResponse createImage(CreateImageRequest createImageRequest) {
         ImageApiResponse imageApiResponse = new ImageApiResponse();
-        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService chatApiService = new ChatApiService(token);
+
         Map<String, Object> request = new HashMap<>();
         request.put("request_id", createImageRequest.getRequestId());
         request.put("user_id", createImageRequest.getUserId());
@@ -255,7 +235,7 @@ public class ClientV4 {
             if(createImageRequest.getExtraJson() !=null){
                 request.replaceAll((s, v) -> createImageRequest.getExtraJson().get(s));
             }
-            ImageResult image = chatApiService.createImage(request);
+            ImageResult image = config.getChatApiService().createImage(request);
             if (image != null) {
                 imageApiResponse.setMsg("调用成功");
                 imageApiResponse.setCode(200);
@@ -291,7 +271,7 @@ public class ClientV4 {
         if (!request.getStream() && StringUtils.isEmpty(request.getInvokeMethod())) {
             return "invoke method can not be empty";
         }
-        if (request.getMessages() == null || request.getMessages().size() == 0) {
+        if (request.getMessages() == null || request.getMessages().isEmpty()) {
             return "message can not be empty";
         }
         if (request.getModel() == null) {
@@ -302,10 +282,9 @@ public class ClientV4 {
 
     public EmbeddingApiResponse invokeEmbeddingsApi(EmbeddingRequest request) {
         EmbeddingApiResponse embeddingApiResponse = new EmbeddingApiResponse();
-        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(config.getApiSecretKey());
+
         try {
-            Map<String, Object> paramsMap = new HashMap();
+            Map<String, Object> paramsMap = new HashMap<>();
             paramsMap.put("request_id", request.getRequestId());
             paramsMap.put("user_id", request.getUserId());
             paramsMap.put("input", request.getInput());
@@ -313,7 +292,7 @@ public class ClientV4 {
             if(request.getExtraJson() !=null){
                 paramsMap.putAll(request.getExtraJson());
             }
-            EmbeddingResult embeddingResult = service.createEmbeddings(paramsMap);
+            EmbeddingResult embeddingResult = config.getChatApiService().createEmbeddings(paramsMap);
             if (embeddingResult != null) {
                 embeddingApiResponse.setCode(200);
                 embeddingApiResponse.setMsg("调用成功");
@@ -338,10 +317,9 @@ public class ClientV4 {
 
     public FileApiResponse invokeUploadFileApi(UploadFileRequest request) {
         FileApiResponse fileApiResponse = new FileApiResponse();
-        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(config.getApiSecretKey());
+
         try {
-            File file = service.uploadFile(request);
+            File file = config.getChatApiService().uploadFile(request);
             if (file != null) {
                 fileApiResponse.setCode(200);
                 fileApiResponse.setSuccess(true);
@@ -365,10 +343,9 @@ public class ClientV4 {
 
     public QueryFileApiResponse queryFilesApi(QueryFilesRequest queryFilesRequest) {
         QueryFileApiResponse queryFileApiResponse = new QueryFileApiResponse();
-        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(config.getApiSecretKey());
+
         try {
-            QueryFileResult queryFileResult = service.queryFileList(queryFilesRequest);
+            QueryFileResult queryFileResult = config.getChatApiService().queryFileList(queryFilesRequest);
             if (queryFileResult != null) {
                 queryFileApiResponse.setCode(200);
                 queryFileApiResponse.setSuccess(true);
@@ -392,11 +369,10 @@ public class ClientV4 {
 
     public CreateFineTuningJobApiResponse createFineTuningJob(FineTuningJobRequest request) {
         CreateFineTuningJobApiResponse createFineTuningJobApiResponse = new CreateFineTuningJobApiResponse();
-        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(config.getApiSecretKey());
+
         FineTuningJob fineTuningJob = null;
         try {
-            fineTuningJob = service.createFineTuningJob(request);
+            fineTuningJob = config.getChatApiService().createFineTuningJob(request);
             if (fineTuningJob != null) {
                 createFineTuningJobApiResponse.setMsg("调用成功");
                 createFineTuningJobApiResponse.setData(fineTuningJob);
@@ -420,10 +396,9 @@ public class ClientV4 {
 
     public QueryFineTuningEventApiResponse queryFineTuningJobsEvents(QueryFineTuningJobRequest queryFineTuningJobRequest) {
         QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = new QueryFineTuningEventApiResponse();
-        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(config.getApiSecretKey());
+
         try {
-            FineTuningEvent fineTuningEvent = service.listFineTuningJobEvents(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
+            FineTuningEvent fineTuningEvent = config.getChatApiService().listFineTuningJobEvents(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
             if (fineTuningEvent != null) {
                 queryFineTuningEventApiResponse.setSuccess(true);
                 queryFineTuningEventApiResponse.setData(fineTuningEvent);
@@ -447,10 +422,9 @@ public class ClientV4 {
 
     public QueryFineTuningJobApiResponse retrieveFineTuningJobs(QueryFineTuningJobRequest queryFineTuningJobRequest) {
         QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = new QueryFineTuningJobApiResponse();
-        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(config.getApiSecretKey());
+
         try {
-            FineTuningJob fineTuningJob = service.retrieveFineTuningJob(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
+            FineTuningJob fineTuningJob = config.getChatApiService().retrieveFineTuningJob(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
             if (fineTuningJob != null) {
                 queryFineTuningJobApiResponse.setSuccess(true);
                 queryFineTuningJobApiResponse.setData(fineTuningJob);
@@ -475,10 +449,9 @@ public class ClientV4 {
 
     public QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobs(QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest) {
         QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = new QueryPersonalFineTuningJobApiResponse();
-        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(config.getApiSecretKey());
+
         try {
-            PersonalFineTuningJob personalFineTuningJob = service.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest.getLimit(), queryPersonalFineTuningJobRequest.getAfter());
+            PersonalFineTuningJob personalFineTuningJob = config.getChatApiService().queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest.getLimit(), queryPersonalFineTuningJobRequest.getAfter());
             if (personalFineTuningJob != null) {
                 queryPersonalFineTuningJobApiResponse.setSuccess(true);
                 queryPersonalFineTuningJobApiResponse.setData(personalFineTuningJob);
@@ -502,16 +475,21 @@ public class ClientV4 {
 
 
     public static final class Builder {
-        private ConfigV4 config = new ConfigV4();
+        private final ConfigV4 config = new ConfigV4();
 
+        public Builder(String baseUrl, String apiSecretKey) {
+            config.setBaseUrl(baseUrl);
+            config.setApiSecretKey(apiSecretKey);
+        }
         public Builder(String apiSecretKey) {
             config.setApiSecretKey(apiSecretKey);
         }
 
-        public Builder(String apiKey, String apiSecret) {
+        public Builder setTokenKey(String apiKey, String apiSecret) {
             config.setApiKey(apiKey);
             config.setApiSecret(apiSecret);
             config.setDisableTokenCache(false);
+            return this;
         }
 
         public Builder disableTokenCache() {
@@ -539,19 +517,54 @@ public class ClientV4 {
 
         private void initCache(ConfigV4 config) {
             if (config.getCache() != null) {
-                GlobalTokenManager.setTokenManager(new TokenManager(config.getCache()));
+                GlobalTokenManager.setTokenManager(new TokenManagerV4(config.getCache()));
             } else {
                 ICache cache = LocalCache.getInstance();
-                GlobalTokenManager.setTokenManager(new TokenManager(cache));
+                GlobalTokenManager.setTokenManager(new TokenManagerV4(cache));
             }
         }
 
         private void initHttpTransport(ConfigV4 config) {
-            if (config.getHttpTransport() == null) {
-                if (config.getRequestTimeOut() > 0) {
-                    config.setHttpTransport(new OkHttpTransport(OkHttps.create(config.getRequestTimeOut(), config.getTimeOutTimeUnit())));
+            if (config.getChatApiService() == null) {
+                if (StringUtils.isEmpty(config.getApiSecretKey())){
+                    throw new RuntimeException("apiSecretKey can not be empty");
+                }
+                if (StringUtils.isNotEmpty(config.getBaseUrl()) && config.getRequestTimeOut() == 0){
+                    ChatApiService chatApiService = new ChatApiService(
+                            config.getBaseUrl(),
+                            config.getApiSecretKey()
+                    );
+
+                    config.setChatApiService(chatApiService);
+                }
+
+                else if (StringUtils.isNotEmpty(config.getBaseUrl()) && config.getRequestTimeOut() > 0) {
+                    OkHttpClient okHttpClient = OkHttps.create(
+                            config.getApiSecretKey(),
+                            config.getRequestTimeOut(),
+                            config.getTimeOutTimeUnit());
+
+                    ChatApiService chatApiService = new ChatApiService(
+                            okHttpClient,
+                            config.getBaseUrl());
+
+                    config.setChatApiService(chatApiService);
+                }
+                else if (StringUtils.isEmpty(config.getBaseUrl()) && config.getRequestTimeOut() > 0) {
+
+                    OkHttpClient okHttpClient = OkHttps.create(
+                            config.getApiSecretKey(),
+                            config.getRequestTimeOut(),
+                            config.getTimeOutTimeUnit());
+
+                    ChatApiService chatApiService = new ChatApiService(
+                            okHttpClient);
+                    config.setChatApiService(chatApiService);
                 } else {
-                    config.setHttpTransport(new OkHttpTransport(OkHttps.defaultClient));
+                    ChatApiService chatApiService = new ChatApiService(
+                            config.getApiSecretKey()
+                    );
+                    config.setChatApiService(chatApiService);
                 }
             }
         }
@@ -563,14 +576,6 @@ public class ClientV4 {
             initHttpTransport(config);
             return client;
         }
-    }
-
-    public ConfigV4 getConfig() {
-        return config;
-    }
-
-    public void setConfig(ConfigV4 config) {
-        this.config = config;
     }
 
 

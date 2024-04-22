@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.zhipu.oapi.service.v4.api.ChatApiService;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.file.FileApiResponse;
@@ -16,6 +17,8 @@ import com.zhipu.oapi.service.v4.image.ImageApiResponse;
 import com.zhipu.oapi.service.v4.model.*;
 import io.reactivex.Flowable;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,10 +29,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class V4Test {
 
-    private static final String API_SECRET_KEY = "e6a98ef1c54484c2afeac1ae8cef93ef.rlpKehWCGDttN9Pl";
+    private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
+    private static final String API_SECRET_KEY = "58e91163afb81c581ce1d90bb07494d3.igjG0t8dXuTJCjOq";
+    private static final String BASE_URL  = "https://open.bigmodel.cn/api/paas/v4/";
 
 
-    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY).build();
+    private static final ClientV4 client = new ClientV4.Builder(BASE_URL, API_SECRET_KEY).build();
 
     // 请自定义自己的业务id
     private static final String requestIdTemplate = "mycompany-%d";
@@ -102,14 +107,14 @@ public class V4Test {
                     .doOnNext(accumulator -> {
                         {
                             if (isFirst.getAndSet(false)) {
-                                System.out.print("Response: ");
+                                logger.info("Response: ");
                             }
                             if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
                                 String jsonString = mapper.writeValueAsString(accumulator.getDelta().getTool_calls());
-                                System.out.println("tool_calls: " + jsonString);
+                                logger.info("tool_calls: {}" , jsonString);
                             }
                             if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
-                                System.out.print(accumulator.getDelta().getContent());
+                                logger.info(accumulator.getDelta().getContent());
                             }
                             choices.add(accumulator.getChoice());
                         }
@@ -128,7 +133,7 @@ public class V4Test {
             sseModelApiResp.setFlowable(null);// 打印前置空
             sseModelApiResp.setData(data);
         }
-        System.out.println("model output:" + mapper.writeValueAsString(sseModelApiResp));
+        logger.info("model output: {}" , mapper.writeValueAsString(sseModelApiResp));
     }
 
 
@@ -161,14 +166,14 @@ public class V4Test {
                     .doOnNext(accumulator -> {
                         {
                             if (isFirst.getAndSet(false)) {
-                                System.out.print("Response: ");
+                                logger.info("Response: ");
                             }
                             if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
                                 String jsonString = mapper.writeValueAsString(accumulator.getDelta().getTool_calls());
-                                System.out.println("tool_calls: " + jsonString);
+                                logger.info("tool_calls: {}", jsonString);
                             }
                             if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
-                                System.out.print(accumulator.getDelta().getContent());
+                                logger.info("accumulator.getDelta().getContent(): {}", accumulator.getDelta().getContent());
                             }
                             choices.add(accumulator.getChoice());
                         }
@@ -187,7 +192,7 @@ public class V4Test {
             sseModelApiResp.setFlowable(null);// 打印前置空
             sseModelApiResp.setData(data);
         }
-        System.out.println("model output:" + mapper.writeValueAsString(sseModelApiResp));
+        logger.info("model output: {}", mapper.writeValueAsString(sseModelApiResp));
     }
 
 
@@ -245,9 +250,9 @@ public class V4Test {
                 .build();
         ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
         try {
-            System.out.println("model output:" + mapper.writeValueAsString(invokeModelApiResp));
+            logger.info("model output: {}" , mapper.writeValueAsString(invokeModelApiResp));
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error("model output error", e); 
         }
     }
 
@@ -276,7 +281,7 @@ public class V4Test {
                 .extraJson(extraJson)
                 .build();
         ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        System.out.println("model output:"+ mapper.writeValueAsString(invokeModelApiResp));
+        logger.info("model output: {}", mapper.writeValueAsString(invokeModelApiResp));
     }
 
     /**
@@ -298,7 +303,7 @@ public class V4Test {
         createImageRequest.setModel(Constants.ModelCogView);
         createImageRequest.setPrompt("画一个温顺可爱的小狗");
         ImageApiResponse imageApiResponse = client.createImage(createImageRequest);
-        System.out.println("imageApiResponse:"+mapper.writeValueAsString(imageApiResponse));
+        logger.info("imageApiResponse: {}", mapper.writeValueAsString(imageApiResponse));
     }
 
 
@@ -332,7 +337,7 @@ public class V4Test {
                 .requestId(requestId)
                 .build();
         ModelApiResponse modelApiResponse = client.invokeModelApi(chatCompletionRequest);
-        System.out.println("model output:"+ mapper.writeValueAsString(modelApiResponse));
+        logger.info("model output: {}", mapper.writeValueAsString(modelApiResponse));
     }
 
 
@@ -345,7 +350,7 @@ public class V4Test {
         embeddingRequest.setInput("hello world");
         embeddingRequest.setModel(Constants.ModelEmbedding2);
         EmbeddingApiResponse apiResponse = client.invokeEmbeddingsApi(embeddingRequest);
-        System.out.println("model output:"+mapper.writeValueAsString(apiResponse));
+        logger.info("model output: {}", mapper.writeValueAsString(apiResponse));
     }
 
 
@@ -362,7 +367,7 @@ public class V4Test {
                 .build();
 
         FileApiResponse fileApiResponse = client.invokeUploadFileApi(request);
-        System.out.println("model output:"+mapper.writeValueAsString(fileApiResponse));
+        logger.info("model output: {}", mapper.writeValueAsString(fileApiResponse));
     }
 
 
@@ -374,7 +379,7 @@ public class V4Test {
 //        String filePath = "/Users/wujianguo/Downloads/transaction-data.jsonl";
 //        String purpose = "fine-tune";
 //        FileApiResponse fileApiResponse = client.invokeUploadFileApi(purpose,filePath);
-//        System.out.println("model output:"+mapper.writeValueAsString(fileApiResponse));
+//        logger.info("model output:"+mapper.writeValueAsString(fileApiResponse));
     }
 
 
@@ -389,7 +394,7 @@ public class V4Test {
         request.setModel("chatglm3-6b");
         request.setTraining_file("file-20240118082608327-kp8qr");
         CreateFineTuningJobApiResponse createFineTuningJobApiResponse = client.createFineTuningJob(request);
-        System.out.println("model output:" + mapper.writeValueAsString(createFineTuningJobApiResponse));
+        logger.info("model output: {}", mapper.writeValueAsString(createFineTuningJobApiResponse));
     }
 
 
@@ -403,7 +408,7 @@ public class V4Test {
 //        queryFineTuningJobRequest.setLimit(1);
 //        queryFineTuningJobRequest.setAfter(1);
         QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.retrieveFineTuningJobs(queryFineTuningJobRequest);
-        System.out.println("model output:"+mapper.writeValueAsString(queryFineTuningJobApiResponse));
+        logger.info("model output: {}", mapper.writeValueAsString(queryFineTuningJobApiResponse));
     }
 
 
@@ -415,7 +420,7 @@ public class V4Test {
          QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest = new QueryPersonalFineTuningJobRequest();
          queryPersonalFineTuningJobRequest.setLimit(1);
          QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = client.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest);
-         System.out.println("model output:"+mapper.writeValueAsString(queryPersonalFineTuningJobApiResponse));
+         logger.info("model output: {}", mapper.writeValueAsString(queryPersonalFineTuningJobApiResponse));
      }
 
 
@@ -457,8 +462,8 @@ public class V4Test {
                 .toolChoice("auto")
                 .build();
         ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        System.out.println("model output:"+ mapper.writeValueAsString(invokeModelApiResp));
-        return invokeModelApiResp.getData().getTaskId();
+        logger.info("model output: {}", mapper.writeValueAsString(invokeModelApiResp));
+        return invokeModelApiResp.getData().getId();
     }
 
 
@@ -466,7 +471,7 @@ public class V4Test {
         QueryModelResultRequest request = new QueryModelResultRequest();
         request.setTaskId(taskId);
         QueryModelResultResponse queryResultResp = client.queryModelResult(request);
-        System.out.println("model output:"+mapper.writeValueAsString(queryResultResp));
+        logger.info("model output {}", mapper.writeValueAsString(queryResultResp));
     }
 
     public static Flowable<ChatMessageAccumulator> mapStreamToAccumulator(Flowable<ModelData> flowable) {

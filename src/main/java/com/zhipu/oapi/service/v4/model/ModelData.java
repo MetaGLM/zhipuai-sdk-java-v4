@@ -21,8 +21,6 @@ public final class ModelData extends ObjectNode {
     @JsonProperty("choices")
     private List<Choice> choices;
     private Usage usage;
-    @JsonProperty("task_id")
-    private String taskId;
     @JsonProperty("request_id")
     private String requestId;
     @JsonProperty("task_status")
@@ -52,11 +50,6 @@ public final class ModelData extends ObjectNode {
             this.setUsage(objectMapper.convertValue(objectNode.get("usage"), Usage.class));
         } else {
             this.setUsage(null);
-        }
-        if (objectNode.get("task_id") != null) {
-            this.setTaskId(objectNode.get("task_id").asText());
-        } else {
-            this.setTaskId(null);
         }
         if (objectNode.get("request_id") != null) {
             this.setRequestId(objectNode.get("request_id").asText());
@@ -96,7 +89,7 @@ public final class ModelData extends ObjectNode {
             String fieldName = fieldNames.next();
 
             JsonNode field = objectNode.get(fieldName);
-            this.put(fieldName, field);
+            this.set(fieldName, field);
         }
 
     }
@@ -125,10 +118,6 @@ public final class ModelData extends ObjectNode {
         this.putPOJO("usage", usage);
     }
 
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
-        this.put("task_id", taskId);
-    }
 
     public void setRequestId(String requestId) {
         this.requestId = requestId;

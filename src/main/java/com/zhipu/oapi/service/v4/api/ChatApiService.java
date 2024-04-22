@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.zhipu.oapi.core.response.RawResponse;
 import com.zhipu.oapi.service.v4.deserialize.ChatCompletionDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
 import com.zhipu.oapi.service.v4.file.UploadFileRequest;
@@ -16,28 +17,33 @@ import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.file.QueryFileResult;
 import com.zhipu.oapi.service.v4.file.QueryFilesRequest;
 import com.zhipu.oapi.service.v4.image.ImageResult;
+import com.zhipu.oapi.utils.StringUtils;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.HttpException;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
-
 public class ChatApiService {
 
-    private static final String BASE_URL = "https://test.bigmodel.cn/";
+    private static final String BASE_URL = "https://open.bigmodel.cn/api/paas/v4/";
     private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(300);
     private static final ObjectMapper mapper = defaultObjectMapper();
+    private final static Logger logger = LoggerFactory.getLogger(ChatApiService.class);
 
     private final ChatApi api;
     private final ExecutorService executorService;
@@ -57,8 +63,57 @@ public class ChatApiService {
     public ChatApiService(final String token, final Duration timeout) {
         ObjectMapper mapper = defaultObjectMapper();
         OkHttpClient client = defaultClient(token, timeout);
-        Retrofit retrofit = defaultRetrofit(client, mapper);
+        Retrofit retrofit = defaultRetrofit(BASE_URL,client, mapper);
 
+        this.api = retrofit.create(ChatApi.class);
+        this.executorService = client.dispatcher().executorService();
+    }
+    /**
+     * Creates a new ChatApiService that wraps ChatApi
+     * @param token api token
+     * @param baseUrl base url of the api
+     */
+    public ChatApiService(final String baseUrl, final String token) {
+        ObjectMapper mapper = defaultObjectMapper();
+        OkHttpClient client = defaultClient(token, DEFAULT_TIMEOUT);
+        Retrofit retrofit = defaultRetrofit(baseUrl, client, mapper);
+
+        this.api = retrofit.create(ChatApi.class);
+        this.executorService = client.dispatcher().executorService();
+    }
+    /**
+     * Creates a new ChatApiService that wraps ChatApi
+     * @param token api token
+     * @param baseUrl base url of the api
+     * @param timeout http read timeout, Duration.ZERO means no timeout
+     */
+    public ChatApiService(final String baseUrl, final String token, final Duration timeout) {
+        ObjectMapper mapper = defaultObjectMapper();
+        OkHttpClient client = defaultClient(token, timeout);
+        Retrofit retrofit = defaultRetrofit(baseUrl, client, mapper);
+
+        this.api = retrofit.create(ChatApi.class);
+        this.executorService = client.dispatcher().executorService();
+    }
+    /**
+     * Creates a new ChatApiService that wraps ChatApi
+     * @param client retrofit instance
+     * @param token api token
+     */
+    public ChatApiService(final OkHttpClient client) {
+
+        Retrofit retrofit = defaultRetrofit(BASE_URL, client, mapper);
+        this.api = retrofit.create(ChatApi.class);
+        this.executorService = client.dispatcher().executorService();
+    }
+    /**
+     * Creates a new ChatApiService that wraps ChatApi
+     * @param client retrofit instance
+     * @param baseUrl base url of the api
+     */
+    public ChatApiService(final OkHttpClient client, final String baseUrl) {
+
+        Retrofit retrofit = defaultRetrofit(baseUrl, client, mapper);
         this.api = retrofit.create(ChatApi.class);
         this.executorService = client.dispatcher().executorService();
     }
@@ -67,6 +122,7 @@ public class ChatApiService {
         try {
             return apiCall.blockingGet();
         } catch (HttpException e) {
+            logger.error("HTTP exception: {}", e.getMessage());
             try {
                 if (e.response() == null || e.response().errorBody() == null) {
                     throw e;
@@ -84,17 +140,43 @@ public class ChatApiService {
             }
         }
     }
+
+
+    /**
+     * sse调用只会返回输出结果
+     * @param request
+     * @return RawResponse
+     */
+    public RawResponse sseExecute(Map<String, Object> request) throws Exception {
+
+        RawResponse resp = new RawResponse();
+        Flowable<ModelData> flowable;
+        try {
+            flowable  = this.streamChatCompletion(request);
+        } catch (Exception e) {
+            logger.error("streamChatCompletion error:{}" , e.getMessage());
+            resp.setStatusCode(500);
+            resp.setSuccess(false);
+            return resp;
+        }
+        resp.setSuccess(true);
+        resp.setStatusCode(200);
+        resp.setFlowable(flowable);
+        return resp;
+    }
+
     public Flowable<ModelData> streamChatCompletion(Map<String,Object> request) {
         return stream(api.createChatCompletionStream(request), ModelData.class);
     }
 
 
-    public ChatCompletionAsyncResult createChatCompletionAsync(Map<String,Object> request) {
+
+    public ModelData createChatCompletionAsync(Map<String,Object> request) {
         return execute(api.createChatCompletionAsync(request));
     }
 
 
-    public ChatCompletionResult createChatCompletion(Map<String,Object> request) {
+    public ModelData createChatCompletion(Map<String,Object> request) {
         return execute(api.createChatCompletion(request));
     }
 
@@ -121,7 +203,7 @@ public class ChatApiService {
         return execute(api.queryPersonalFineTuningJobs(limit,after));
     }
 
-    public ChatCompletionResult queryAsyncResult(String id) {
+    public ModelData queryAsyncResult(String id) {
         return execute(api.queryAsyncResult(id));
     }
 
@@ -237,9 +319,11 @@ public class ChatApiService {
                 .build();
     }
 
-    public static Retrofit defaultRetrofit(OkHttpClient client, ObjectMapper mapper) {
+    public static Retrofit defaultRetrofit(final String baseUrl,
+                                           OkHttpClient client,
+                                           ObjectMapper mapper) {
         return new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(StringUtils.isEmpty(baseUrl) ? BASE_URL:baseUrl)
                 .client(client)
                 .addConverterFactory(JacksonConverterFactory.create(mapper))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
