@@ -1,17 +1,14 @@
 package com.zhipu.oapi.service.v4.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -42,10 +39,12 @@ public final class ModelData extends ObjectNode {
 
     public ModelData(ObjectNode objectNode) {
         super(JsonNodeFactory.instance);
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = MessageDeserializeFactory.defaultObjectMapper();
         if (objectNode.get("choices") != null) {
-            this.setChoices(objectMapper.convertValue(objectNode.get("choices"), new TypeReference<List<Choice>>() {
-            }));
+            List<Choice> choices1 = objectMapper.convertValue(objectNode.get("choices"), new TypeReference<List<Choice>>() {
+            });
+
+            this.setChoices(choices1);
         } else {
             this.setChoices(null);
         }
@@ -109,7 +108,16 @@ public final class ModelData extends ObjectNode {
 
     public void setChoices(List<Choice> choices) {
         this.choices = choices;
-        this.putPOJO("choices", choices);
+        ArrayNode jsonNodes = this.putArray("choices");
+        if (choices == null) {
+            jsonNodes.removeAll();
+        }
+        else {
+
+            for (Choice choice : choices) {
+                jsonNodes.add(choice);
+            }
+        }
     }
 
     public void setUsage(Usage usage) {

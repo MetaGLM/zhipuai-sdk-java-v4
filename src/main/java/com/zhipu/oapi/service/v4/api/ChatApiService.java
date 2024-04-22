@@ -218,8 +218,6 @@ public class ChatApiService {
         mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
         mapper.addMixIn(ChatFunction.class, ChatFunctionMixIn.class);
         mapper.addMixIn(ChatCompletionRequest.class, ChatCompletionRequestMixIn.class);
-        mapper.addMixIn(ChatFunctionCall.class, ChatFunctionCallMixIn.class);
-        mapper.addMixIn(ChatFunctionCall.class, ChatFunctionCallMixIn.class);
 
         SimpleModule module = new SimpleModule();
 
@@ -246,12 +244,6 @@ public class ChatApiService {
                 .addConverterFactory(JacksonConverterFactory.create(mapper))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
-    }
-
-    public Flowable<ChatMessageAccumulator> mapStreamToAccumulator(Flowable<ModelData> flowable) {
-        return flowable.map(chunk -> {
-            return new ChatMessageAccumulator(chunk.getChoices().get(0).getDelta(), null,chunk.getChoices().get(0),chunk.getUsage(),chunk.getCreated(),chunk.getId());
-        });
     }
 
 

@@ -75,8 +75,8 @@ public class ClientV4 {
 
         rawReq.setBody(paramsMap);
         // token
-        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        rawReq.setToken(token);
+//        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        rawReq.setToken(config.getApiSecretKey());
         ModelApiResponse resp = new ModelApiResponse();
         try {
             RawResponse rawResp = this.getConfig().getHttpTransport().sseExecute(rawReq);
@@ -123,8 +123,8 @@ public class ClientV4 {
         }
 
         // token
-        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(token);
+//        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(config.getApiSecretKey());
         ModelApiResponse resp = new ModelApiResponse();
         try {
             ChatCompletionResult chatCompletionResult = service.createChatCompletion(paramsMap);
@@ -175,8 +175,8 @@ public class ClientV4 {
 
         rawReq.setBody(paramsMap);
         // token
-        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(token);
+//        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(config.getApiSecretKey());
         ModelApiResponse resp = new ModelApiResponse();
         try {
             ChatCompletionAsyncResult chatCompletionAsyncResult = service.createChatCompletionAsync(rawReq.getBody());
@@ -209,8 +209,8 @@ public class ClientV4 {
 
     public QueryModelResultResponse queryModelResult(QueryModelResultRequest request) {
         QueryModelResultResponse resp = new QueryModelResultResponse();
-        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(token);
+        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(config.getApiSecretKey());
         try {
             ChatCompletionResult chatCompletionResult = service.queryAsyncResult(request.getTaskId());
             if (chatCompletionResult != null) {
@@ -302,8 +302,8 @@ public class ClientV4 {
 
     public EmbeddingApiResponse invokeEmbeddingsApi(EmbeddingRequest request) {
         EmbeddingApiResponse embeddingApiResponse = new EmbeddingApiResponse();
-        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(token);
+        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(config.getApiSecretKey());
         try {
             Map<String, Object> paramsMap = new HashMap();
             paramsMap.put("request_id", request.getRequestId());
@@ -338,8 +338,8 @@ public class ClientV4 {
 
     public FileApiResponse invokeUploadFileApi(UploadFileRequest request) {
         FileApiResponse fileApiResponse = new FileApiResponse();
-        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(token);
+        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(config.getApiSecretKey());
         try {
             File file = service.uploadFile(request);
             if (file != null) {
@@ -365,8 +365,8 @@ public class ClientV4 {
 
     public QueryFileApiResponse queryFilesApi(QueryFilesRequest queryFilesRequest) {
         QueryFileApiResponse queryFileApiResponse = new QueryFileApiResponse();
-        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(token);
+        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(config.getApiSecretKey());
         try {
             QueryFileResult queryFileResult = service.queryFileList(queryFilesRequest);
             if (queryFileResult != null) {
@@ -392,8 +392,8 @@ public class ClientV4 {
 
     public CreateFineTuningJobApiResponse createFineTuningJob(FineTuningJobRequest request) {
         CreateFineTuningJobApiResponse createFineTuningJobApiResponse = new CreateFineTuningJobApiResponse();
-        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(token);
+        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(config.getApiSecretKey());
         FineTuningJob fineTuningJob = null;
         try {
             fineTuningJob = service.createFineTuningJob(request);
@@ -420,8 +420,8 @@ public class ClientV4 {
 
     public QueryFineTuningEventApiResponse queryFineTuningJobsEvents(QueryFineTuningJobRequest queryFineTuningJobRequest) {
         QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = new QueryFineTuningEventApiResponse();
-        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(token);
+        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(config.getApiSecretKey());
         try {
             FineTuningEvent fineTuningEvent = service.listFineTuningJobEvents(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
             if (fineTuningEvent != null) {
@@ -447,8 +447,8 @@ public class ClientV4 {
 
     public QueryFineTuningJobApiResponse retrieveFineTuningJobs(QueryFineTuningJobRequest queryFineTuningJobRequest) {
         QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = new QueryFineTuningJobApiResponse();
-        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(token);
+        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(config.getApiSecretKey());
         try {
             FineTuningJob fineTuningJob = service.retrieveFineTuningJob(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
             if (fineTuningJob != null) {
@@ -475,8 +475,8 @@ public class ClientV4 {
 
     public QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobs(QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest) {
         QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = new QueryPersonalFineTuningJobApiResponse();
-        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
-        ChatApiService service = new ChatApiService(token);
+        //        String token = GlobalTokenManager.getTokenManagerV4().getToken(config);
+        ChatApiService service = new ChatApiService(config.getApiSecretKey());
         try {
             PersonalFineTuningJob personalFineTuningJob = service.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest.getLimit(), queryPersonalFineTuningJobRequest.getAfter());
             if (personalFineTuningJob != null) {
