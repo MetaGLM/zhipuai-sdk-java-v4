@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
-    private static final String API_SECRET_KEY = "58e91163afb81c581ce1d90bb07494d3.igjG0t8dXuTJCjOq";
+    private static final String API_SECRET_KEY = "your_api_secret_key";
     private static final String BASE_URL  = "https://open.bigmodel.cn/api/paas/v4/";
 
 
