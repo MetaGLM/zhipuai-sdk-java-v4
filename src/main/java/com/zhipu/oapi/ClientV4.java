@@ -28,6 +28,9 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.zhipu.oapi.Constants.BASE_URL;
+import static com.zhipu.oapi.Constants.TEST_BASE_URL;
+
 
 public class ClientV4 {
 
@@ -477,10 +480,6 @@ public class ClientV4 {
     public static final class Builder {
         private final ConfigV4 config = new ConfigV4();
 
-        public Builder(String baseUrl, String apiSecretKey) {
-            config.setBaseUrl(baseUrl);
-            config.setApiSecretKey(apiSecretKey);
-        }
         public Builder(String apiSecretKey) {
             config.setApiSecretKey(apiSecretKey);
         }
@@ -529,16 +528,23 @@ public class ClientV4 {
                 if (StringUtils.isEmpty(config.getApiSecretKey())){
                     throw new RuntimeException("apiSecretKey can not be empty");
                 }
-                if (StringUtils.isNotEmpty(config.getBaseUrl()) && config.getRequestTimeOut() == 0){
+                String baseUrl = null;
+                if (config.isDevMode()){
+                    baseUrl = TEST_BASE_URL;
+                }else {
+                    baseUrl = BASE_URL;
+                }
+
+                if (config.getRequestTimeOut() == 0){
                     ChatApiService chatApiService = new ChatApiService(
-                            config.getBaseUrl(),
+                            baseUrl,
                             config.getApiSecretKey()
                     );
 
                     config.setChatApiService(chatApiService);
                 }
 
-                else if (StringUtils.isNotEmpty(config.getBaseUrl()) && config.getRequestTimeOut() > 0) {
+                else if (config.getRequestTimeOut() > 0) {
                     OkHttpClient okHttpClient = OkHttps.create(
                             config.getApiSecretKey(),
                             config.getRequestTimeOut(),
@@ -546,22 +552,13 @@ public class ClientV4 {
 
                     ChatApiService chatApiService = new ChatApiService(
                             okHttpClient,
-                            config.getBaseUrl());
+                            baseUrl);
 
                     config.setChatApiService(chatApiService);
                 }
-                else if (StringUtils.isEmpty(config.getBaseUrl()) && config.getRequestTimeOut() > 0) {
-
-                    OkHttpClient okHttpClient = OkHttps.create(
-                            config.getApiSecretKey(),
-                            config.getRequestTimeOut(),
-                            config.getTimeOutTimeUnit());
-
+                else {
                     ChatApiService chatApiService = new ChatApiService(
-                            okHttpClient);
-                    config.setChatApiService(chatApiService);
-                } else {
-                    ChatApiService chatApiService = new ChatApiService(
+                            baseUrl,
                             config.getApiSecretKey()
                     );
                     config.setChatApiService(chatApiService);

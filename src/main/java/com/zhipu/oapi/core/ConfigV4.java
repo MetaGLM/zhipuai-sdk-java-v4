@@ -8,9 +8,6 @@ import lombok.Setter;
 import java.util.concurrent.TimeUnit;
 
 public class ConfigV4 {
-    @Setter
-    @Getter
-    private String baseUrl;
 
     // api credentials
     // apiSecretKey = {apiKey}.{apiSecret}

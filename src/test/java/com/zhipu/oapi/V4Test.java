@@ -31,10 +31,12 @@ public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
     private static final String API_SECRET_KEY = "your_api_secret_key";
-    private static final String BASE_URL  = "https://open.bigmodel.cn/api/paas/v4/";
+    private static final boolean devMode = false;
 
 
-    private static final ClientV4 client = new ClientV4.Builder(BASE_URL, API_SECRET_KEY).build();
+    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
+            .devMode(devMode)
+            .build();
 
     // 请自定义自己的业务id
     private static final String requestIdTemplate = "mycompany-%d";
