@@ -12,10 +12,10 @@ public class WuDaoUtils {
 	 * 获取鉴权token
 	 * 
 	 * @param createTokenUrl 获取token
-	 * @param apiKey
-	 * @param publicKey
-	 * @return Map<String, Object>
-	 * @throws Exception
+	 * @param apiKey  apiKey
+	 * @param publicKey  publicKey
+	 * @return 回一个包含键值对的Map对象，键是字符串，值是整数。
+	 * @throws Exception  Exception
 	 */
 	public static Map<String, Object> getToken(String createTokenUrl, String apiKey, String publicKey)
 			throws Exception {
@@ -38,13 +38,12 @@ public class WuDaoUtils {
 	}
 
 	/**
-	 * 引擎请求
 	 *
 	 * @param engineUrl 引擎请求地址
 	 * @param authToken 鉴权token
-	 * @param paramsMap
-	 * @return Map<String, Object>
-	 * @throws Exception
+	 * @param paramsMap  paramsMap
+	 * @return 回一个包含键值对的Map对象，键是字符串，值是整数。
+	 * @throws Exception Exception
 	 */
 	public static Map<String, Object> executePost(String engineUrl, String authToken, Map<String, Object> paramsMap)
 			throws Exception {

@@ -99,7 +99,6 @@ public class ChatApiService {
     /**
      * Creates a new ChatApiService that wraps ChatApi
      * @param client retrofit instance
-     * @param token api token
      */
     public ChatApiService(final OkHttpClient client) {
 
