@@ -8,7 +8,7 @@ public class Constants {
     public static final String TEST_BASE_URL = "https://test.bigmodel.cn/stage-api/paas/v4/";
     public static final String ModelChatGLM4 = "GLM-4";
 
-    public static final String ModelCogView = "cogview";
+    public static final String ModelCogView = "cogview-3";
 
     public static final String ModelChatGLM4V = "glm-4v";
 

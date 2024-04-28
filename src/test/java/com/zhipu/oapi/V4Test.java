@@ -30,8 +30,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
-    private static final String API_SECRET_KEY = "your_api_secret_key";
-    private static final boolean devMode = false;
+    private static final String API_SECRET_KEY = "e6a98ef1c54484c2afeac1ae8cef93ef.rlpKehWCGDttN9Pl";
+    private static final boolean devMode = true;
 
 
     private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
@@ -204,7 +204,7 @@ public class V4Test {
     @Test
     public void testFunctionInvoke(){
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "北京天气如何");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         // 函数调用参数构建部分
@@ -236,9 +236,10 @@ public class V4Test {
         WebSearch webSearch = new WebSearch();
         webSearch.setSearch_query("清华的升学率");
         webSearch.setSearch_result(true);
+        webSearch.setEnable(false);
         chatTool1.setWeb_search(webSearch);
 
-//        chatToolList.add(chatTool);
+        chatToolList.add(chatTool);
         chatToolList.add(chatTool1);
 
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()

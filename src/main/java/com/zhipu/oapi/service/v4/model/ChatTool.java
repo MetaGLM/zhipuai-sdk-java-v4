@@ -9,14 +9,9 @@ import lombok.*;
 
 import java.util.Map;
 
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-public class ChatTool {
 
-//    @Getter
-//    public class ChatTool extends ObjectNode {
+@Getter
+public class ChatTool extends ObjectNode {
     private String type;
 
     private ChatFunction function;
@@ -27,30 +22,30 @@ public class ChatTool {
     @JsonProperty("web_search")
     private WebSearch web_search;
 
-//    public ChatTool(){
-//        super(JsonNodeFactory.instance);
-//    }
-//    public ChatTool(JsonNodeFactory nc, Map<String, JsonNode> kids) {
-//        super(nc, kids);
-//    }
-//
-//
-//    public void setType(String type){
-//        this.type = type;
-//        this.put("type",type);
-//    }
-//    public void setFunction(ChatFunction function){
-//        this.function = function;
-//        this.putPOJO("function",function);
-//    }
-//
-//    public void setRetrieval(Retrieval retrieval){
-//        this.retrieval = retrieval;
-//        this.putPOJO("retrieval",retrieval);
-//    }
-//
-//    public void setWeb_search(WebSearch web_search) {
-//        this.web_search = web_search;
-//        this.putPOJO("web_search",web_search);
-//    }
+    public ChatTool(){
+        super(JsonNodeFactory.instance);
+    }
+    public ChatTool(JsonNodeFactory nc, Map<String, JsonNode> kids) {
+        super(nc, kids);
+    }
+
+
+    public void setType(String type){
+        this.type = type;
+        this.put("type",type);
+    }
+    public void setFunction(ChatFunction function){
+        this.function = function;
+        this.putPOJO("function",function);
+    }
+
+    public void setRetrieval(Retrieval retrieval){
+        this.retrieval = retrieval;
+        this.putPOJO("retrieval",retrieval);
+    }
+
+    public void setWeb_search(WebSearch web_search) {
+        this.web_search = web_search;
+        this.putPOJO("web_search",web_search);
+    }
 }

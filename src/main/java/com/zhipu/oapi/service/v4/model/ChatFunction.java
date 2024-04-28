@@ -3,17 +3,20 @@ package com.zhipu.oapi.service.v4.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-public class ChatFunction {
+@Getter
+public class ChatFunction extends ObjectNode {
 
 
     private String name;
@@ -25,8 +28,32 @@ public class ChatFunction {
 
     private List<String> required;
 
-    @JsonIgnore
-    private Function<Object, Object> executor;
+    public ChatFunction(){
+        super(JsonNodeFactory.instance);
+    }
+    public ChatFunction(JsonNodeFactory nc, Map<String, JsonNode> kids) {
+        super(nc, kids);
+    }
+
+    public void setName(String name) {
+        this.name = name;
+        this.put("name",name);
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+        this.put("description",description);
+    }
+
+    public void setParameters(ChatFunctionParameters parameters) {
+        this.parameters = parameters;
+        this.set("parameters",parameters);
+    }
+
+    public void setRequired(List<String> required) {
+        this.required = required;
+        this.putPOJO("required",required);
+    }
 
     public static Builder builder() {
         return new Builder();
