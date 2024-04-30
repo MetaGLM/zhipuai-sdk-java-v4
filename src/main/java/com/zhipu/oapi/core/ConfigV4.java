@@ -4,6 +4,7 @@ import com.zhipu.oapi.core.cache.ICache;
 import com.zhipu.oapi.service.v4.api.ChatApiService;
 import lombok.Getter;
 import lombok.Setter;
+import okhttp3.OkHttpClient;
 
 import java.util.concurrent.TimeUnit;
 
@@ -41,9 +42,33 @@ public class ConfigV4 {
     @Setter
     @Getter
     private ChatApiService chatApiService;
+
+    /**
+     * @see OkHttpClient.Builder#callTimeout(long, TimeUnit)
+     */
     @Setter
     @Getter
     private int requestTimeOut;
+    /**
+     * @see OkHttpClient.Builder#connectTimeout(long, TimeUnit)
+     */
+    @Setter
+    @Getter
+    private int connectTimeout;
+
+    /**
+     * @see OkHttpClient.Builder#readTimeout(long, TimeUnit)
+     */
+    @Setter
+    @Getter
+    private int readTimeout;
+
+    /**
+     * @see OkHttpClient.Builder#writeTimeout(long, TimeUnit)
+     */
+    @Setter
+    @Getter
+    private int writeTimeout;
     @Setter
     @Getter
     private TimeUnit timeOutTimeUnit;

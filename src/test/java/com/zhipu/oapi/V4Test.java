@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -31,11 +32,12 @@ public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
     private static final String API_SECRET_KEY = "";
-    private static final boolean devMode = true;
+    private static final boolean devMode = false;
 
 
     private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
             .devMode(devMode)
+            .networkConfig(30, 10, 10, 10, TimeUnit.SECONDS)
             .build();
 
     // 请自定义自己的业务id

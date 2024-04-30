@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.zhipu.oapi.Constants.BASE_URL;
 import static com.zhipu.oapi.Constants.TEST_BASE_URL;
@@ -507,7 +508,33 @@ public class ClientV4 {
             return this;
         }
 
+        /**
+         * 设置网络请求超时时间
+         * @param requestTimeOut @see OkHttpClient.Builder#callTimeout(long, TimeUnit)
+         * @param connectTimeout @see OkHttpClient.Builder#connectTimeout(long, TimeUnit)
+         * @param readTimeout @see OkHttpClient.Builder#readTimeout(long, TimeUnit)
+         * @param writeTimeout @see OkHttpClient.Builder#writeTimeout(long, TimeUnit)
+         * @param timeUnit @see TimeUnit
+         * @return Builder
+         */
+        public Builder networkConfig(int requestTimeOut,
+                                     int connectTimeout,
+                                     int readTimeout,
+                                     int writeTimeout,
+                                     TimeUnit timeUnit) {
+            config.setRequestTimeOut(requestTimeOut);
+            config.setConnectTimeout(connectTimeout);
+            config.setReadTimeout(readTimeout);
+            config.setWriteTimeout(writeTimeout);
+            config.setTimeOutTimeUnit(timeUnit);
+            return this;
+        }
 
+        /**
+         * 设置是否开发模式
+         * @param devMode 是否开发模式
+         * @return Builder
+         */
         public Builder devMode(boolean devMode) {
             config.setDevMode(devMode);
             return this;
@@ -544,10 +571,17 @@ public class ClientV4 {
                     config.setChatApiService(chatApiService);
                 }
 
-                else if (config.getRequestTimeOut() > 0) {
+                else if (config.getRequestTimeOut() > 0 ||
+                         config.getConnectTimeout() > 0 ||
+                            config.getReadTimeout() > 0 ||
+                            config.getWriteTimeout() > 0
+                        ) {
                     OkHttpClient okHttpClient = OkHttps.create(
                             config.getApiSecretKey(),
                             config.getRequestTimeOut(),
+                            config.getConnectTimeout(),
+                            config.getReadTimeout(),
+                            config.getWriteTimeout(),
                             config.getTimeOutTimeUnit());
 
                     ChatApiService chatApiService = new ChatApiService(
