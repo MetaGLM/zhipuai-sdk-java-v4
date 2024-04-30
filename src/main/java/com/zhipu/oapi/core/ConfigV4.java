@@ -4,9 +4,13 @@ import com.zhipu.oapi.core.cache.ICache;
 import com.zhipu.oapi.service.v4.api.ChatApiService;
 import lombok.Getter;
 import lombok.Setter;
+import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 
 import java.util.concurrent.TimeUnit;
+
+import static com.zhipu.oapi.Constants.BASE_URL;
+import static com.zhipu.oapi.Constants.TEST_BASE_URL;
 
 public class ConfigV4 {
 
@@ -41,8 +45,14 @@ public class ConfigV4 {
     // 传输层
     @Setter
     @Getter
-    private ChatApiService chatApiService;
+    private OkHttpClient httpClient;
 
+    /**
+     * @see OkHttpClient.Builder#connectionPool(ConnectionPool)
+     */
+    @Setter
+    @Getter
+    private okhttp3.ConnectionPool connectionPool;
     /**
      * @see OkHttpClient.Builder#callTimeout(long, TimeUnit)
      */
@@ -106,4 +116,5 @@ public class ConfigV4 {
         this.apiKey = arrStr[0];
         this.apiSecret = arrStr[1];
     }
+
 }

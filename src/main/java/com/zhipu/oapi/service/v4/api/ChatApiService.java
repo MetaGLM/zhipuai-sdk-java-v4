@@ -42,60 +42,12 @@ import static com.zhipu.oapi.Constants.BASE_URL;
 
 public class ChatApiService {
 
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(300);
     private static final ObjectMapper mapper = defaultObjectMapper();
     private final static Logger logger = LoggerFactory.getLogger(ChatApiService.class);
 
     private final ChatApi api;
     private final ExecutorService executorService;
 
-    /**
-     * Creates a new ChatApiService that wraps ChatApi
-     */
-    public ChatApiService(final String token) {
-        this(token, DEFAULT_TIMEOUT);
-    }
-
-    /**
-     * Creates a new ChatApiService that wraps ChatApi
-     * @param token
-     * @param timeout http read timeout, Duration.ZERO means no timeout
-     */
-    public ChatApiService(final String token, final Duration timeout) {
-        ObjectMapper mapper = defaultObjectMapper();
-        OkHttpClient client = defaultClient(token, timeout);
-        Retrofit retrofit = defaultRetrofit(BASE_URL,client, mapper);
-
-        this.api = retrofit.create(ChatApi.class);
-        this.executorService = client.dispatcher().executorService();
-    }
-    /**
-     * Creates a new ChatApiService that wraps ChatApi
-     * @param token api token
-     * @param baseUrl base url of the api
-     */
-    public ChatApiService(final String baseUrl, final String token) {
-        ObjectMapper mapper = defaultObjectMapper();
-        OkHttpClient client = defaultClient(token, DEFAULT_TIMEOUT);
-        Retrofit retrofit = defaultRetrofit(baseUrl, client, mapper);
-
-        this.api = retrofit.create(ChatApi.class);
-        this.executorService = client.dispatcher().executorService();
-    }
-    /**
-     * Creates a new ChatApiService that wraps ChatApi
-     * @param token api token
-     * @param baseUrl base url of the api
-     * @param timeout http read timeout, Duration.ZERO means no timeout
-     */
-    public ChatApiService(final String baseUrl, final String token, final Duration timeout) {
-        ObjectMapper mapper = defaultObjectMapper();
-        OkHttpClient client = defaultClient(token, timeout);
-        Retrofit retrofit = defaultRetrofit(baseUrl, client, mapper);
-
-        this.api = retrofit.create(ChatApi.class);
-        this.executorService = client.dispatcher().executorService();
-    }
     /**
      * Creates a new ChatApiService that wraps ChatApi
      * @param client retrofit instance
@@ -303,7 +255,6 @@ public class ChatApiService {
 
         SimpleModule module = new SimpleModule();
 
-//        module.addSerializer(ChatCompletionResult.class, serializer);
         module.addDeserializer(ChatCompletionResult.class, new ChatCompletionDeserializer());
         module.addDeserializer(ModelData.class, new ModelDataDeserializer());
         mapper.registerModule(module);
@@ -311,13 +262,7 @@ public class ChatApiService {
         return mapper;
     }
 
-    public static OkHttpClient defaultClient(String token, Duration timeout) {
-        return new OkHttpClient.Builder()
-                .addInterceptor(new AuthenticationInterceptor(token))
-                .connectionPool(new ConnectionPool(5, 1, TimeUnit.SECONDS))
-                .readTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
-                .build();
-    }
+
 
     public static Retrofit defaultRetrofit(final String baseUrl,
                                            OkHttpClient client,

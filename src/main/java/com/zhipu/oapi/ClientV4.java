@@ -21,6 +21,7 @@ import com.zhipu.oapi.utils.OkHttps;
 import com.zhipu.oapi.utils.StringUtils;
 import lombok.Getter;
 import lombok.Setter;
+import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,9 @@ public class ClientV4 {
     @Setter
     @Getter
     private ConfigV4 config;
+    @Setter
+    @Getter
+    private ChatApiService chatApiService;
 
 
     public ModelApiResponse invokeModelApi(ChatCompletionRequest request) {
@@ -82,7 +86,7 @@ public class ClientV4 {
 
         ModelApiResponse resp = new ModelApiResponse();
         try {
-            RawResponse rawResp = this.getConfig().getChatApiService().sseExecute(paramsMap);
+            RawResponse rawResp = chatApiService.sseExecute(paramsMap);
             resp.setCode(rawResp.getStatusCode());
             resp.setMsg(rawResp.getMsg());
             resp.setSuccess(rawResp.isSuccess());
@@ -127,7 +131,7 @@ public class ClientV4 {
 
         ModelApiResponse resp = new ModelApiResponse();
         try {
-            ModelData modelData = config.getChatApiService().createChatCompletion(paramsMap);
+            ModelData modelData = chatApiService.createChatCompletion(paramsMap);
             if (modelData != null) {
                 resp.setCode(200);
                 resp.setMsg("调用成功");
@@ -172,7 +176,7 @@ public class ClientV4 {
 
         ModelApiResponse resp = new ModelApiResponse();
         try {
-            ModelData modelData = config.getChatApiService().createChatCompletionAsync(paramsMap);
+            ModelData modelData = chatApiService.createChatCompletionAsync(paramsMap);
             if (modelData != null) {
                 resp.setCode(200);
                 resp.setMsg("调用成功");
@@ -199,7 +203,7 @@ public class ClientV4 {
         QueryModelResultResponse resp = new QueryModelResultResponse();
 
         try {
-            ModelData modelData = config.getChatApiService().queryAsyncResult(request.getTaskId());
+            ModelData modelData = chatApiService.queryAsyncResult(request.getTaskId());
             if (modelData != null) {
                 resp.setCode(200);
                 resp.setMsg("调用成功");
@@ -239,7 +243,7 @@ public class ClientV4 {
             if(createImageRequest.getExtraJson() !=null){
                 request.replaceAll((s, v) -> createImageRequest.getExtraJson().get(s));
             }
-            ImageResult image = config.getChatApiService().createImage(request);
+            ImageResult image = chatApiService.createImage(request);
             if (image != null) {
                 imageApiResponse.setMsg("调用成功");
                 imageApiResponse.setCode(200);
@@ -296,7 +300,7 @@ public class ClientV4 {
             if(request.getExtraJson() !=null){
                 paramsMap.putAll(request.getExtraJson());
             }
-            EmbeddingResult embeddingResult = config.getChatApiService().createEmbeddings(paramsMap);
+            EmbeddingResult embeddingResult = chatApiService.createEmbeddings(paramsMap);
             if (embeddingResult != null) {
                 embeddingApiResponse.setCode(200);
                 embeddingApiResponse.setMsg("调用成功");
@@ -323,7 +327,7 @@ public class ClientV4 {
         FileApiResponse fileApiResponse = new FileApiResponse();
 
         try {
-            File file = config.getChatApiService().uploadFile(request);
+            File file = chatApiService.uploadFile(request);
             if (file != null) {
                 fileApiResponse.setCode(200);
                 fileApiResponse.setSuccess(true);
@@ -349,7 +353,7 @@ public class ClientV4 {
         QueryFileApiResponse queryFileApiResponse = new QueryFileApiResponse();
 
         try {
-            QueryFileResult queryFileResult = config.getChatApiService().queryFileList(queryFilesRequest);
+            QueryFileResult queryFileResult = chatApiService.queryFileList(queryFilesRequest);
             if (queryFileResult != null) {
                 queryFileApiResponse.setCode(200);
                 queryFileApiResponse.setSuccess(true);
@@ -376,7 +380,7 @@ public class ClientV4 {
 
         FineTuningJob fineTuningJob = null;
         try {
-            fineTuningJob = config.getChatApiService().createFineTuningJob(request);
+            fineTuningJob = chatApiService.createFineTuningJob(request);
             if (fineTuningJob != null) {
                 createFineTuningJobApiResponse.setMsg("调用成功");
                 createFineTuningJobApiResponse.setData(fineTuningJob);
@@ -402,7 +406,7 @@ public class ClientV4 {
         QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = new QueryFineTuningEventApiResponse();
 
         try {
-            FineTuningEvent fineTuningEvent = config.getChatApiService().listFineTuningJobEvents(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
+            FineTuningEvent fineTuningEvent = chatApiService.listFineTuningJobEvents(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
             if (fineTuningEvent != null) {
                 queryFineTuningEventApiResponse.setSuccess(true);
                 queryFineTuningEventApiResponse.setData(fineTuningEvent);
@@ -428,7 +432,7 @@ public class ClientV4 {
         QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = new QueryFineTuningJobApiResponse();
 
         try {
-            FineTuningJob fineTuningJob = config.getChatApiService().retrieveFineTuningJob(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
+            FineTuningJob fineTuningJob = chatApiService.retrieveFineTuningJob(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
             if (fineTuningJob != null) {
                 queryFineTuningJobApiResponse.setSuccess(true);
                 queryFineTuningJobApiResponse.setData(fineTuningJob);
@@ -455,7 +459,7 @@ public class ClientV4 {
         QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = new QueryPersonalFineTuningJobApiResponse();
 
         try {
-            PersonalFineTuningJob personalFineTuningJob = config.getChatApiService().queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest.getLimit(), queryPersonalFineTuningJobRequest.getAfter());
+            PersonalFineTuningJob personalFineTuningJob = chatApiService.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest.getLimit(), queryPersonalFineTuningJobRequest.getAfter());
             if (personalFineTuningJob != null) {
                 queryPersonalFineTuningJobApiResponse.setSuccess(true);
                 queryPersonalFineTuningJobApiResponse.setData(personalFineTuningJob);
@@ -488,12 +492,25 @@ public class ClientV4 {
         public Builder setTokenKey(String apiKey, String apiSecret) {
             config.setApiKey(apiKey);
             config.setApiSecret(apiSecret);
-            config.setDisableTokenCache(false);
+            config.setDisableTokenCache(true);
             return this;
         }
 
+        /**
+         * 使用apikey直接请求 默认true
+         * @return
+         */
         public Builder disableTokenCache() {
             config.setDisableTokenCache(true);
+            return this;
+        }
+
+        /**
+         * 使用accessToken请求 默认false
+         * @return
+         */
+        public Builder enableTokenCache() {
+            config.setDisableTokenCache(false);
             return this;
         }
 
@@ -531,6 +548,17 @@ public class ClientV4 {
         }
 
         /**
+         * 设置连接池
+         * @param connectionPool @see OkHttpClient.Builder#connectionPool(ConnectionPool)
+         * @return Builder
+         */
+        public Builder connectionPool(ConnectionPool connectionPool) {
+            config.setConnectionPool(connectionPool);
+            return this;
+        }
+
+
+        /**
          * 设置是否开发模式
          * @param devMode 是否开发模式
          * @return Builder
@@ -551,60 +579,31 @@ public class ClientV4 {
         }
 
         private void initHttpTransport(ConfigV4 config) {
-            if (config.getChatApiService() == null) {
+            if (config.getHttpClient() == null) {
                 if (StringUtils.isEmpty(config.getApiSecretKey())){
                     throw new RuntimeException("apiSecretKey can not be empty");
                 }
-                String baseUrl = null;
-                if (config.isDevMode()){
-                    baseUrl = TEST_BASE_URL;
-                }else {
-                    baseUrl = BASE_URL;
-                }
-
-                if (config.getRequestTimeOut() == 0){
-                    ChatApiService chatApiService = new ChatApiService(
-                            baseUrl,
-                            config.getApiSecretKey()
-                    );
-
-                    config.setChatApiService(chatApiService);
-                }
-
-                else if (config.getRequestTimeOut() > 0 ||
-                         config.getConnectTimeout() > 0 ||
-                            config.getReadTimeout() > 0 ||
-                            config.getWriteTimeout() > 0
-                        ) {
-                    OkHttpClient okHttpClient = OkHttps.create(
-                            config.getApiSecretKey(),
-                            config.getRequestTimeOut(),
-                            config.getConnectTimeout(),
-                            config.getReadTimeout(),
-                            config.getWriteTimeout(),
-                            config.getTimeOutTimeUnit());
-
-                    ChatApiService chatApiService = new ChatApiService(
-                            okHttpClient,
-                            baseUrl);
-
-                    config.setChatApiService(chatApiService);
-                }
-                else {
-                    ChatApiService chatApiService = new ChatApiService(
-                            baseUrl,
-                            config.getApiSecretKey()
-                    );
-                    config.setChatApiService(chatApiService);
-                }
+                 
+                OkHttpClient okHttpClient = OkHttps.create(config);
+                config.setHttpClient(okHttpClient);
             }
+            
         }
 
         public ClientV4 build() {
             ClientV4 client = new ClientV4();
             client.setConfig(config);
+            
             initCache(config);
             initHttpTransport(config);
+
+            String baseUrl = null;
+            if (config.isDevMode()){
+                baseUrl = TEST_BASE_URL;
+            }else {
+                baseUrl = BASE_URL;
+            }
+            client.setChatApiService(new ChatApiService(config.getHttpClient(),baseUrl));
             return client;
         }
     }

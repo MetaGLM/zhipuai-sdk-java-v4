@@ -1,6 +1,7 @@
 package com.zhipu.oapi.utils;
 
-import com.zhipu.oapi.service.v4.model.AuthenticationInterceptor;
+import com.zhipu.oapi.core.ConfigV4;
+import com.zhipu.oapi.core.token.AuthenticationInterceptor;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 
@@ -10,42 +11,39 @@ public class OkHttps {
 
     /**
      *  创建一个OkHttpClient
-     * @param token 智谱 token
-     * @param callTimeout  @see OkHttpClient.Builder#callTimeout(long, TimeUnit)
-     * @param connectTimeout @see OkHttpClient.Builder#connectTimeout(long, TimeUnit)
-     * @param readTimeout @see OkHttpClient.Builder#readTimeout(long, TimeUnit)
-     * @param writeTimeout @see OkHttpClient.Builder#writeTimeout(long, TimeUnit)
-     * @param timeUnit @see TimeUnit
+     * @param config config
      * @return OkHttpClient
      */
-    public static OkHttpClient create(String token,
-                                      long callTimeout,
-                                      long connectTimeout,
-                                      long readTimeout,
-                                      long writeTimeout,
-                                      TimeUnit timeUnit) {
+    public static OkHttpClient create(ConfigV4 config)
+    {
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                .addInterceptor(new AuthenticationInterceptor(token));
+                .addInterceptor(new AuthenticationInterceptor(config));
 
-        if(callTimeout > 0) {
-            builder.callTimeout(callTimeout, timeUnit);
+        if(config.getRequestTimeOut() > 0) {
+            builder.callTimeout(config.getRequestTimeOut(), config.getTimeOutTimeUnit());
         } else {
             builder.callTimeout(30, TimeUnit.SECONDS);
         }
-        if (connectTimeout > 0) {
-            builder.connectTimeout(connectTimeout, timeUnit);
+        if (config.getConnectTimeout() > 0) {
+            builder.connectTimeout(config.getConnectTimeout(), config.getTimeOutTimeUnit());
         } else {
             builder.connectTimeout(10, TimeUnit.SECONDS);
         }
-        if (readTimeout > 0) {
-            builder.readTimeout(readTimeout, timeUnit);
+        if (config.getReadTimeout() > 0) {
+            builder.readTimeout(config.getReadTimeout(), config.getTimeOutTimeUnit());
         } else {
             builder.readTimeout(10, TimeUnit.SECONDS);
         }
-        if (writeTimeout > 0) {
-            builder.writeTimeout(writeTimeout, timeUnit);
+        if (config.getWriteTimeout() > 0) {
+            builder.writeTimeout(config.getWriteTimeout(), config.getTimeOutTimeUnit());
         } else {
             builder.writeTimeout(10, TimeUnit.SECONDS);
+        }
+        if (config.getConnectionPool() != null) {
+            builder.connectionPool(config.getConnectionPool());
+        }else {
+
+            builder.connectionPool(new ConnectionPool(5, 1, TimeUnit.SECONDS));
         }
 
         return builder.build();
