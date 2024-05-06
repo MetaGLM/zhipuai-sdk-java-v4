@@ -1,5 +1,6 @@
 package com.zhipu.oapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zhipu.oapi.core.ConfigV4;
 import com.zhipu.oapi.core.cache.ICache;
@@ -338,6 +339,8 @@ public class ClientV4 {
             File file = new File();
             file.setError(chatError);
             fileApiResponse.setData(file);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
         return fileApiResponse;
     }
