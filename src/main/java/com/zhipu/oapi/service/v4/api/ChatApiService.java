@@ -99,7 +99,7 @@ public class ChatApiService {
      * @param request
      * @return RawResponse
      */
-    public RawResponse sseExecute(Map<String, Object> request) throws Exception {
+    public RawResponse sseExecute(Map<String, Object> request){
 
         RawResponse resp = new RawResponse();
         Flowable<ModelData> flowable;

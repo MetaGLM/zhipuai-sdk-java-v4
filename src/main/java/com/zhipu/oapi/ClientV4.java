@@ -94,15 +94,14 @@ public class ClientV4 {
                 resp.setFlowable(rawResp.getFlowable());
             }
             return resp;
-        } catch (Exception e) {
-            logger.error("sse invoke model fail!", e);
-            String[] error = e.getMessage().split("&");
-            resp.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
-            resp.setMsg("调用失败，异常:" + error[0]);
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            resp.setCode(e.statusCode);
+            resp.setMsg("业务出错，异常:" + e.getMessage());
             resp.setSuccess(false);
             ChatError chatError = new ChatError();
-            chatError.setCode(error.length >= 2 ? Integer.parseInt(error[1]) : 500);
-            chatError.setMessage(error[0]);
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
             ModelData modelData = new ModelData();
             modelData.setError(chatError);
             resp.setData(modelData);
@@ -138,15 +137,14 @@ public class ClientV4 {
                 resp.setData(modelData);
             }
             return resp;
-        } catch (Exception e) {
-            logger.error("invoke model fail!", e);
-            String[] error = e.getMessage().split("&");
-            resp.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
-            resp.setMsg("调用失败，异常:" + error[0]);
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            resp.setCode(e.statusCode);
+            resp.setMsg("业务出错，异常:" + e.getMessage());
             resp.setSuccess(false);
             ChatError chatError = new ChatError();
-            chatError.setCode(error.length >= 2 ? Integer.parseInt(error[1]) : 500);
-            chatError.setMessage(error[0]);
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
             ModelData modelData = new ModelData();
             modelData.setError(chatError);
             resp.setData(modelData);
@@ -182,15 +180,14 @@ public class ClientV4 {
                 resp.setMsg("调用成功");
                 resp.setData(modelData);
             }
-        } catch (Exception e) {
-            logger.error("async invoke model fail!", e);
-            String[] error = e.getMessage().split("&");
-            resp.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
-            resp.setMsg("调用失败，异常:" + error[0]);
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            resp.setCode(e.statusCode);
+            resp.setMsg("业务出错，异常:" + e.getMessage());
             resp.setSuccess(false);
             ChatError chatError = new ChatError();
-            chatError.setCode(error.length >= 2 ? Integer.parseInt(error[1]) : 500);
-            chatError.setMessage(error[0]);
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
             ModelData modelData = new ModelData();
             modelData.setError(chatError);
             resp.setData(modelData);
@@ -214,19 +211,17 @@ public class ClientV4 {
                 modelData.setTaskStatus(modelData.getTaskStatus());
                 resp.setData(modelData);
             }
-        } catch (Exception e) {
-            logger.error("query result fail", e);
-            String[] error = e.getMessage().split("&");
-            resp.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
-            resp.setMsg("调用失败，异常:" + error[0]);
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            resp.setCode(e.statusCode);
+            resp.setMsg("业务出错，异常:" + e.getMessage());
             resp.setSuccess(false);
             ChatError chatError = new ChatError();
-            chatError.setCode(error.length >= 2 ? Integer.parseInt(error[1]) : 500);
-            chatError.setMessage(error[0]);
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
             ModelData modelData = new ModelData();
             modelData.setError(chatError);
             resp.setData(modelData);
-            return resp;
         }
         return resp;
     }
@@ -250,15 +245,14 @@ public class ClientV4 {
                 imageApiResponse.setSuccess(true);
                 imageApiResponse.setData(image);
             }
-        } catch (Exception e) {
-            logger.error("createImageResult:", e);
-            String[] error = e.getMessage().split("&");
-            imageApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
-            imageApiResponse.setMsg("调用失败，异常:" + error[0]);
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            imageApiResponse.setCode(e.statusCode);
+            imageApiResponse.setMsg("业务出错，异常:" + e.getMessage());
             imageApiResponse.setSuccess(false);
             ChatError chatError = new ChatError();
-            chatError.setCode(error.length >= 2 ? Integer.parseInt(error[1]) : 500);
-            chatError.setMessage(error[0]);
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
             ImageResult imageResult = new ImageResult();
             imageResult.setError(chatError);
             imageApiResponse.setData(imageResult);
@@ -307,15 +301,14 @@ public class ClientV4 {
                 embeddingApiResponse.setSuccess(true);
                 embeddingApiResponse.setData(embeddingResult);
             }
-        } catch (Exception e) {
-            logger.error("createEmbeddings:", e);
-            String[] error = e.getMessage().split("&");
-            embeddingApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
-            embeddingApiResponse.setMsg("调用失败，异常:" + error[0]);
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            embeddingApiResponse.setCode(e.statusCode);
+            embeddingApiResponse.setMsg("业务出错，异常:" + e.getMessage());
             embeddingApiResponse.setSuccess(false);
             ChatError chatError = new ChatError();
-            chatError.setCode(error.length >= 2 ? Integer.parseInt(error[1]) : 500);
-            chatError.setMessage(error[0]);
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
             EmbeddingResult embeddingResult = new EmbeddingResult();
             embeddingResult.setError(chatError);
             embeddingApiResponse.setData(embeddingResult);
@@ -334,14 +327,14 @@ public class ClientV4 {
                 fileApiResponse.setMsg("调用成功");
                 fileApiResponse.setData(file);
             }
-        } catch (Exception e) {
-            String[] error = e.getMessage().split("&");
-            fileApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
-            fileApiResponse.setMsg("调用失败，异常:" + error[0]);
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            fileApiResponse.setCode(e.statusCode);
+            fileApiResponse.setMsg("业务出错，异常:" + e.getMessage());
             fileApiResponse.setSuccess(false);
             ChatError chatError = new ChatError();
-            chatError.setCode(error.length >= 2 ? Integer.parseInt(error[1]) : 500);
-            chatError.setMessage(error[0]);
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
             File file = new File();
             file.setError(chatError);
             fileApiResponse.setData(file);
@@ -360,14 +353,14 @@ public class ClientV4 {
                 queryFileApiResponse.setMsg("调用成功");
                 queryFileApiResponse.setData(queryFileResult);
             }
-        } catch (Exception e) {
-            String[] error = e.getMessage().split("&");
-            queryFileApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
-            queryFileApiResponse.setMsg("调用失败，异常:" + error[0]);
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            queryFileApiResponse.setCode(e.statusCode);
+            queryFileApiResponse.setMsg("业务出错，异常:" + e.getMessage());
             queryFileApiResponse.setSuccess(false);
             ChatError chatError = new ChatError();
-            chatError.setCode(error.length >= 2 ? Integer.parseInt(error[1]) : 500);
-            chatError.setMessage(error[0]);
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
             QueryFileResult queryFileResult = new QueryFileResult();
             queryFileResult.setError(chatError);
             queryFileApiResponse.setData(queryFileResult);
@@ -387,14 +380,14 @@ public class ClientV4 {
                 createFineTuningJobApiResponse.setSuccess(true);
                 createFineTuningJobApiResponse.setCode(200);
             }
-        } catch (Exception e) {
-            String[] error = e.getMessage().split("&");
-            createFineTuningJobApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
-            createFineTuningJobApiResponse.setMsg("调用失败，异常:" + error[0]);
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            createFineTuningJobApiResponse.setCode(e.statusCode);
+            createFineTuningJobApiResponse.setMsg("业务出错，异常:" + e.getMessage());
             createFineTuningJobApiResponse.setSuccess(false);
             ChatError chatError = new ChatError();
-            chatError.setCode(error.length >= 2 ? Integer.parseInt(error[1]) : 500);
-            chatError.setMessage(error[0]);
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
             fineTuningJob = new FineTuningJob();
             fineTuningJob.setError(chatError);
             createFineTuningJobApiResponse.setData(fineTuningJob);
@@ -413,14 +406,14 @@ public class ClientV4 {
                 queryFineTuningEventApiResponse.setCode(200);
                 queryFineTuningEventApiResponse.setMsg("调用成功");
             }
-        } catch (Exception e) {
-            String[] error = e.getMessage().split("&");
-            queryFineTuningEventApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
-            queryFineTuningEventApiResponse.setMsg("调用失败，异常:" + error[0]);
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            queryFineTuningEventApiResponse.setCode(e.statusCode);
+            queryFineTuningEventApiResponse.setMsg("业务出错，异常:" + e.getMessage());
             queryFineTuningEventApiResponse.setSuccess(false);
             ChatError chatError = new ChatError();
-            chatError.setCode(error.length >= 2 ? Integer.parseInt(error[1]) : 500);
-            chatError.setMessage(error[0]);
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
             FineTuningEvent fineTuningEvent = new FineTuningEvent();
             fineTuningEvent.setError(chatError);
             queryFineTuningEventApiResponse.setData(fineTuningEvent);
@@ -439,14 +432,14 @@ public class ClientV4 {
                 queryFineTuningJobApiResponse.setCode(200);
                 queryFineTuningJobApiResponse.setMsg("调用成功");
             }
-        } catch (Exception e) {
-            String[] error = e.getMessage().split("&");
-            queryFineTuningJobApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
-            queryFineTuningJobApiResponse.setMsg("调用失败，异常:" + error[0]);
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            queryFineTuningJobApiResponse.setCode(e.statusCode);
+            queryFineTuningJobApiResponse.setMsg("业务出错，异常:" + e.getMessage());
             queryFineTuningJobApiResponse.setSuccess(false);
             ChatError chatError = new ChatError();
-            chatError.setCode(error.length >= 2 ? Integer.parseInt(error[1]) : 500);
-            chatError.setMessage(error[0]);
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
             FineTuningJob fineTuningJob = new FineTuningJob();
             fineTuningJob.setError(chatError);
             queryFineTuningJobApiResponse.setData(fineTuningJob);
@@ -466,14 +459,14 @@ public class ClientV4 {
                 queryPersonalFineTuningJobApiResponse.setMsg("调用成功");
                 queryPersonalFineTuningJobApiResponse.setCode(200);
             }
-        } catch (Exception e) {
-            String[] error = e.getMessage().split("&");
-            queryPersonalFineTuningJobApiResponse.setCode(error.length >= 3 ? Integer.parseInt(error[2]) : 500);
-            queryPersonalFineTuningJobApiResponse.setMsg("调用失败，异常:" + error[0]);
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            queryPersonalFineTuningJobApiResponse.setCode(e.statusCode);
+            queryPersonalFineTuningJobApiResponse.setMsg("业务出错，异常:" + e.getMessage());
             queryPersonalFineTuningJobApiResponse.setSuccess(false);
             ChatError chatError = new ChatError();
-            chatError.setCode(error.length >= 2 ? Integer.parseInt(error[1]) : 500);
-            chatError.setMessage(error[0]);
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
             PersonalFineTuningJob personalFineTuningJob = new PersonalFineTuningJob();
             personalFineTuningJob.setError(chatError);
             queryPersonalFineTuningJobApiResponse.setData(personalFineTuningJob);
