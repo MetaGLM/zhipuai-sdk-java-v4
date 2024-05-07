@@ -39,7 +39,7 @@ public interface ChatApi {
     Single<ModelData> createChatCompletion(@Body Map<String,Object> request);
 
 
-    @GET("/api/paas/v4/async-result/{id}")
+    @GET("api/paas/v4/async-result/{id}")
     Single<ModelData> queryAsyncResult(@Path("id") String id);
 
 
