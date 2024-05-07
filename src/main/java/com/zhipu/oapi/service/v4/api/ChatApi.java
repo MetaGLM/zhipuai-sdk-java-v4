@@ -1,10 +1,7 @@
 package com.zhipu.oapi.service.v4.api;
 
 
-import com.zhipu.oapi.service.v4.fine_turning.FineTuningEvent;
-import com.zhipu.oapi.service.v4.fine_turning.FineTuningJob;
-import com.zhipu.oapi.service.v4.fine_turning.FineTuningJobRequest;
-import com.zhipu.oapi.service.v4.fine_turning.PersonalFineTuningJob;
+import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.model.ChatCompletionAsyncResult;
 import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
 import com.zhipu.oapi.service.v4.model.ChatCompletionResult;
@@ -39,7 +36,7 @@ public interface ChatApi {
     Single<ModelData> createChatCompletion(@Body Map<String,Object> request);
 
 
-    @GET("api/paas/v4/async-result/{id}")
+    @GET("async-result/{id}")
     Single<ModelData> queryAsyncResult(@Path("id") String id);
 
 
@@ -74,6 +71,23 @@ public interface ChatApi {
     @GET("fine_tuning/jobs")
     Single<PersonalFineTuningJob> queryPersonalFineTuningJobs(@Query("limit") Integer limit
             , @Query("after") String after);
+
+
+
+    @POST("fine_tuning/jobs/{fine_tuning_job_id}/cancel")
+    Single<FineTuningJob> cancelFineTuningJob(@Path("fine_tuning_job_id") String fineTuningJobId);
+
+
+
+
+    @DELETE("fine_tuning/jobs/{fine_tuning_job_id}")
+    Single<FineTuningJob> deleteFineTuningJob(@Path("fine_tuning_job_id") String fineTuningJobId);
+
+    @DELETE("fine_tuning/fine_tuned_models/{fine_tuned_model}")
+    Single<FineTunedModelsStatus> deleteFineTuningModel(@Path("fine_tuned_model") String fineTunedModel);
+
+
+
 
 }
 

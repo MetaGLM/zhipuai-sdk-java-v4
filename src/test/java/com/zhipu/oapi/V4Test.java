@@ -366,11 +366,13 @@ public class V4Test {
      */
     @Test
     public void testUploadFile() throws JsonProcessingException {
-        String filePath = "/Users/wujianguo/Downloads/transaction-data.jsonl";
+        String filePath = "demo.jsonl";
+
+        String path = ClassLoader.getSystemResource(filePath).getPath();
         String purpose = "fine-tune";
         UploadFileRequest request = UploadFileRequest.builder()
                 .purpose(purpose)
-                .filePath(filePath)
+                .filePath(path)
                 .build();
 
         FileApiResponse fileApiResponse = client.invokeUploadFileApi(request);

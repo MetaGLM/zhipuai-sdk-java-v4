@@ -398,6 +398,11 @@ public class ClientV4 {
         return createFineTuningJobApiResponse;
     }
 
+    /**
+     * 查询微调任务列表
+     * @param queryFineTuningJobRequest queryFineTuningJobRequest
+     * @return QueryFineTuningEventApiResponse
+     */
     public QueryFineTuningEventApiResponse queryFineTuningJobsEvents(QueryFineTuningJobRequest queryFineTuningJobRequest) {
         QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = new QueryFineTuningEventApiResponse();
 
@@ -424,6 +429,11 @@ public class ClientV4 {
         return queryFineTuningEventApiResponse;
     }
 
+    /**
+     * 查询微调任务
+     * @param queryFineTuningJobRequest queryFineTuningJobRequest
+     * @return QueryFineTuningJobApiResponse
+     */
     public QueryFineTuningJobApiResponse retrieveFineTuningJobs(QueryFineTuningJobRequest queryFineTuningJobRequest) {
         QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = new QueryFineTuningJobApiResponse();
 
@@ -451,6 +461,11 @@ public class ClientV4 {
         return queryFineTuningJobApiResponse;
     }
 
+    /**
+     * 查询微调任务列表
+     * @param queryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest
+     * @return QueryPersonalFineTuningJobApiResponse
+     */
     public QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobs(QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest) {
         QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = new QueryPersonalFineTuningJobApiResponse();
 
@@ -478,6 +493,101 @@ public class ClientV4 {
     }
 
 
+    /**
+     * 取消微调任务
+     * @param fineTuningJobIdRequest fineTuningJobIdRequest
+     * @return QueryFineTuningJobApiResponse
+     */
+    public QueryFineTuningJobApiResponse cancelFineTuningJob(FineTuningJobIdRequest fineTuningJobIdRequest) {
+        QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = new QueryFineTuningJobApiResponse();
+
+        try {
+            FineTuningJob fineTuningJob = chatApiService.cancelFineTuningJob(fineTuningJobIdRequest.getJobId());
+            if (fineTuningJob != null) {
+                queryFineTuningJobApiResponse.setSuccess(true);
+                queryFineTuningJobApiResponse.setData(fineTuningJob);
+                queryFineTuningJobApiResponse.setCode(200);
+                queryFineTuningJobApiResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            queryFineTuningJobApiResponse.setCode(e.statusCode);
+            queryFineTuningJobApiResponse.setMsg("业务出错，异常:" + e.getMessage());
+            queryFineTuningJobApiResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            FineTuningJob fineTuningJob = new FineTuningJob();
+            fineTuningJob.setError(chatError);
+            queryFineTuningJobApiResponse.setData(fineTuningJob);
+        }
+
+        return queryFineTuningJobApiResponse;
+    }
+
+
+    /**
+     * 删除微调任务
+     * @param fineTuningJobIdRequest fineTuningJobIdRequest
+     * @return QueryFineTuningJobApiResponse
+     */
+    public QueryFineTuningJobApiResponse deleteFineTuningJob(FineTuningJobIdRequest fineTuningJobIdRequest) {
+        QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = new QueryFineTuningJobApiResponse();
+
+        try {
+            FineTuningJob fineTuningJob = chatApiService.deleteFineTuningJob(fineTuningJobIdRequest.getJobId());
+            if (fineTuningJob != null) {
+                queryFineTuningJobApiResponse.setSuccess(true);
+                queryFineTuningJobApiResponse.setData(fineTuningJob);
+                queryFineTuningJobApiResponse.setCode(200);
+                queryFineTuningJobApiResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            queryFineTuningJobApiResponse.setCode(e.statusCode);
+            queryFineTuningJobApiResponse.setMsg("业务出错，异常:" + e.getMessage());
+            queryFineTuningJobApiResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            FineTuningJob fineTuningJob = new FineTuningJob();
+            fineTuningJob.setError(chatError);
+            queryFineTuningJobApiResponse.setData(fineTuningJob);
+        }
+
+        return queryFineTuningJobApiResponse;
+    }
+
+
+    /**
+     * 删除微调模型
+     * @param fineTuningJobModelRequest fineTuningJobIdRequest
+     * @return FineTunedModelsStatusResponse
+     */
+    public FineTunedModelsStatusResponse deleteFineTuningModel(FineTuningJobModelRequest fineTuningJobModelRequest) {
+        FineTunedModelsStatusResponse fineTunedModelsStatusResponse = new FineTunedModelsStatusResponse();
+
+        try {
+            FineTunedModelsStatus fineTunedModelsStatus = chatApiService.deleteFineTuningModel(fineTuningJobModelRequest.getFineTunedModel());
+            if (fineTunedModelsStatus != null) {
+                fineTunedModelsStatusResponse.setSuccess(true);
+                fineTunedModelsStatusResponse.setData(fineTunedModelsStatus);
+                fineTunedModelsStatusResponse.setCode(200);
+                fineTunedModelsStatusResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            fineTunedModelsStatusResponse.setCode(e.statusCode);
+            fineTunedModelsStatusResponse.setMsg("业务出错，异常:" + e.getMessage());
+            fineTunedModelsStatusResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+        }
+
+        return fineTunedModelsStatusResponse;
+    }
+
     public static final class Builder {
         private final ConfigV4 config = new ConfigV4();
 
@@ -494,7 +604,7 @@ public class ClientV4 {
 
         /**
          * 使用apikey直接请求 默认true
-         * @return
+         * @return QueryFineTuningEventApiResponse
          */
         public Builder disableTokenCache() {
             config.setDisableTokenCache(true);
@@ -503,7 +613,7 @@ public class ClientV4 {
 
         /**
          * 使用accessToken请求 默认false
-         * @return
+         * @return QueryFineTuningEventApiResponse
          */
         public Builder enableTokenCache() {
             config.setDisableTokenCache(false);

@@ -8,10 +8,7 @@ import com.zhipu.oapi.core.response.RawResponse;
 import com.zhipu.oapi.service.v4.deserialize.ChatCompletionDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
 import com.zhipu.oapi.service.v4.file.UploadFileRequest;
-import com.zhipu.oapi.service.v4.fine_turning.FineTuningEvent;
-import com.zhipu.oapi.service.v4.fine_turning.FineTuningJob;
-import com.zhipu.oapi.service.v4.fine_turning.FineTuningJobRequest;
-import com.zhipu.oapi.service.v4.fine_turning.PersonalFineTuningJob;
+import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.file.QueryFileResult;
@@ -157,6 +154,18 @@ public class ChatApiService {
 
     public ModelData queryAsyncResult(String id) {
         return execute(api.queryAsyncResult(id));
+    }
+
+    public FineTuningJob cancelFineTuningJob(String fineTuningJobId) {
+        return execute(api.cancelFineTuningJob(fineTuningJobId));
+    }
+
+    public FineTuningJob deleteFineTuningJob(String fineTuningJobId) {
+        return execute(api.deleteFineTuningJob(fineTuningJobId));
+    }
+
+    public FineTunedModelsStatus deleteFineTuningModel(String fineTunedModel) {
+        return execute(api.deleteFineTuningModel(fineTunedModel));
     }
 
 
