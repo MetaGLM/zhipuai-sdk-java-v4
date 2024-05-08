@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.bigmodel.openapi</groupId>
-    <artifactId>oapi-big-sdk-v4</artifactId>
-    <version>release-V4-2.0.2-SNAPSHOT</version>
+    <artifactId>oapi-java-sdk</artifactId>
+    <version>release-V4-2.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>zhipu sdk for GLM open api</name>
