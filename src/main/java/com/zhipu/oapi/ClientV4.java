@@ -80,6 +80,7 @@ public class ClientV4 {
         paramsMap.put("do_sample", request.getDoSample());
         paramsMap.put("max_tokens", request.getMaxTokens());
         paramsMap.put("stop", request.getStop());
+        paramsMap.put("meta", request.getMeta());
 
         if(request.getExtraJson() !=null){
             paramsMap.putAll(request.getExtraJson());
@@ -125,6 +126,7 @@ public class ClientV4 {
         paramsMap.put("do_sample", request.getDoSample());
         paramsMap.put("max_tokens", request.getMaxTokens());
         paramsMap.put("stop", request.getStop());
+        paramsMap.put("meta", request.getMeta());
         if(request.getExtraJson() !=null){
             paramsMap.putAll(request.getExtraJson());
         }

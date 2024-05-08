@@ -4,8 +4,10 @@ package com.zhipu.oapi;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zhipu.oapi.service.v4.api.ChatApiService;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
@@ -53,9 +55,6 @@ public class V4Test {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
-        mapper.addMixIn(ChatFunction.class, ChatFunctionMixIn.class);
-        mapper.addMixIn(ChatCompletionRequest.class, ChatCompletionRequestMixIn.class);
-        mapper.addMixIn(ChatFunctionCall.class, ChatFunctionCallMixIn.class);
         return mapper;
     }
 
@@ -75,14 +74,17 @@ public class V4Test {
         chatTool.setType(ChatToolType.FUNCTION.value());
         ChatFunctionParameters chatFunctionParameters = new ChatFunctionParameters();
         chatFunctionParameters.setType("object");
-        Map<String,Object> properties = new HashMap<>();
-        properties.put("location",new HashMap<String,Object>(){{
-            put("type","string");
-            put("description","城市，如：北京");
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("location", new HashMap<String, Object>() {{
+            put("type", "string");
+            put("description", "城市，如：北京");
         }});
-        properties.put("unit",new HashMap<String,Object>(){{
-            put("type","string");
-            put("enum",new ArrayList<String>(){{add("celsius");add("fahrenheit");}});
+        properties.put("unit", new HashMap<String, Object>() {{
+            put("type", "string");
+            put("enum", new ArrayList<String>() {{
+                add("celsius");
+                add("fahrenheit");
+            }});
         }});
         chatFunctionParameters.setProperties(properties);
         ChatFunction chatFunction = ChatFunction.builder()
@@ -117,7 +119,7 @@ public class V4Test {
                             }
                             if (accumulator.getDelta() != null && accumulator.getDelta().getTool_calls() != null) {
                                 String jsonString = mapper.writeValueAsString(accumulator.getDelta().getTool_calls());
-                                logger.info("tool_calls: {}" , jsonString);
+                                logger.info("tool_calls: {}", jsonString);
                             }
                             if (accumulator.getDelta() != null && accumulator.getDelta().getContent() != null) {
                                 logger.info(accumulator.getDelta().getContent());
@@ -139,7 +141,7 @@ public class V4Test {
             sseModelApiResp.setFlowable(null);// 打印前置空
             sseModelApiResp.setData(data);
         }
-        logger.info("model output: {}" , mapper.writeValueAsString(sseModelApiResp));
+        logger.info("model output: {}", mapper.writeValueAsString(sseModelApiResp));
     }
 
 
@@ -206,7 +208,7 @@ public class V4Test {
      * V4-同步function调用
      */
     @Test
-    public void testFunctionInvoke(){
+    public void testFunctionInvoke() {
         List<ChatMessage> messages = new ArrayList<>();
         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "北京天气如何");
         messages.add(chatMessage);
@@ -217,14 +219,17 @@ public class V4Test {
         chatTool.setType(ChatToolType.FUNCTION.value());
         ChatFunctionParameters chatFunctionParameters = new ChatFunctionParameters();
         chatFunctionParameters.setType("object");
-        Map<String,Object> properties = new HashMap<>();
-        properties.put("location",new HashMap<String,Object>(){{
-            put("type","string");
-            put("description","城市，如：北京");
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("location", new HashMap<String, Object>() {{
+            put("type", "string");
+            put("description", "城市，如：北京");
         }});
-        properties.put("unit",new HashMap<String,Object>(){{
-            put("type","string");
-            put("enum",new ArrayList<String>(){{add("celsius");add("fahrenheit");}});
+        properties.put("unit", new HashMap<String, Object>() {{
+            put("type", "string");
+            put("enum", new ArrayList<String>() {{
+                add("celsius");
+                add("fahrenheit");
+            }});
         }});
         chatFunctionParameters.setProperties(properties);
         ChatFunction chatFunction = ChatFunction.builder()
@@ -257,12 +262,11 @@ public class V4Test {
                 .build();
         ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
         try {
-            logger.info("model output: {}" , mapper.writeValueAsString(invokeModelApiResp));
+            logger.info("model output: {}", mapper.writeValueAsString(invokeModelApiResp));
         } catch (JsonProcessingException e) {
-            logger.error("model output error", e); 
+            logger.error("model output error", e);
         }
     }
-
 
 
     /**
@@ -285,6 +289,43 @@ public class V4Test {
                 .invokeMethod(Constants.invokeMethod)
                 .messages(messages)
                 .requestId(requestId)
+                .extraJson(extraJson)
+                .build();
+        ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        logger.info("model output: {}", mapper.writeValueAsString(invokeModelApiResp));
+    }
+
+
+    /**
+     * V4-同步非function调用
+     */
+    @Test
+    public void testCharGlmInvoke() throws JsonProcessingException {
+        List<ChatMessage> messages = new ArrayList<>();
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
+        messages.add(chatMessage);
+        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+
+
+        HashMap<String, Object> extraJson = new HashMap<>();
+        extraJson.put("temperature", 0.5);
+        String metaString = "{\n" +
+                "                \"user_info\": \"我是陆星辰，是一个男性，是一位知名导演，也是苏梦远的合作导演。我擅长拍摄音乐题材的电影。苏梦远对我的态度是尊敬的，并视我为良师益友。\",\n" +
+                "                \"bot_info\": \"苏梦远，本名苏远心，是一位当红的国内女歌手及演员。在参加选秀节目后，凭借独特的嗓音及出众的舞台魅力迅速成名，进入娱乐圈。她外表美丽动人，但真正的魅力在于她的才华和勤奋。苏梦远是音乐学院毕业的优秀生，善于创作，拥有多首热门原创歌曲。除了音乐方面的成就，她还热衷于慈善事业，积极参加公益活动，用实际行动传递正能量。在工作中，她对待工作非常敬业，拍戏时总是全身心投入角色，赢得了业内人士的赞誉和粉丝的喜爱。虽然在娱乐圈，但她始终保持低调、谦逊的态度，深得同行尊重。在表达时，苏梦远喜欢使用“我们”和“一起”，强调团队精神。\",\n" +
+                "                \"bot_name\": \"苏梦远\",\n" +
+                "                \"user_name\": \"陆星辰\"\n" +
+                "            }";
+
+        ObjectNode objectNode = (ObjectNode) mapper.readTree(metaString);
+        ChatMeta meta = new ChatMeta(objectNode);
+
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                .model(Constants.ModelCharGLM3)
+                .stream(Boolean.FALSE)
+                .invokeMethod(Constants.invokeMethod)
+                .messages(messages)
+                .requestId(requestId)
+                .meta(meta)
                 .extraJson(extraJson)
                 .build();
         ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
@@ -320,15 +361,15 @@ public class V4Test {
     @Test
     public void testImageToWord() throws JsonProcessingException {
         List<ChatMessage> messages = new ArrayList<>();
-        List<Map<String,Object>> contentList = new ArrayList<>();
-        Map<String,Object> textMap = new HashMap<>();
-        textMap.put("type","text");
-        textMap.put("text","图里有什么");
-        Map<String,Object> typeMap = new HashMap<>();
-        typeMap.put("type","image_url");
-        Map<String,Object> urlMap = new HashMap<>();
-        urlMap.put("url","https://sfile.chatglm.cn/testpath/275ae5b6-5390-51ca-a81a-60332d1a7cac_0.png");
-        typeMap.put("image_url",urlMap);
+        List<Map<String, Object>> contentList = new ArrayList<>();
+        Map<String, Object> textMap = new HashMap<>();
+        textMap.put("type", "text");
+        textMap.put("text", "图里有什么");
+        Map<String, Object> typeMap = new HashMap<>();
+        typeMap.put("type", "image_url");
+        Map<String, Object> urlMap = new HashMap<>();
+        urlMap.put("url", "https://sfile.chatglm.cn/testpath/275ae5b6-5390-51ca-a81a-60332d1a7cac_0.png");
+        typeMap.put("image_url", urlMap);
         contentList.add(textMap);
         contentList.add(typeMap);
         ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), contentList);
@@ -424,13 +465,13 @@ public class V4Test {
     /**
      * testQueryPersonalFineTuningJobs V4-查询个人微调任务
      */
-     @Test
-     public void testQueryPersonalFineTuningJobs() throws JsonProcessingException {
-         QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest = new QueryPersonalFineTuningJobRequest();
-         queryPersonalFineTuningJobRequest.setLimit(1);
-         QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = client.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest);
-         logger.info("model output: {}", mapper.writeValueAsString(queryPersonalFineTuningJobApiResponse));
-     }
+    @Test
+    public void testQueryPersonalFineTuningJobs() throws JsonProcessingException {
+        QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest = new QueryPersonalFineTuningJobRequest();
+        queryPersonalFineTuningJobRequest.setLimit(1);
+        QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = client.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest);
+        logger.info("model output: {}", mapper.writeValueAsString(queryPersonalFineTuningJobApiResponse));
+    }
 
 
     private static String getAsyncTaskId() throws JsonProcessingException {
@@ -444,14 +485,17 @@ public class V4Test {
         chatTool.setType(ChatToolType.FUNCTION.value());
         ChatFunctionParameters chatFunctionParameters = new ChatFunctionParameters();
         chatFunctionParameters.setType("object");
-        Map<String,Object> properties = new HashMap<>();
-        properties.put("location",new HashMap<String,Object>(){{
-            put("type","string");
-            put("description","城市，如：北京");
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("location", new HashMap<String, Object>() {{
+            put("type", "string");
+            put("description", "城市，如：北京");
         }});
-        properties.put("unit",new HashMap<String,Object>(){{
-            put("type","string");
-            put("enum",new ArrayList<String>(){{add("celsius");add("fahrenheit");}});
+        properties.put("unit", new HashMap<String, Object>() {{
+            put("type", "string");
+            put("enum", new ArrayList<String>() {{
+                add("celsius");
+                add("fahrenheit");
+            }});
         }});
         chatFunctionParameters.setProperties(properties);
         ChatFunction chatFunction = ChatFunction.builder()

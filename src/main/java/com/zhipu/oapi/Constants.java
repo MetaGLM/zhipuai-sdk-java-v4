@@ -20,6 +20,7 @@ public class Constants {
     public static final String ModelEmbedding2 = "embedding-2";
 
     public static final String ModelChatGLM3TURBO= "glm-3-turbo";
+    public static final String ModelCharGLM3= "charglm-3";
 
     // invoke methods
     public static final String invokeMethodAsync = "async-invoke";

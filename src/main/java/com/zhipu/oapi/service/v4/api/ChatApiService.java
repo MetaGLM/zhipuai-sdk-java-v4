@@ -259,8 +259,6 @@ public class ChatApiService {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
-        mapper.addMixIn(ChatFunction.class, ChatFunctionMixIn.class);
-        mapper.addMixIn(ChatCompletionRequest.class, ChatCompletionRequestMixIn.class);
 
         SimpleModule module = new SimpleModule();
 

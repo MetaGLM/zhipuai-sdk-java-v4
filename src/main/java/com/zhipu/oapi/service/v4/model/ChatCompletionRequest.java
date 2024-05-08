@@ -83,6 +83,11 @@ public class ChatCompletionRequest extends CommonRequest {
      */
     private List<ChatTool> tools;
 
+    /**
+     * 会话元数据
+     */
+    private ChatMeta meta;
+
 
     /**
      * 指定调用一个特定函数
@@ -94,19 +99,6 @@ public class ChatCompletionRequest extends CommonRequest {
 
     private String invokeMethod;
 
-
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ChatCompletionRequestFunctionCall {
-        String name;
-
-        public static ChatCompletionRequestFunctionCall of(String name) {
-            return new ChatCompletionRequestFunctionCall(name);
-        }
-
-    }
 
 
 }
