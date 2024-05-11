@@ -79,9 +79,7 @@ public class ChatApiService {
                 String errorBody = e.response().errorBody().string();
 
                 ZhiPuAiError error = mapper.readValue(errorBody, ZhiPuAiError.class);
-                String message = error.getError().getMessage();
-                message+="&"+error.getError().getCode()+"&"+e.code();
-                error.getError().setMessage(message);
+
                 throw new ZhiPuAiHttpException(error, e, e.code());
             } catch (IOException ex) {
                 // couldn't parse ZhiPuAiError error

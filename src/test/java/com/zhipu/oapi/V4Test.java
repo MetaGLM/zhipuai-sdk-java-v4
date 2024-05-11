@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
-    private static final String API_SECRET_KEY = "a9733a59370d34ef51d261bd461251a5.YD9PU7sAqUwgD8Sk";
+    private static final String API_SECRET_KEY = "";
     private static final boolean devMode = false;
 
 
@@ -210,7 +210,7 @@ public class V4Test {
     @Test
     public void testFunctionInvoke() {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "北京天气如何");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "64事件");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         // 函数调用参数构建部分
@@ -451,11 +451,24 @@ public class V4Test {
     @Test
     public void testRetrieveFineTuningJobs() throws JsonProcessingException {
         QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
-        queryFineTuningJobRequest.setJobId("ftjob-20240119114544390-zkgjb");
+        queryFineTuningJobRequest.setJobId("ftjob-20240429172916475-fb7r9");
 //        queryFineTuningJobRequest.setLimit(1);
 //        queryFineTuningJobRequest.setAfter(1);
         QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.retrieveFineTuningJobs(queryFineTuningJobRequest);
         logger.info("model output: {}", mapper.writeValueAsString(queryFineTuningJobApiResponse));
+    }
+
+
+    /**
+     * 微调V4-查询微调任务
+     */
+    @Test
+    public void testFueryFineTuningJobsEvents() throws JsonProcessingException {
+        QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
+        queryFineTuningJobRequest.setJobId("ftjob-20240429172916475-fb7r9");
+
+        QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = client.queryFineTuningJobsEvents(queryFineTuningJobRequest);
+        logger.info("model output: {}", mapper.writeValueAsString(queryFineTuningEventApiResponse));
     }
 
 
