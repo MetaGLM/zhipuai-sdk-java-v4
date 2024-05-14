@@ -596,6 +596,10 @@ public class ClientV4 {
         public Builder(String apiSecretKey) {
             config.setApiSecretKey(apiSecretKey);
         }
+        public Builder(String baseUrl, String apiSecretKey) {
+            config.setBaseUrl(baseUrl);
+            config.setApiSecretKey(apiSecretKey);
+        }
 
         public Builder setTokenKey(String apiKey, String apiSecret) {
             config.setApiKey(apiKey);
@@ -706,10 +710,15 @@ public class ClientV4 {
             initHttpTransport(config);
 
             String baseUrl = null;
-            if (config.isDevMode()){
-                baseUrl = TEST_BASE_URL;
-            }else {
-                baseUrl = BASE_URL;
+            if(StringUtils.isEmpty(config.getBaseUrl())){
+
+                if (config.isDevMode()){
+                    baseUrl = TEST_BASE_URL;
+                }else {
+                    baseUrl = BASE_URL;
+                }
+            }else{
+                baseUrl = config.getBaseUrl();
             }
             client.setChatApiService(new ChatApiService(config.getHttpClient(),baseUrl));
             return client;

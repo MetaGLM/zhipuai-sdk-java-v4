@@ -13,7 +13,9 @@ import static com.zhipu.oapi.Constants.BASE_URL;
 import static com.zhipu.oapi.Constants.TEST_BASE_URL;
 
 public class ConfigV4 {
-
+    @Getter
+    @Setter
+    private String baseUrl;
     // api credentials
     // apiSecretKey = {apiKey}.{apiSecret}
     @Getter
