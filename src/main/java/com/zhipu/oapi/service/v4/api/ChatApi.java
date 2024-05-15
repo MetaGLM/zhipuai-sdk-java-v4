@@ -2,10 +2,6 @@ package com.zhipu.oapi.service.v4.api;
 
 
 import com.zhipu.oapi.service.v4.fine_turning.*;
-import com.zhipu.oapi.service.v4.model.ChatCompletionAsyncResult;
-import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
-import com.zhipu.oapi.service.v4.model.ChatCompletionResult;
-import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.file.File;
 import com.zhipu.oapi.service.v4.file.QueryFileResult;

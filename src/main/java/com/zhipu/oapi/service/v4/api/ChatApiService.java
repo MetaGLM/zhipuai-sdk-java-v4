@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.zhipu.oapi.core.response.RawResponse;
-import com.zhipu.oapi.service.v4.deserialize.ChatCompletionDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
 import com.zhipu.oapi.service.v4.file.UploadFileRequest;
 import com.zhipu.oapi.service.v4.fine_turning.*;
@@ -260,7 +259,6 @@ public class ChatApiService {
 
         SimpleModule module = new SimpleModule();
 
-        module.addDeserializer(ChatCompletionResult.class, new ChatCompletionDeserializer());
         module.addDeserializer(ModelData.class, new ModelDataDeserializer());
         mapper.registerModule(module);
 

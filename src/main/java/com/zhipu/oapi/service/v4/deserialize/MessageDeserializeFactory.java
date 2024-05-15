@@ -14,6 +14,7 @@ public class MessageDeserializeFactory {
         mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
         SimpleModule module = new SimpleModule();
 
+        module.addDeserializer(ModelData.class, new ModelDataDeserializer());
         module.addDeserializer(Choice.class, new ChoiceDeserializer());
         module.addDeserializer(ChatMessage.class, new ChatMessageDeserializer());
         module.addDeserializer(Delta.class, new DeltaDeserializer());

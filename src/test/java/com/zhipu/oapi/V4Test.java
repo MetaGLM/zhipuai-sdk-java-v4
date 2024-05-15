@@ -58,6 +58,10 @@ public class V4Test {
         return mapper;
     }
 
+    @Test
+    public void test(){
+
+    }
     /**
      * sse-V4：function调用
      */
