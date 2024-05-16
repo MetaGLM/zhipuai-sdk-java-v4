@@ -9,6 +9,7 @@ import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.core.response.RawResponse;
 import com.zhipu.oapi.core.token.GlobalTokenManager;
 import com.zhipu.oapi.core.token.TokenManagerV4;
+import com.zhipu.oapi.service.v4.batchs.*;
 import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.api.ChatApiService;
@@ -380,6 +381,60 @@ public class ClientV4 {
         return chatApiService.fileContent(fileId);
     }
 
+//
+//    public  FileApiResponse retrieveFile(String fileId) throws IOException {
+//
+//        FileApiResponse fileApiResponse = new FileApiResponse();
+//
+//        try {
+//            File file = chatApiService.retrieveFile(fileId);
+//            if (file != null) {
+//                fileApiResponse.setCode(200);
+//                fileApiResponse.setSuccess(true);
+//                fileApiResponse.setMsg("调用成功");
+//                fileApiResponse.setData(file);
+//            }
+//        } catch (ZhiPuAiHttpException e) {
+//            logger.error("业务出错", e);
+//            fileApiResponse.setCode(e.statusCode);
+//            fileApiResponse.setMsg("业务出错");
+//            fileApiResponse.setSuccess(false);
+//            ChatError chatError = new ChatError();
+//            chatError.setCode(Integer.parseInt(e.code));
+//            chatError.setMessage(e.getMessage());
+//            File file = new File();
+//            file.setError(chatError);
+//            fileApiResponse.setData(file);
+//        }
+//        return fileApiResponse;
+//    }
+
+//    public  FileDelResponse deletedFile(String fileId) throws IOException {
+//        FileDelResponse fileDelResponse = new FileDelResponse();
+//
+//        try {
+//            FileDeleted deleted = chatApiService.deletedFile(fileId);
+//            if (deleted != null) {
+//                fileDelResponse.setCode(200);
+//                fileDelResponse.setSuccess(true);
+//                fileDelResponse.setMsg("调用成功");
+//                fileDelResponse.setData(deleted);
+//            }
+//        } catch (ZhiPuAiHttpException e) {
+//            logger.error("业务出错", e);
+//            fileDelResponse.setCode(e.statusCode);
+//            fileDelResponse.setMsg("业务出错");
+//            fileDelResponse.setSuccess(false);
+//            ChatError chatError = new ChatError();
+//            chatError.setCode(Integer.parseInt(e.code));
+//            chatError.setMessage(e.getMessage());
+//            FileDeleted file = new FileDeleted();
+//            file.setError(chatError);
+//            fileDelResponse.setData(file);
+//        }
+//        return fileDelResponse;
+//    }
+
 
     public CreateFineTuningJobApiResponse createFineTuningJob(FineTuningJobRequest request) {
         CreateFineTuningJobApiResponse createFineTuningJobApiResponse = new CreateFineTuningJobApiResponse();
@@ -596,6 +651,134 @@ public class ClientV4 {
         }
 
         return fineTunedModelsStatusResponse;
+    }
+
+    /**
+     * 发起批量请求
+     * @param batchCreateParams batchCreateParams
+     * @return BatchResponse
+     */
+    public BatchResponse batchesCreate(BatchCreateParams batchCreateParams) {
+        BatchResponse batchResponse = new BatchResponse();
+
+        try {
+            Batch batch = chatApiService.batchesCreate(batchCreateParams);
+            if (batch != null) {
+                batchResponse.setSuccess(true);
+                batchResponse.setData(batch);
+                batchResponse.setCode(200);
+                batchResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            batchResponse.setCode(e.statusCode);
+            batchResponse.setMsg("业务出错");
+            batchResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            Batch batch = new Batch();
+            batch.setError(chatError);
+            batchResponse.setData(batch);
+        }
+
+        return batchResponse;
+    }
+    /**
+     * 检索批量请求
+     * @param batchId batchId
+     * @return BatchResponse
+     */
+    public BatchResponse batchesRetrieve(String batchId) {
+        BatchResponse batchResponse = new BatchResponse();
+
+        try {
+            Batch batch = chatApiService.batchesRetrieve(batchId);
+            if (batch != null) {
+                batchResponse.setSuccess(true);
+                batchResponse.setData(batch);
+                batchResponse.setCode(200);
+                batchResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            batchResponse.setCode(e.statusCode);
+            batchResponse.setMsg("业务出错");
+            batchResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            Batch batch = new Batch();
+            batch.setError(chatError);
+            batchResponse.setData(batch);
+        }
+
+        return batchResponse;
+    }
+
+    /**
+     * 查询批量请求列表
+     * @param queryBatchRequest queryBatchRequest
+     * @return QueryBatchResponse
+     */
+    public QueryBatchResponse batchesList(QueryBatchRequest queryBatchRequest) {
+        QueryBatchResponse batchResponse = new QueryBatchResponse();
+
+        try {
+            BatchPage batchPage = chatApiService.batchesList(queryBatchRequest.getLimit(), queryBatchRequest.getAfter());
+            if (batchPage != null) {
+                batchResponse.setSuccess(true);
+                batchResponse.setData(batchPage);
+                batchResponse.setCode(200);
+                batchResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            batchResponse.setCode(e.statusCode);
+            batchResponse.setMsg("业务出错");
+            batchResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            BatchPage batch = new BatchPage();
+            batch.setError(chatError);
+            batchResponse.setData(batch);
+        }
+
+        return batchResponse;
+    }
+
+
+    /**
+     * 检索批量请求
+     * @param batchId batchId
+     * @return BatchResponse
+     */
+    public BatchResponse batchesCancel(String batchId) {
+        BatchResponse batchResponse = new BatchResponse();
+
+        try {
+            Batch batch = chatApiService.batchesCancel(batchId);
+            if (batch != null) {
+                batchResponse.setSuccess(true);
+                batchResponse.setData(batch);
+                batchResponse.setCode(200);
+                batchResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            batchResponse.setCode(e.statusCode);
+            batchResponse.setMsg("业务出错");
+            batchResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            Batch batch = new Batch();
+            batch.setError(chatError);
+            batchResponse.setData(batch);
+        }
+
+        return batchResponse;
     }
 
     public static final class Builder {

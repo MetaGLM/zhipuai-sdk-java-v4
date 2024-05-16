@@ -1,6 +1,7 @@
 package com.zhipu.oapi.service.v4.batchs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.zhipu.oapi.service.v4.model.ChatError;
 import lombok.Data;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class Batch {
     private String completionWindow;
 
     @JsonProperty("created_at")
-    private int createdAt;
+    private long createdAt;
 
     @JsonProperty("endpoint")
     private String endpoint;
@@ -30,13 +31,13 @@ public class Batch {
     private String status;
 
     @JsonProperty("cancelled_at")
-    private Integer cancelledAt;
+    private Long cancelledAt;
 
     @JsonProperty("cancelling_at")
-    private Integer cancellingAt;
+    private Long cancellingAt;
 
     @JsonProperty("completed_at")
-    private Integer completedAt;
+    private Long completedAt;
 
     @JsonProperty("error_file_id")
     private String errorFileId;
@@ -45,19 +46,19 @@ public class Batch {
     private Errors errors;
 
     @JsonProperty("expired_at")
-    private Integer expiredAt;
+    private Long expiredAt;
 
     @JsonProperty("expires_at")
-    private Integer expiresAt;
+    private Long expiresAt;
 
     @JsonProperty("failed_at")
-    private Integer failedAt;
+    private Long failedAt;
 
     @JsonProperty("finalizing_at")
-    private Integer finalizingAt;
+    private Long finalizingAt;
 
     @JsonProperty("in_progress_at")
-    private Integer inProgressAt;
+    private Long inProgressAt;
 
     @JsonProperty("metadata")
     private Object metadata;
@@ -68,7 +69,8 @@ public class Batch {
     @JsonProperty("request_counts")
     private BatchRequestCounts requestCounts;
 
-    // Getters and setters for all fields here
+
+    private ChatError error;
 }
 
 @Data
@@ -100,7 +102,7 @@ class BatchError {
     private String code;
 
     @JsonProperty("line")
-    private Integer line;
+    private Long line;
 
     @JsonProperty("message")
     private String message;

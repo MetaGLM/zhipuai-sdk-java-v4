@@ -6,7 +6,11 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.core.response.RawResponse;
+import com.zhipu.oapi.service.v4.batchs.Batch;
+import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
+import com.zhipu.oapi.service.v4.batchs.BatchPage;
 import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
+import com.zhipu.oapi.service.v4.file.FileDeleted;
 import com.zhipu.oapi.service.v4.file.UploadFileRequest;
 import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.model.*;
@@ -143,6 +147,14 @@ public class ChatApiService {
         return fileWrapper(api.fileContent(fileId));
     }
 
+    public com.zhipu.oapi.service.v4.file.File retrieveFile(String fileId) {
+        return execute(api.retrieveFile(fileId));
+    }
+
+    public FileDeleted deletedFile(String fileId) {
+        return execute(api.deletedFile(fileId));
+    }
+
 
     public FineTuningEvent listFineTuningJobEvents(String fineTuningJobId,Integer limit,String after) {
         return execute(api.listFineTuningJobEvents(fineTuningJobId,limit,after));
@@ -217,6 +229,22 @@ public class ChatApiService {
 
     public FineTuningJob createFineTuningJob(FineTuningJobRequest request) {
         return execute(api.createFineTuningJob(request));
+    }
+
+    public Batch batchesCreate(BatchCreateParams batchCreateParams) {
+        return execute(api.batchesCreate(batchCreateParams));
+    }
+
+    public Batch batchesRetrieve(String batchId) {
+        return execute(api.batchesRetrieve(batchId));
+    }
+
+    public BatchPage batchesList(Integer limit, String after) {
+        return execute(api.batchesList(after,limit));
+    }
+
+    public Batch batchesCancel(String batchId) {
+        return execute(api.batchesCancel(batchId));
     }
 
 

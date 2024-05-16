@@ -4,6 +4,7 @@ package com.zhipu.oapi.service.v4.api;
 import com.zhipu.oapi.service.v4.batchs.Batch;
 import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
 import com.zhipu.oapi.service.v4.batchs.BatchPage;
+import com.zhipu.oapi.service.v4.file.FileDeleted;
 import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.file.File;
@@ -54,6 +55,13 @@ public interface ChatApi {
     Single<File> uploadFile(@Body MultipartBody multipartBody);
 
 
+    @GET("files/{file_id}")
+    Single<File> retrieveFile(@Path("file_id") String fileId);
+
+    @DELETE("files/{file_id}")
+    Single<FileDeleted> deletedFile(@Path("file_id") String fileId);
+
+
     @GET("files")
     Single<QueryFileResult> queryFileList(@Query("after") String after
             , @Query("purpose") String purpose,@Query("order") String order,@Query("limit") Integer limit);
@@ -102,7 +110,7 @@ public interface ChatApi {
 
 
     @POST("batches/{batch_id}/cancel")
-    Single<Batch> batchesList(@Path("batch_id") String batchId);
+    Single<Batch> batchesCancel(@Path("batch_id") String batchId);
 
 
 
