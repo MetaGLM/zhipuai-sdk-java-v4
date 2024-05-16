@@ -38,7 +38,7 @@ class HttpxBinaryResponseContentTest {
 
                     .respond(request -> {
                         return response()
-                                .withStatusCode(401)
+                                .withStatusCode(200)
                                 .withBody("file info");
                     });
 
