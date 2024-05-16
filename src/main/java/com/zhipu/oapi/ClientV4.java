@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zhipu.oapi.core.ConfigV4;
 import com.zhipu.oapi.core.cache.ICache;
 import com.zhipu.oapi.core.cache.LocalCache;
+import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.core.response.RawResponse;
 import com.zhipu.oapi.core.token.GlobalTokenManager;
 import com.zhipu.oapi.core.token.TokenManagerV4;
@@ -27,6 +28,7 @@ import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -372,6 +374,12 @@ public class ClientV4 {
         }
         return queryFileApiResponse;
     }
+
+
+    public HttpxBinaryResponseContent fileContent(String fileId) throws IOException {
+        return chatApiService.fileContent(fileId);
+    }
+
 
     public CreateFineTuningJobApiResponse createFineTuningJob(FineTuningJobRequest request) {
         CreateFineTuningJobApiResponse createFineTuningJobApiResponse = new CreateFineTuningJobApiResponse();

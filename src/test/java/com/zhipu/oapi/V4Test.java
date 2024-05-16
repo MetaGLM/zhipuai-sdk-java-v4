@@ -8,10 +8,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.service.v4.api.ChatApiService;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.file.FileApiResponse;
+import com.zhipu.oapi.service.v4.file.QueryFileApiResponse;
+import com.zhipu.oapi.service.v4.file.QueryFilesRequest;
 import com.zhipu.oapi.service.v4.file.UploadFileRequest;
 import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.image.CreateImageRequest;
@@ -22,6 +25,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,11 +38,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
-    private static final String API_SECRET_KEY = "";
+    private static final String API_SECRET_KEY = "e6a98ef1c54484c2afeac1ae8cef93ef.rlpKehWCGDttN9Pl";
     private static final boolean devMode = false;
 
 
-    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
+    private static final ClientV4 client = new ClientV4.Builder("https://test.bigmodel.cn/stage-api/paas/v4/",API_SECRET_KEY)
             .devMode(devMode)
             .enableTokenCache()
             .networkConfig(30, 10, 10, 10, TimeUnit.SECONDS)
@@ -427,10 +432,22 @@ public class V4Test {
      */
     @Test
     public void testQueryUploadFileList() throws JsonProcessingException {
-//        String filePath = "/Users/wujianguo/Downloads/transaction-data.jsonl";
-//        String purpose = "fine-tune";
-//        FileApiResponse fileApiResponse = client.invokeUploadFileApi(purpose,filePath);
-//        logger.info("model output:"+mapper.writeValueAsString(fileApiResponse));
+        QueryFilesRequest queryFilesRequest = new QueryFilesRequest();
+        QueryFileApiResponse queryFileApiResponse = client.queryFilesApi(queryFilesRequest);
+        logger.info("model output: {}", mapper.writeValueAsString(queryFileApiResponse));
+    }
+    /**
+     * 微调V4-查询上传文件列表
+     */
+    @Test
+    public void testFileContent() throws IOException {
+        HttpxBinaryResponseContent httpxBinaryResponseContent = client.fileContent("20240514_ea19d21b-d256-4586-b0df-e80a45e3c286");
+        String filePath = "demo_output.jsonl";
+        String resourcePath = V4Test.class.getClassLoader().getResource("").getPath();
+
+        httpxBinaryResponseContent.streamToFile(resourcePath+"1" +filePath,1000);
+        httpxBinaryResponseContent.writeToFile(resourcePath+ filePath);
+
     }
 
 
