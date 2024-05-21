@@ -1,67 +1,67 @@
 package com.zhipu.oapi.service.v4.api;
 
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.zhipu.oapi.Constants;
-import com.zhipu.oapi.service.v4.fine_turning.FineTuningEvent;
-import com.zhipu.oapi.service.v4.fine_turning.FineTuningJob;
-import com.zhipu.oapi.service.v4.fine_turning.FineTuningJobRequest;
-import com.zhipu.oapi.service.v4.fine_turning.PersonalFineTuningJob;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.zhipu.oapi.core.response.RawResponse;
+import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
+import com.zhipu.oapi.service.v4.file.UploadFileRequest;
+import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.model.*;
-import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.file.QueryFileResult;
 import com.zhipu.oapi.service.v4.file.QueryFilesRequest;
 import com.zhipu.oapi.service.v4.image.ImageResult;
+import com.zhipu.oapi.utils.StringUtils;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.HttpException;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.zhipu.oapi.Constants.BASE_URL;
 
 
 public class ChatApiService {
 
-    private static final String BASE_URL = "https://open.bigmodel.cn/";
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(300);
     private static final ObjectMapper mapper = defaultObjectMapper();
+    private final static Logger logger = LoggerFactory.getLogger(ChatApiService.class);
 
     private final ChatApi api;
     private final ExecutorService executorService;
 
     /**
      * Creates a new ChatApiService that wraps ChatApi
+     * @param client retrofit instance
      */
-    public ChatApiService(final String token) {
-        this(token, DEFAULT_TIMEOUT);
-    }
+    public ChatApiService(final OkHttpClient client) {
 
+        Retrofit retrofit = defaultRetrofit(BASE_URL, client, mapper);
+        this.api = retrofit.create(ChatApi.class);
+        this.executorService = client.dispatcher().executorService();
+    }
     /**
      * Creates a new ChatApiService that wraps ChatApi
-     * @param token
-     * @param timeout http read timeout, Duration.ZERO means no timeout
+     * @param client retrofit instance
+     * @param baseUrl base url of the api
      */
-    public ChatApiService(final String token, final Duration timeout) {
-        ObjectMapper mapper = defaultObjectMapper();
-        OkHttpClient client = defaultClient(token, timeout);
-        Retrofit retrofit = defaultRetrofit(client, mapper);
+    public ChatApiService(final OkHttpClient client, final String baseUrl) {
 
+        Retrofit retrofit = defaultRetrofit(baseUrl, client, mapper);
         this.api = retrofit.create(ChatApi.class);
         this.executorService = client.dispatcher().executorService();
     }
@@ -70,6 +70,7 @@ public class ChatApiService {
         try {
             return apiCall.blockingGet();
         } catch (HttpException e) {
+            logger.error("HTTP exception: {}", e.getMessage());
             try {
                 if (e.response() == null || e.response().errorBody() == null) {
                     throw e;
@@ -77,9 +78,7 @@ public class ChatApiService {
                 String errorBody = e.response().errorBody().string();
 
                 ZhiPuAiError error = mapper.readValue(errorBody, ZhiPuAiError.class);
-                String message = error.getError().getMessage();
-                message+="&"+error.getError().getCode()+"&"+e.code();
-                error.getError().setMessage(message);
+
                 throw new ZhiPuAiHttpException(error, e, e.code());
             } catch (IOException ex) {
                 // couldn't parse ZhiPuAiError error
@@ -87,22 +86,48 @@ public class ChatApiService {
             }
         }
     }
+
+
+    /**
+     * sse调用只会返回输出结果
+     * @param request
+     * @return RawResponse
+     */
+    public RawResponse sseExecute(Map<String, Object> request){
+
+        RawResponse resp = new RawResponse();
+        Flowable<ModelData> flowable;
+        try {
+            flowable  = this.streamChatCompletion(request);
+        } catch (Exception e) {
+            logger.error("streamChatCompletion error:{}" , e.getMessage());
+            resp.setStatusCode(500);
+            resp.setSuccess(false);
+            return resp;
+        }
+        resp.setSuccess(true);
+        resp.setStatusCode(200);
+        resp.setFlowable(flowable);
+        return resp;
+    }
+
     public Flowable<ModelData> streamChatCompletion(Map<String,Object> request) {
         return stream(api.createChatCompletionStream(request), ModelData.class);
     }
 
 
-    public ChatCompletionAsyncResult createChatCompletionAsync(Map<String,Object> request) {
+
+    public ModelData createChatCompletionAsync(Map<String,Object> request) {
         return execute(api.createChatCompletionAsync(request));
     }
 
 
-    public ChatCompletionResult createChatCompletion(Map<String,Object> request) {
+    public ModelData createChatCompletion(Map<String,Object> request) {
         return execute(api.createChatCompletion(request));
     }
 
 
-    public EmbeddingResult createEmbeddings(EmbeddingRequest request) {
+    public EmbeddingResult createEmbeddings( Map<String, Object> request) {
         return execute(api.createEmbeddings(request));
     }
 
@@ -124,17 +149,55 @@ public class ChatApiService {
         return execute(api.queryPersonalFineTuningJobs(limit,after));
     }
 
-    public ChatCompletionResult queryAsyncResult(String id) {
+    public ModelData queryAsyncResult(String id) {
         return execute(api.queryAsyncResult(id));
     }
 
+    public FineTuningJob cancelFineTuningJob(String fineTuningJobId) {
+        return execute(api.cancelFineTuningJob(fineTuningJobId));
+    }
 
-    public com.zhipu.oapi.service.v4.file.File uploadFile(String purpose, String filepath) {
-        java.io.File file = new java.io.File(filepath);
+    public FineTuningJob deleteFineTuningJob(String fineTuningJobId) {
+        return execute(api.deleteFineTuningJob(fineTuningJobId));
+    }
+
+    public FineTunedModelsStatus deleteFineTuningModel(String fineTunedModel) {
+        return execute(api.deleteFineTuningModel(fineTunedModel));
+    }
+
+
+    public com.zhipu.oapi.service.v4.file.File uploadFile(UploadFileRequest request) throws JsonProcessingException {
+        java.io.File file = new java.io.File(request.getFilePath());
+        if(!file.exists()){
+            throw new RuntimeException("file not found");
+        }
         MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
         MultipartBody.Builder formBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
         formBodyBuilder.addPart(filePart);
-        formBodyBuilder.addFormDataPart("purpose", purpose);
+        formBodyBuilder.addFormDataPart("purpose", request.getPurpose());
+        if (request.getExtraJson()!=null){
+            for (String s : request.getExtraJson().keySet()) {
+                if(request.getExtraJson().get(s) instanceof String
+                        || request.getExtraJson().get(s) instanceof Number
+                        || request.getExtraJson().get(s) instanceof Boolean
+                        || request.getExtraJson().get(s) instanceof Character
+
+                ) {
+
+                    formBodyBuilder.addFormDataPart(s, request.getExtraJson().get(s).toString());
+                }else if(request.getExtraJson().get(s) instanceof Date) {
+                    Date date = (Date) request.getExtraJson().get(s);
+                    formBodyBuilder.addFormDataPart(s, String.valueOf(date.getTime()));
+                }else {
+
+                    formBodyBuilder.addFormDataPart(s, null,
+                            RequestBody.create(MediaType.parse("application/json"),
+                                    mapper.writeValueAsString(request.getExtraJson().get(s))));
+
+                }
+
+            }
+        }
         MultipartBody multipartBody = formBodyBuilder.build();
         return execute(api.uploadFile(multipartBody));
     }
@@ -193,33 +256,26 @@ public class ChatApiService {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
-        mapper.addMixIn(ChatFunction.class, ChatFunctionMixIn.class);
-        mapper.addMixIn(ChatCompletionRequest.class, ChatCompletionRequestMixIn.class);
-        mapper.addMixIn(ChatFunctionCall.class, ChatFunctionCallMixIn.class);
+
+        SimpleModule module = new SimpleModule();
+
+        module.addDeserializer(ModelData.class, new ModelDataDeserializer());
+        mapper.registerModule(module);
+
         return mapper;
     }
 
-    public static OkHttpClient defaultClient(String token, Duration timeout) {
-        return new OkHttpClient.Builder()
-                .addInterceptor(new AuthenticationInterceptor(token))
-                .connectionPool(new ConnectionPool(5, 1, TimeUnit.SECONDS))
-                .readTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
-                .build();
-    }
 
-    public static Retrofit defaultRetrofit(OkHttpClient client, ObjectMapper mapper) {
+
+    public static Retrofit defaultRetrofit(final String baseUrl,
+                                           OkHttpClient client,
+                                           ObjectMapper mapper) {
         return new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(StringUtils.isEmpty(baseUrl) ? BASE_URL:baseUrl)
                 .client(client)
                 .addConverterFactory(JacksonConverterFactory.create(mapper))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
-    }
-
-    public Flowable<ChatMessageAccumulator> mapStreamToAccumulator(Flowable<ModelData> flowable) {
-        return flowable.map(chunk -> {
-            return new ChatMessageAccumulator(chunk.getChoices().get(0).getDelta(), null,chunk.getChoices().get(0),chunk.getUsage(),chunk.getCreated(),chunk.getId());
-        });
     }
 
 

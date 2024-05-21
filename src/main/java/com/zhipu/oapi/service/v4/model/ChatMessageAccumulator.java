@@ -59,9 +59,5 @@ public class ChatMessageAccumulator {
     public Long getCreated(){return created;}
 
 
-    public ChatFunctionCall getAccumulatedChatFunctionCall() {
-        return getAccumulatedMessage().getTool_calls().get(0).getFunction();
-    }
-
 
 }
