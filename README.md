@@ -18,6 +18,15 @@ Java），让开发者更便捷的调用智谱开放API
             <version>release-V4-2.0.2</version>
         </dependency>
 ```
+### 依赖信息
+
+```text
+okhttp
+java-jwt 
+jackson
+retrofit2
+mbknor-jackson-jsonschema
+```
 
 ## 升级内容
 #### release-V4-2.0.1

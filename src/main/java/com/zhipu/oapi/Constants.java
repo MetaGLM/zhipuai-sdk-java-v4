@@ -2,17 +2,25 @@ package com.zhipu.oapi;
 
 import okhttp3.MediaType;
 
+import java.time.Duration;
+
 public class Constants {
+
+    public static final String BASE_URL = "https://open.bigmodel.cn/api/paas/v4/";
+    public static final String TEST_BASE_URL = "https://test.bigmodel.cn/stage-api/paas/v4/";
+
+    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(300);
 
     public static final String ModelChatGLM4 = "GLM-4";
 
-    public static final String ModelCogView = "cogview";
+    public static final String ModelCogView = "cogview-3";
 
     public static final String ModelChatGLM4V = "glm-4v";
 
     public static final String ModelEmbedding2 = "embedding-2";
 
     public static final String ModelChatGLM3TURBO= "glm-3-turbo";
+    public static final String ModelCharGLM3= "charglm-3";
 
     // invoke methods
     public static final String invokeMethodAsync = "async-invoke";

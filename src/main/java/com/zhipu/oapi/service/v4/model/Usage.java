@@ -1,16 +1,12 @@
 package com.zhipu.oapi.service.v4.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.gson.annotations.SerializedName;
 
 public class Usage {
-    @SerializedName("prompt_tokens")
     @JsonProperty("prompt_tokens")
     private int promptTokens;
-    @SerializedName("completion_tokens")
     @JsonProperty("completion_tokens")
     private int completionTokens;
-    @SerializedName("total_tokens")
     @JsonProperty("total_tokens")
     private int totalTokens;
 //    @SerializedName("prompt_chars")

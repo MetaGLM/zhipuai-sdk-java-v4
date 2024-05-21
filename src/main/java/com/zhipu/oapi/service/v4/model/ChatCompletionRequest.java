@@ -1,18 +1,19 @@
 package com.zhipu.oapi.service.v4.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.zhipu.oapi.service.v4.CommonRequest;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.Map;
 
 
-@Builder
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ChatCompletionRequest {
+public class ChatCompletionRequest extends CommonRequest {
 
     /**
      * 所要调用的模型编码
@@ -24,13 +25,6 @@ public class ChatCompletionRequest {
      * 调用语言模型时，将当前对话信息列表作为提示输入给模型， 按照 {"role": "user", "content": "你好"} 的json 数组形式进行传参； 可能的消息类型包括 System message、User message、Assistant message 和 Tool message。见下方 message 消息字段说明
      */
      private List<ChatMessage> messages;
-
-
-
-    /**
-     * 由用户端传参，需保证唯一性；用于区分每次请求的唯一标识，用户端不传时平台会默认生成
-     */
-    private String requestId;
 
 
     /**
@@ -89,6 +83,11 @@ public class ChatCompletionRequest {
      */
     private List<ChatTool> tools;
 
+    /**
+     * 会话元数据
+     */
+    private ChatMeta meta;
+
 
     /**
      * 指定调用一个特定函数
@@ -100,19 +99,6 @@ public class ChatCompletionRequest {
 
     private String invokeMethod;
 
-
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ChatCompletionRequestFunctionCall {
-        String name;
-
-        public static ChatCompletionRequestFunctionCall of(String name) {
-            return new ChatCompletionRequestFunctionCall(name);
-        }
-
-    }
 
 
 }

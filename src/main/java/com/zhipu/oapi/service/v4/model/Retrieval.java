@@ -1,9 +1,15 @@
 package com.zhipu.oapi.service.v4.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Data;
+import lombok.Getter;
 
-@Data
-public class Retrieval {
+import java.util.Map;
+
+@Getter
+public class Retrieval extends ObjectNode {
 
 
     /**
@@ -28,4 +34,21 @@ public class Retrieval {
      * 注意：用户自定义模板时，知识库内容占位符 和用户侧问题占位符必是{{ knowledge}} 和{{question}}，其他模板内容用户可根据实际场景定义
      */
     private String prompt_template;
+
+    public Retrieval(){
+        super(JsonNodeFactory.instance);
+    }
+    public Retrieval(JsonNodeFactory nc, Map<String, JsonNode> kids) {
+        super(nc, kids);
+    }
+
+    public void setKnowledge_id(String knowledge_id) {
+        this.knowledge_id = knowledge_id;
+        this.put("knowledge_id",knowledge_id);
+    }
+
+    public void setPrompt_template(String prompt_template) {
+        this.prompt_template = prompt_template;
+        this.put("prompt_template",prompt_template);
+    }
 }

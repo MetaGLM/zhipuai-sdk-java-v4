@@ -1,33 +1,93 @@
 package com.zhipu.oapi.core;
 
 import com.zhipu.oapi.core.cache.ICache;
-import com.zhipu.oapi.core.httpclient.IHttpTransport;
+import com.zhipu.oapi.service.v4.api.ChatApiService;
+import lombok.Getter;
+import lombok.Setter;
+import okhttp3.ConnectionPool;
+import okhttp3.OkHttpClient;
 
 import java.util.concurrent.TimeUnit;
 
-public class ConfigV4 {
+import static com.zhipu.oapi.Constants.BASE_URL;
+import static com.zhipu.oapi.Constants.TEST_BASE_URL;
 
+public class ConfigV4 {
+    @Getter
+    @Setter
+    private String baseUrl;
     // api credentials
     // apiSecretKey = {apiKey}.{apiSecret}
-    private String apiSecretKey="120dd8b9ce50a9dd7b0583909dd49822.N3VMdpTH7RqkHIFT";
-    private String apiKey="120dd8b9ce50a9dd7b0583909dd49822";
-    private String apiSecret = "CwMTq2c3mGGQqs9U";
+    @Getter
+    private String apiSecretKey="";
+    @Setter
+    @Getter
+    private String apiKey="";
+    @Setter
+    @Getter
+    private String apiSecret = "";
 
     // jwt config
     // jwt过期时间，默认30分钟
+    @Setter
+    @Getter
     private int expireMillis = 30 * 60 * 1000;
     // jwt加密算法
+    @Setter
+    @Getter
     private String alg = "HS256";
+    @Setter
+    @Getter
     private boolean disableTokenCache;
 
     // 缓存
+    @Setter
+    @Getter
     private ICache cache;
     // 传输层
-    private IHttpTransport httpTransport;
+    @Setter
+    @Getter
+    private OkHttpClient httpClient;
+
+    /**
+     * @see OkHttpClient.Builder#connectionPool(ConnectionPool)
+     */
+    @Setter
+    @Getter
+    private okhttp3.ConnectionPool connectionPool;
+    /**
+     * @see OkHttpClient.Builder#callTimeout(long, TimeUnit)
+     */
+    @Setter
+    @Getter
     private int requestTimeOut;
+    /**
+     * @see OkHttpClient.Builder#connectTimeout(long, TimeUnit)
+     */
+    @Setter
+    @Getter
+    private int connectTimeout;
+
+    /**
+     * @see OkHttpClient.Builder#readTimeout(long, TimeUnit)
+     */
+    @Setter
+    @Getter
+    private int readTimeout;
+
+    /**
+     * @see OkHttpClient.Builder#writeTimeout(long, TimeUnit)
+     */
+    @Setter
+    @Getter
+    private int writeTimeout;
+    @Setter
+    @Getter
     private TimeUnit timeOutTimeUnit;
 
     // 开发能力
+    @Setter
+    @Getter
     private boolean devMode;
 
     public ConfigV4() {
@@ -49,82 +109,6 @@ public class ConfigV4 {
         this.apiSecretKey = String.format("%s.%s", apiKey, apiSecret);
     }
 
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
-    }
-
-    public String getApiSecret() {
-        return apiSecret;
-    }
-
-    public void setApiSecret(String apiSecret) {
-        this.apiSecret = apiSecret;
-    }
-
-    public int getExpireMillis() {
-        return expireMillis;
-    }
-
-    public void setExpireMillis(int expireMillis) {
-        this.expireMillis = expireMillis;
-    }
-
-    public String getAlg() {
-        return alg;
-    }
-
-    public void setAlg(String alg) {
-        this.alg = alg;
-    }
-
-    public boolean isDisableTokenCache() {
-        return disableTokenCache;
-    }
-
-    public void setDisableTokenCache(boolean disableTokenCache) {
-        this.disableTokenCache = disableTokenCache;
-    }
-
-    public ICache getCache() {
-        return cache;
-    }
-
-    public void setCache(ICache cache) {
-        this.cache = cache;
-    }
-
-    public IHttpTransport getHttpTransport() {
-        return httpTransport;
-    }
-
-    public void setHttpTransport(IHttpTransport httpTransport) {
-        this.httpTransport = httpTransport;
-    }
-
-    public int getRequestTimeOut() {
-        return requestTimeOut;
-    }
-
-    public void setRequestTimeOut(int requestTimeOut) {
-        this.requestTimeOut = requestTimeOut;
-    }
-
-    public TimeUnit getTimeOutTimeUnit() {
-        return timeOutTimeUnit;
-    }
-
-    public void setTimeOutTimeUnit(TimeUnit timeOutTimeUnit) {
-        this.timeOutTimeUnit = timeOutTimeUnit;
-    }
-
-    public String getApiSecretKey() {
-        return apiSecretKey;
-    }
-
     public void setApiSecretKey(String apiSecretKey) {
         this.apiSecretKey = apiSecretKey;
         String[] arrStr = apiSecretKey.split("\\.");
@@ -135,11 +119,4 @@ public class ConfigV4 {
         this.apiSecret = arrStr[1];
     }
 
-    public boolean isDevMode() {
-        return devMode;
-    }
-
-    public void setDevMode(boolean devMode) {
-        this.devMode = devMode;
-    }
 }
