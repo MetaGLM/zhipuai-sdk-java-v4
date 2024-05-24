@@ -38,11 +38,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
-    private static final String API_SECRET_KEY = "e6a98ef1c54484c2afeac1ae8cef93ef.rlpKehWCGDttN9Pl";
+    private static final String API_SECRET_KEY = "";
     private static final boolean devMode = false;
 
 
-    private static final ClientV4 client = new ClientV4.Builder("https://test.bigmodel.cn/stage-api/paas/v4/",API_SECRET_KEY)
+    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
             .devMode(devMode)
             .enableTokenCache()
             .networkConfig(30, 10, 10, 10, TimeUnit.SECONDS)
