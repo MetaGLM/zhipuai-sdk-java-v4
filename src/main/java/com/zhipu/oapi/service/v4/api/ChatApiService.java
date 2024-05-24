@@ -4,8 +4,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.core.response.RawResponse;
+import com.zhipu.oapi.service.v4.batchs.Batch;
+import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
+import com.zhipu.oapi.service.v4.batchs.BatchPage;
 import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
+import com.zhipu.oapi.service.v4.file.FileDeleted;
 import com.zhipu.oapi.service.v4.file.UploadFileRequest;
 import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.model.*;
@@ -17,9 +22,12 @@ import com.zhipu.oapi.utils.StringUtils;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.HttpException;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -135,6 +143,18 @@ public class ChatApiService {
         return execute(api.queryFileList(queryFilesRequest.getAfter(),queryFilesRequest.getPurpose(),queryFilesRequest.getOrder(),queryFilesRequest.getLimit()));
     }
 
+    public HttpxBinaryResponseContent fileContent(String fileId) throws IOException {
+        return fileWrapper(api.fileContent(fileId));
+    }
+
+    public com.zhipu.oapi.service.v4.file.File retrieveFile(String fileId) {
+        return execute(api.retrieveFile(fileId));
+    }
+
+    public FileDeleted deletedFile(String fileId) {
+        return execute(api.deletedFile(fileId));
+    }
+
 
     public FineTuningEvent listFineTuningJobEvents(String fineTuningJobId,Integer limit,String after) {
         return execute(api.listFineTuningJobEvents(fineTuningJobId,limit,after));
@@ -211,6 +231,30 @@ public class ChatApiService {
         return execute(api.createFineTuningJob(request));
     }
 
+    public Batch batchesCreate(BatchCreateParams batchCreateParams) {
+        return execute(api.batchesCreate(batchCreateParams));
+    }
+
+    public Batch batchesRetrieve(String batchId) {
+        return execute(api.batchesRetrieve(batchId));
+    }
+
+    public BatchPage batchesList(Integer limit, String after) {
+        return execute(api.batchesList(after,limit));
+    }
+
+    public Batch batchesCancel(String batchId) {
+        return execute(api.batchesCancel(batchId));
+    }
+
+
+    private HttpxBinaryResponseContent fileWrapper(retrofit2.Call<ResponseBody> response) throws IOException {
+        Response<ResponseBody> execute = response.execute();
+        if (!execute.isSuccessful() || execute.body() == null) {
+            throw new IOException("Failed to get the file content");
+        }
+        return new HttpxBinaryResponseContent(execute);
+    }
     private Flowable<ModelData> stream(retrofit2.Call<ResponseBody> apiCall, Class<ModelData> cl) {
         return  stream(apiCall).map(sse -> mapper.readValue(sse.getData(), cl));
     }

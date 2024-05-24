@@ -8,11 +8,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.service.v4.api.ChatApiService;
+import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
+import com.zhipu.oapi.service.v4.batchs.BatchResponse;
+import com.zhipu.oapi.service.v4.batchs.QueryBatchResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
-import com.zhipu.oapi.service.v4.file.FileApiResponse;
-import com.zhipu.oapi.service.v4.file.UploadFileRequest;
+import com.zhipu.oapi.service.v4.file.*;
 import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.image.CreateImageRequest;
 import com.zhipu.oapi.service.v4.image.ImageApiResponse;
@@ -22,6 +25,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,11 +38,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
-    private static final String API_SECRET_KEY = "";
+    private static final String API_SECRET_KEY = "e6a98ef1c54484c2afeac1ae8cef93ef.rlpKehWCGDttN9Pl";
     private static final boolean devMode = false;
 
 
-    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
+    private static final ClientV4 client = new ClientV4.Builder("https://test.bigmodel.cn/stage-api/paas/v4/",API_SECRET_KEY)
             .devMode(devMode)
             .enableTokenCache()
             .networkConfig(30, 10, 10, 10, TimeUnit.SECONDS)
@@ -427,11 +432,28 @@ public class V4Test {
      */
     @Test
     public void testQueryUploadFileList() throws JsonProcessingException {
-//        String filePath = "/Users/wujianguo/Downloads/transaction-data.jsonl";
-//        String purpose = "fine-tune";
-//        FileApiResponse fileApiResponse = client.invokeUploadFileApi(purpose,filePath);
-//        logger.info("model output:"+mapper.writeValueAsString(fileApiResponse));
+        QueryFilesRequest queryFilesRequest = new QueryFilesRequest();
+        QueryFileApiResponse queryFileApiResponse = client.queryFilesApi(queryFilesRequest);
+        logger.info("model output: {}", mapper.writeValueAsString(queryFileApiResponse));
     }
+
+    @Test
+    public void testFileContent() throws IOException {
+        HttpxBinaryResponseContent httpxBinaryResponseContent = client.fileContent("20240514_ea19d21b-d256-4586-b0df-e80a45e3c286");
+        String filePath = "demo_output.jsonl";
+        String resourcePath = V4Test.class.getClassLoader().getResource("").getPath();
+
+        httpxBinaryResponseContent.streamToFile(resourcePath+"1" +filePath,1000);
+
+    }
+
+//    @Test
+//    public void deletedFile() throws IOException {
+//        FileDelResponse fileDelResponse = client.deletedFile("20240514_ea19d21b-d256-4586-b0df-e80a45e3c286");
+//
+//        logger.info("model output: {}", mapper.writeValueAsString(fileDelResponse));
+//
+//    }
 
 
     /**
@@ -487,6 +509,46 @@ public class V4Test {
         logger.info("model output: {}", mapper.writeValueAsString(queryPersonalFineTuningJobApiResponse));
     }
 
+
+    @Test
+    public void testBatchesCreate(){
+        BatchCreateParams batchCreateParams = new BatchCreateParams(
+                "24h",
+                "/v4/chat/completions",
+                "20240514_ea19d21b-d256-4586-b0df-e80a45e3c286",
+                new HashMap<String, String>() {{
+                    put("key1", "value1");
+                    put("key2", "value2");
+                }}
+        );
+
+        BatchResponse batchResponse = client.batchesCreate(batchCreateParams);
+        logger.info("output: {}", batchResponse);
+//         output: BatchResponse(code=200, msg=调用成功, success=true, data=Batch(id=batch_1791021399316246528, completionWindow=24h, createdAt=1715847751822, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=validating, cancelledAt=null, cancellingAt=null, completedAt=null, errorFileId=null, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=null, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null))
+    }
+
+    @Test
+    public void testBatchesRetrieve() {
+        BatchResponse batchResponse = client.batchesRetrieve("batch_1791021399316246528");
+        logger.info("output: {}", batchResponse);
+//        output: BatchResponse(code=200, msg=调用成功, success=true, data=Batch(id=batch_1791021399316246528, completionWindow=24h, createdAt=1715847752000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=validating, cancelledAt=null, cancellingAt=null, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null))
+
+    }
+    @Test
+    public void testBatchesList() {
+        QueryBatchRequest queryBatchRequest = new QueryBatchRequest();
+        queryBatchRequest.setLimit(10);
+        QueryBatchResponse queryBatchResponse = client.batchesList(queryBatchRequest);
+        logger.info("output: {}", queryBatchResponse);
+// output: QueryBatchResponse(code=200, msg=调用成功, success=true, data=BatchPage(object=list, data=[Batch(id=batch_1790291013237211136, completionWindow=24h, createdAt=1715673614000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=completed, cancelledAt=null, cancellingAt=1715673699000, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={description=job test}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null), Batch(id=batch_1790292763050508288, completionWindow=24h, createdAt=1715674031000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=completed, cancelledAt=null, cancellingAt=null, completedAt=1715766416000, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=1715754569000, inProgressAt=null, metadata={description=job test}, outputFileId=1715766415_e5a77222855a406ca8a082de28549c99, requestCounts=BatchRequestCounts(completed=2, failed=0, total=2), error=null), Batch(id=batch_1791021114887909376, completionWindow=24h, createdAt=1715847684000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=validating, cancelledAt=null, cancellingAt=null, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null), Batch(id=batch_1791021399316246528, completionWindow=24h, createdAt=1715847752000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=validating, cancelledAt=null, cancellingAt=null, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null)], error=null))
+
+    }
+    @Test
+    public void testBatchesCancel(){
+        BatchResponse batchResponse = client.batchesCancel("batch_1791021399316246528");
+        logger.info("output: {}", batchResponse);
+//         BatchResponse(code=200, msg=调用成功, success=true, data=Batch(id=batch_1791021399316246528, completionWindow=24h, createdAt=1715847752000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=cancelled, cancelledAt=1715847965600, cancellingAt=1715847965600, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null))
+    }
 
     private static String getAsyncTaskId() throws JsonProcessingException {
         List<ChatMessage> messages = new ArrayList<>();
