@@ -603,6 +603,25 @@ public class V4Test {
         logger.info("model output {}", mapper.writeValueAsString(queryResultResp));
     }
 
+    /**
+     * V4微调上传数据集
+     */
+    @Test
+    public void documentCreate() throws JsonProcessingException {
+        String filePath = "demo.jsonl";
+
+        String path = ClassLoader.getSystemResource(filePath).getPath();
+        String purpose = "fine-tune";
+        UploadFileRequest request = UploadFileRequest.builder()
+                .purpose(purpose)
+                .filePath(path)
+                .build();
+
+        FileApiResponse fileApiResponse = client.invokeUploadFileApi(request);
+        logger.info("model output: {}", mapper.writeValueAsString(fileApiResponse));
+    }
+
+
     public static Flowable<ChatMessageAccumulator> mapStreamToAccumulator(Flowable<ModelData> flowable) {
         return flowable.map(chunk -> {
             return new ChatMessageAccumulator(chunk.getChoices().get(0).getDelta(), null, chunk.getChoices().get(0), chunk.getUsage(), chunk.getCreated(), chunk.getId());

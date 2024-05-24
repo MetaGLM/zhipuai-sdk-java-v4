@@ -13,6 +13,10 @@ import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
 import com.zhipu.oapi.service.v4.file.FileDeleted;
 import com.zhipu.oapi.service.v4.file.UploadFileRequest;
 import com.zhipu.oapi.service.v4.fine_turning.*;
+import com.zhipu.oapi.service.v4.knowledge.KnowledgeBaseParams;
+import com.zhipu.oapi.service.v4.knowledge.KnowledgeInfo;
+import com.zhipu.oapi.service.v4.knowledge.KnowledgeInfoPage;
+import com.zhipu.oapi.service.v4.knowledge.KnowledgeUsed;
 import com.zhipu.oapi.service.v4.knowledge.document.DocumentObject;
 import com.zhipu.oapi.service.v4.knowledge.document.FileCreateParams;
 import com.zhipu.oapi.service.v4.model.*;
@@ -27,11 +31,13 @@ import io.reactivex.Single;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.HttpException;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+import retrofit2.http.Query;
 
 import java.io.IOException;
 import java.util.*;
@@ -243,6 +249,35 @@ public class ChatApiService {
         return execute(api.batchesCancel(batchId));
     }
 
+
+    public KnowledgeInfo knowledgeCreate(KnowledgeBaseParams knowledgeBaseParams) {
+        return execute(api.knowledgeCreate(knowledgeBaseParams));
+    }
+
+
+    public Response<ResponseBody> knowledgeModify(KnowledgeBaseParams knowledgeBaseParams) throws IOException {
+
+        Call<ResponseBody> responseBodyCall = api.knowledgeModify(knowledgeBaseParams.getKnowledgeId(), knowledgeBaseParams);
+
+
+        return responseBodyCall.execute();
+    }
+
+    public KnowledgeInfoPage knowledgeList(Integer page, Integer size) {
+
+        return execute(api.knowledgeList(page, size));
+    }
+
+    public Response<ResponseBody> knowledgeDelete(String knowledgeId) throws IOException {
+        Call<ResponseBody> responseBodyCall = api.knowledgeDelete(knowledgeId);
+
+        return responseBodyCall.execute();
+    }
+
+    public KnowledgeUsed knowledgeUsed() {
+
+        return execute(api.knowledgeUsed());
+    }
 
     public DocumentObject documentCreate(FileCreateParams request) throws JsonProcessingException {
         java.io.File file = new java.io.File(request.getFilePath());

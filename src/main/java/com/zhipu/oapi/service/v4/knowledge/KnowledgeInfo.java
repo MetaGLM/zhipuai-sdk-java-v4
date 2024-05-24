@@ -1,6 +1,8 @@
 package com.zhipu.oapi.service.v4.knowledge;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.zhipu.oapi.service.v4.model.ChatError;
 import lombok.Data;
 
 @Data
@@ -29,4 +31,6 @@ public class KnowledgeInfo {
 
     @JsonProperty("bucket_id")
     private String bucketId; // 桶id，限制32位
+    @JsonIgnore
+    private ChatError error;
 }

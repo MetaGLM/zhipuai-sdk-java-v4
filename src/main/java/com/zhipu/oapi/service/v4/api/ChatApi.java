@@ -134,7 +134,7 @@ public interface ChatApi {
 
 
     @DELETE("knowledge/{knowledge_id}")
-    Call<ResponseBody> knowledgeDelete(@Path("knowledge_id") String knowledge_id);
+    Call<ResponseBody> knowledgeDelete(@Path("knowledge_id") String knowledgeId);
 
 
     @GET("knowledge/capacity")

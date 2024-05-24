@@ -11,6 +11,7 @@ import com.zhipu.oapi.core.token.GlobalTokenManager;
 import com.zhipu.oapi.core.token.TokenManagerV4;
 import com.zhipu.oapi.service.v4.batchs.*;
 import com.zhipu.oapi.service.v4.fine_turning.*;
+import com.zhipu.oapi.service.v4.knowledge.*;
 import com.zhipu.oapi.service.v4.knowledge.document.DocumentObject;
 import com.zhipu.oapi.service.v4.knowledge.document.DocumentResponse;
 import com.zhipu.oapi.service.v4.knowledge.document.FileCreateParams;
@@ -29,8 +30,10 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit2.Response;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -785,6 +788,172 @@ public class ClientV4 {
     }
 
 
+    /**
+     * 检索批量请求
+     * @param knowledgeBaseParams knowledgeBaseParams
+     * @return DocumentResponse
+     */
+    public KnowledgeInfoResponse knowledgeCreate(KnowledgeBaseParams knowledgeBaseParams) {
+        KnowledgeInfoResponse knowledgeInfoResponse = new KnowledgeInfoResponse();
+
+        try {
+            KnowledgeInfo documentObject = chatApiService.knowledgeCreate(knowledgeBaseParams);
+            if (documentObject != null) {
+                knowledgeInfoResponse.setSuccess(true);
+                knowledgeInfoResponse.setData(documentObject);
+                knowledgeInfoResponse.setCode(200);
+                knowledgeInfoResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            knowledgeInfoResponse.setCode(e.statusCode);
+            knowledgeInfoResponse.setMsg("业务出错");
+            knowledgeInfoResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            KnowledgeInfo knowledgeInfo = new KnowledgeInfo();
+            knowledgeInfo.setError(chatError);
+            knowledgeInfoResponse.setData(knowledgeInfo);
+        }
+
+        return knowledgeInfoResponse;
+    }
+
+
+
+    /**
+     * 知识库修改
+     * @param knowledgeBaseParams knowledgeBaseParams
+     * @return DocumentResponse
+     */
+    public KnowledgeInfoResponse knowledgeModify(KnowledgeBaseParams knowledgeBaseParams) {
+        KnowledgeInfoResponse knowledgeInfoResponse = new KnowledgeInfoResponse();
+
+        try {
+            Response<ResponseBody> responseBodyResponse = chatApiService.knowledgeModify(knowledgeBaseParams);
+            if (responseBodyResponse.isSuccessful()) {
+                knowledgeInfoResponse.setSuccess(true);
+                knowledgeInfoResponse.setCode(200);
+                knowledgeInfoResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            knowledgeInfoResponse.setCode(e.statusCode);
+            knowledgeInfoResponse.setMsg("业务出错");
+            knowledgeInfoResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            KnowledgeInfo knowledgeInfo = new KnowledgeInfo();
+            knowledgeInfo.setError(chatError);
+            knowledgeInfoResponse.setData(knowledgeInfo);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return knowledgeInfoResponse;
+    }
+
+    /**
+     * 知识库列表
+     * @param queryKnowledgeRequest queryKnowledgeRequest
+     * @return DocumentResponse
+     */
+    public QueryKnowledgeResponse knowledgeList(QueryKnowledgeRequest queryKnowledgeRequest) {
+        QueryKnowledgeResponse queryKnowledgeResponse = new QueryKnowledgeResponse();
+
+        try {
+            KnowledgeInfoPage knowledgeInfoPage = chatApiService.knowledgeList(
+                    queryKnowledgeRequest.getPage(), queryKnowledgeRequest.getSize()
+            );
+            if (knowledgeInfoPage!=null) {
+                queryKnowledgeResponse.setSuccess(true);
+                queryKnowledgeResponse.setCode(200);
+                queryKnowledgeResponse.setData(knowledgeInfoPage);
+                queryKnowledgeResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            queryKnowledgeResponse.setCode(e.statusCode);
+            queryKnowledgeResponse.setMsg("业务出错");
+            queryKnowledgeResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            KnowledgeInfoPage knowledgeInfoPage = new KnowledgeInfoPage();
+            knowledgeInfoPage.setError(chatError);
+            queryKnowledgeResponse.setData(knowledgeInfoPage);
+        }
+
+        return queryKnowledgeResponse;
+    }
+
+
+    /**
+     * 知识库使用情况
+     * @return KnowledgeUsedResponse
+     */
+    public KnowledgeUsedResponse knowledgeUsed() {
+        KnowledgeUsedResponse knowledgeUsedResponse = new KnowledgeUsedResponse();
+
+        try {
+            KnowledgeUsed knowledgeUsed = chatApiService.knowledgeUsed();
+            if (knowledgeUsed!=null) {
+                knowledgeUsedResponse.setSuccess(true);
+                knowledgeUsedResponse.setCode(200);
+                knowledgeUsedResponse.setData(knowledgeUsed);
+                knowledgeUsedResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            knowledgeUsedResponse.setCode(e.statusCode);
+            knowledgeUsedResponse.setMsg("业务出错");
+            knowledgeUsedResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            KnowledgeUsed knowledgeUsed = new KnowledgeUsed();
+            knowledgeUsed.setError(chatError);
+            knowledgeUsedResponse.setData(knowledgeUsed);
+        }
+
+        return knowledgeUsedResponse;
+    }
+
+
+    /**
+     * 知识库删除
+     * @param knowledgeId knowledgeId
+     * @return KnowledgeInfoResponse
+     */
+    public KnowledgeInfoResponse knowledgeDelete(String knowledgeId) {
+        KnowledgeInfoResponse knowledgeInfoResponse = new KnowledgeInfoResponse();
+
+        try {
+            Response<ResponseBody> responseBodyResponse = chatApiService.knowledgeDelete(knowledgeId);
+            if (responseBodyResponse.isSuccessful()) {
+                knowledgeInfoResponse.setSuccess(true);
+                knowledgeInfoResponse.setCode(200);
+                knowledgeInfoResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            knowledgeInfoResponse.setCode(e.statusCode);
+            knowledgeInfoResponse.setMsg("业务出错");
+            knowledgeInfoResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            KnowledgeInfo knowledgeInfo = new KnowledgeInfo();
+            knowledgeInfo.setError(chatError);
+            knowledgeInfoResponse.setData(knowledgeInfo);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return knowledgeInfoResponse;
+    }
     /**
      * 检索批量请求
      * @param createParams createParams
