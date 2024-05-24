@@ -11,6 +11,9 @@ import com.zhipu.oapi.core.token.GlobalTokenManager;
 import com.zhipu.oapi.core.token.TokenManagerV4;
 import com.zhipu.oapi.service.v4.batchs.*;
 import com.zhipu.oapi.service.v4.fine_turning.*;
+import com.zhipu.oapi.service.v4.knowledge.document.DocumentObject;
+import com.zhipu.oapi.service.v4.knowledge.document.DocumentResponse;
+import com.zhipu.oapi.service.v4.knowledge.document.FileCreateParams;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.api.ChatApiService;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
@@ -779,6 +782,41 @@ public class ClientV4 {
         }
 
         return batchResponse;
+    }
+
+
+    /**
+     * 检索批量请求
+     * @param createParams createParams
+     * @return DocumentResponse
+     */
+    public DocumentResponse documentCreate(FileCreateParams createParams) {
+        DocumentResponse documentResponse = new DocumentResponse();
+
+        try {
+            DocumentObject documentObject = chatApiService.documentCreate(createParams);
+            if (documentObject != null) {
+                documentResponse.setSuccess(true);
+                documentResponse.setData(documentObject);
+                documentResponse.setCode(200);
+                documentResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            documentResponse.setCode(e.statusCode);
+            documentResponse.setMsg("业务出错");
+            documentResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            DocumentObject documentObject = new DocumentObject();
+            documentObject.setError(chatError);
+            documentResponse.setData(documentObject);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        return documentResponse;
     }
 
     public static final class Builder {

@@ -10,8 +10,16 @@ import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.file.File;
 import com.zhipu.oapi.service.v4.file.QueryFileResult;
 import com.zhipu.oapi.service.v4.image.ImageResult;
+import com.zhipu.oapi.service.v4.knowledge.KnowledgeBaseParams;
+import com.zhipu.oapi.service.v4.knowledge.KnowledgeInfo;
+import com.zhipu.oapi.service.v4.knowledge.KnowledgeInfoPage;
+import com.zhipu.oapi.service.v4.knowledge.KnowledgeUsed;
+import com.zhipu.oapi.service.v4.knowledge.document.DocumentObject;
+import com.zhipu.oapi.service.v4.knowledge.document.FileCreateParams;
+import com.zhipu.oapi.service.v4.knowledge.document.UploadDetail;
 import com.zhipu.oapi.service.v4.model.ModelData;
 import io.reactivex.Single;
+import lombok.Data;
 import lombok.Getter;
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
@@ -112,6 +120,29 @@ public interface ChatApi {
     @POST("batches/{batch_id}/cancel")
     Single<Batch> batchesCancel(@Path("batch_id") String batchId);
 
+
+    @POST("knowledge")
+    Single<KnowledgeInfo> knowledgeCreate(@Body KnowledgeBaseParams knowledgeBaseParams);
+
+
+    @PUT("knowledge/{knowledge_id}")
+    Call<ResponseBody> knowledgeModify(@Path("knowledge_id") String knowledge_id,
+                                       @Body KnowledgeBaseParams knowledgeBaseParams);
+
+    @GET("knowledge")
+    Single<KnowledgeInfoPage> knowledgeList(@Query("page") Integer page, @Query("size") Integer size);
+
+
+    @DELETE("knowledge/{knowledge_id}")
+    Call<ResponseBody> knowledgeDelete(@Path("knowledge_id") String knowledge_id);
+
+
+    @GET("knowledge/capacity")
+    Single<KnowledgeUsed> knowledgeUsed();
+
+    @POST("document")
+    Single<DocumentObject> documentCreate(@Body MultipartBody multipartBody,
+                                          @Body FileCreateParams uploadDetail);
 
 
 }

@@ -13,6 +13,8 @@ import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
 import com.zhipu.oapi.service.v4.file.FileDeleted;
 import com.zhipu.oapi.service.v4.file.UploadFileRequest;
 import com.zhipu.oapi.service.v4.fine_turning.*;
+import com.zhipu.oapi.service.v4.knowledge.document.DocumentObject;
+import com.zhipu.oapi.service.v4.knowledge.document.FileCreateParams;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.file.QueryFileResult;
@@ -22,11 +24,9 @@ import com.zhipu.oapi.utils.StringUtils;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.HttpException;
@@ -34,12 +34,8 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static com.zhipu.oapi.Constants.BASE_URL;
 
@@ -245,6 +241,44 @@ public class ChatApiService {
 
     public Batch batchesCancel(String batchId) {
         return execute(api.batchesCancel(batchId));
+    }
+
+
+    public DocumentObject documentCreate(FileCreateParams request) throws JsonProcessingException {
+        java.io.File file = new java.io.File(request.getFilePath());
+        if(!file.exists()){
+            throw new RuntimeException("file not found");
+        }
+        MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+        MultipartBody.Builder formBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        formBodyBuilder.addPart(filePart);
+        formBodyBuilder.addFormDataPart("purpose", request.getPurpose());
+        if (request.getExtraJson()!=null){
+            for (String s : request.getExtraJson().keySet()) {
+                if(request.getExtraJson().get(s) instanceof String
+                        || request.getExtraJson().get(s) instanceof Number
+                        || request.getExtraJson().get(s) instanceof Boolean
+                        || request.getExtraJson().get(s) instanceof Character
+
+                ) {
+
+                    formBodyBuilder.addFormDataPart(s, request.getExtraJson().get(s).toString());
+                }else if(request.getExtraJson().get(s) instanceof Date) {
+                    Date date = (Date) request.getExtraJson().get(s);
+                    formBodyBuilder.addFormDataPart(s, String.valueOf(date.getTime()));
+                }else {
+
+                    formBodyBuilder.addFormDataPart(s, null,
+                            RequestBody.create(MediaType.parse("application/json"),
+                                    mapper.writeValueAsString(request.getExtraJson().get(s))));
+
+                }
+
+            }
+        }
+        MultipartBody multipartBody = formBodyBuilder.build();
+
+        return execute(api.documentCreate(multipartBody, request));
     }
 
 

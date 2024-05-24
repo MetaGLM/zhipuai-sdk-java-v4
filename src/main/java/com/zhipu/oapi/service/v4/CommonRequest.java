@@ -1,5 +1,6 @@
 package com.zhipu.oapi.service.v4;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,5 +31,6 @@ public class CommonRequest {
      */
     private String userId;
 
+    @JsonIgnore
     private Map<String,Object> extraJson;
 }
