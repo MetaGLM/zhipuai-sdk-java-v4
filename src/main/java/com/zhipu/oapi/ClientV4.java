@@ -12,6 +12,7 @@ import com.zhipu.oapi.core.token.TokenManagerV4;
 import com.zhipu.oapi.service.v4.batchs.*;
 import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.knowledge.*;
+import com.zhipu.oapi.service.v4.knowledge.document.DocumentEditParams;
 import com.zhipu.oapi.service.v4.knowledge.document.DocumentObject;
 import com.zhipu.oapi.service.v4.knowledge.document.DocumentResponse;
 import com.zhipu.oapi.service.v4.knowledge.document.FileCreateParams;
@@ -827,7 +828,7 @@ public class ClientV4 {
      * @param knowledgeBaseParams knowledgeBaseParams
      * @return DocumentResponse
      */
-    public KnowledgeInfoResponse knowledgeModify(KnowledgeBaseParams knowledgeBaseParams) {
+    public KnowledgeInfoResponse knowledgeModify(KnowledgeModifyParams knowledgeBaseParams) {
         KnowledgeInfoResponse knowledgeInfoResponse = new KnowledgeInfoResponse();
 
         try {
@@ -986,6 +987,39 @@ public class ClientV4 {
         }
 
         return documentResponse;
+    }
+
+    /**
+     * 知识库文档修改
+     * @param documentEditParams documentEditParams
+     * @return KnowledgeInfoResponse
+     */
+    public KnowledgeInfoResponse documentEdit(DocumentEditParams documentEditParams) {
+        KnowledgeInfoResponse knowledgeInfoResponse = new KnowledgeInfoResponse();
+
+        try {
+            Response<ResponseBody> responseBodyResponse = chatApiService.documentEdit(documentEditParams);
+            if (responseBodyResponse.isSuccessful()) {
+                knowledgeInfoResponse.setSuccess(true);
+                knowledgeInfoResponse.setCode(200);
+                knowledgeInfoResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            knowledgeInfoResponse.setCode(e.statusCode);
+            knowledgeInfoResponse.setMsg("业务出错");
+            knowledgeInfoResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            KnowledgeInfo knowledgeInfo = new KnowledgeInfo();
+            knowledgeInfo.setError(chatError);
+            knowledgeInfoResponse.setData(knowledgeInfo);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return knowledgeInfoResponse;
     }
 
     public static final class Builder {

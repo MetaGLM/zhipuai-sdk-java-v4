@@ -14,9 +14,7 @@ import com.zhipu.oapi.service.v4.knowledge.KnowledgeBaseParams;
 import com.zhipu.oapi.service.v4.knowledge.KnowledgeInfo;
 import com.zhipu.oapi.service.v4.knowledge.KnowledgeInfoPage;
 import com.zhipu.oapi.service.v4.knowledge.KnowledgeUsed;
-import com.zhipu.oapi.service.v4.knowledge.document.DocumentObject;
-import com.zhipu.oapi.service.v4.knowledge.document.FileCreateParams;
-import com.zhipu.oapi.service.v4.knowledge.document.UploadDetail;
+import com.zhipu.oapi.service.v4.knowledge.document.*;
 import com.zhipu.oapi.service.v4.model.ModelData;
 import io.reactivex.Single;
 import lombok.Data;
@@ -141,9 +139,20 @@ public interface ChatApi {
     Single<KnowledgeUsed> knowledgeUsed();
 
     @POST("document")
-    Single<DocumentObject> documentCreate(@Body MultipartBody multipartBody,
-                                          @Body FileCreateParams uploadDetail);
+    Single<DocumentObject> documentCreate(@Body MultipartBody multipartBody);
 
+    @PUT("document/{document_id}")
+    Call<ResponseBody> documentEdit(@Path("document_id")  String documentId,
+                                          @Body DocumentEditParams documentEditParams);
+
+    @GET("files")
+    Single<DocumentDataPage> documentList(@QueryMap DocumentListParams params);
+
+    @DELETE("document/{document_id}")
+    Call<ResponseBody> deleteDocument(@Path("document_id") String documentId);
+
+    @GET("document/{document_id}")
+    Single<DocumentData> retrieveDocument(@Path("document_id") String documentId);
 
 }
 

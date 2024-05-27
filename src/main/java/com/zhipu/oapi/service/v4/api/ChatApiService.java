@@ -13,12 +13,8 @@ import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
 import com.zhipu.oapi.service.v4.file.FileDeleted;
 import com.zhipu.oapi.service.v4.file.UploadFileRequest;
 import com.zhipu.oapi.service.v4.fine_turning.*;
-import com.zhipu.oapi.service.v4.knowledge.KnowledgeBaseParams;
-import com.zhipu.oapi.service.v4.knowledge.KnowledgeInfo;
-import com.zhipu.oapi.service.v4.knowledge.KnowledgeInfoPage;
-import com.zhipu.oapi.service.v4.knowledge.KnowledgeUsed;
-import com.zhipu.oapi.service.v4.knowledge.document.DocumentObject;
-import com.zhipu.oapi.service.v4.knowledge.document.FileCreateParams;
+import com.zhipu.oapi.service.v4.knowledge.*;
+import com.zhipu.oapi.service.v4.knowledge.document.*;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.file.QueryFileResult;
@@ -255,9 +251,9 @@ public class ChatApiService {
     }
 
 
-    public Response<ResponseBody> knowledgeModify(KnowledgeBaseParams knowledgeBaseParams) throws IOException {
+    public Response<ResponseBody> knowledgeModify(KnowledgeModifyParams knowledgeModifyParams) throws IOException {
 
-        Call<ResponseBody> responseBodyCall = api.knowledgeModify(knowledgeBaseParams.getKnowledgeId(), knowledgeBaseParams);
+        Call<ResponseBody> responseBodyCall = api.knowledgeModify(knowledgeModifyParams.getKnowledgeId(), knowledgeModifyParams);
 
 
         return responseBodyCall.execute();
@@ -280,14 +276,29 @@ public class ChatApiService {
     }
 
     public DocumentObject documentCreate(FileCreateParams request) throws JsonProcessingException {
-        java.io.File file = new java.io.File(request.getFilePath());
-        if(!file.exists()){
-            throw new RuntimeException("file not found");
-        }
-        MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
         MultipartBody.Builder formBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
-        formBodyBuilder.addPart(filePart);
+
+        if(StringUtils.isNotEmpty(request.getFilePath())){
+
+            java.io.File file = new java.io.File(request.getFilePath());
+            if(!file.exists()){
+                throw new RuntimeException("file not found");
+            }
+            MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+            formBodyBuilder.addPart(filePart);
+
+        }
+        else if (request.getUploadDetail()==null) {
+            throw new RuntimeException("upload_detail or file is required");
+        }
+
         formBodyBuilder.addFormDataPart("purpose", request.getPurpose());
+        formBodyBuilder.addFormDataPart("upload_detail", null,
+                RequestBody.create(MediaType.parse("application/json"),
+                        mapper.writeValueAsString(request.getUploadDetail())));
+        formBodyBuilder.addFormDataPart("knowledge_id", request.getKnowledgeId());
+        formBodyBuilder.addFormDataPart("sentence_size", String.valueOf(request.getSentenceSize()));
+
         if (request.getExtraJson()!=null){
             for (String s : request.getExtraJson().keySet()) {
                 if(request.getExtraJson().get(s) instanceof String
@@ -313,7 +324,29 @@ public class ChatApiService {
         }
         MultipartBody multipartBody = formBodyBuilder.build();
 
-        return execute(api.documentCreate(multipartBody, request));
+        return execute(api.documentCreate(multipartBody));
+    }
+
+
+    public Response<ResponseBody> documentEdit(DocumentEditParams documentEditParams) throws IOException {
+        Call<ResponseBody> responseBodyCall = api.documentEdit(documentEditParams.getId(),documentEditParams);
+
+        return responseBodyCall.execute();
+    }
+
+    public DocumentDataPage documentList(DocumentListParams documentListParams) {
+
+        return execute(api.documentList(documentListParams));
+    }
+
+
+    public Response<ResponseBody> deleteDocument(String documentId) throws IOException {
+        Call<ResponseBody> responseBodyCall = api.deleteDocument(documentId);
+
+        return responseBodyCall.execute();
+    }
+    public DocumentData retrieveDocument(String documentId)  {
+        return execute(api.retrieveDocument(documentId));
     }
 
 

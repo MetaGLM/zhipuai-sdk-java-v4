@@ -3,13 +3,16 @@ package com.zhipu.oapi.service.v4.knowledge.document;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.zhipu.oapi.service.v4.CommonRequest;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@SuperBuilder
 public class FileCreateParams extends CommonRequest {
 
     /**
