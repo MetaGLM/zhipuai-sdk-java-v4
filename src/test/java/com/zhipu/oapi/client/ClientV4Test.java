@@ -6,13 +6,16 @@ import com.zhipu.oapi.core.cache.ICache;
 import com.zhipu.oapi.core.cache.LocalCache;
 import com.zhipu.oapi.core.token.TokenManagerV4;
 import okhttp3.OkHttpClient;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.testcontainers.shaded.org.hamcrest.MatcherAssert.assertThat;
 
+
+@Testcontainers
 public class ClientV4Test {
     static ConfigV4 configV4 = null;
     static OkHttpClient client = null;

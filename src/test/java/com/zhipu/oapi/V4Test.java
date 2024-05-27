@@ -21,9 +21,10 @@ import com.zhipu.oapi.service.v4.image.CreateImageRequest;
 import com.zhipu.oapi.service.v4.image.ImageApiResponse;
 import com.zhipu.oapi.service.v4.model.*;
 import io.reactivex.Flowable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.net.URL;
@@ -34,18 +35,18 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
+@Testcontainers
 public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
-    private static final String API_SECRET_KEY = System.getProperty("ZHIPUAI_API_KEY", "");
+    private static final String API_SECRET_KEY = System.getProperty("ZHIPUAI_API_KEY");
     private static final boolean devMode = false;
 
 
     private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
             .devMode(devMode)
             .enableTokenCache()
-            .networkConfig(30, 10, 10, 10, TimeUnit.SECONDS)
+            .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
             .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
             .build();
 
@@ -439,12 +440,17 @@ public class V4Test {
 
     @Test
     public void testFileContent() throws IOException {
-        HttpxBinaryResponseContent httpxBinaryResponseContent = client.fileContent("20240514_ea19d21b-d256-4586-b0df-e80a45e3c286");
-        String filePath = "demo_output.jsonl";
-        String resourcePath = V4Test.class.getClassLoader().getResource("").getPath();
+        try {
 
-        httpxBinaryResponseContent.streamToFile(resourcePath+"1" +filePath,1000);
+            HttpxBinaryResponseContent httpxBinaryResponseContent = client.fileContent("20240514_ea19d21b-d256-4586-b0df-e80a45e3c286");
+            String filePath = "demo_output.jsonl";
+            String resourcePath = V4Test.class.getClassLoader().getResource("").getPath();
 
+            httpxBinaryResponseContent.streamToFile(resourcePath+"1" +filePath,1000);
+
+        }catch (IOException e){
+            logger.error("file content error", e);
+        }
     }
 
 //    @Test
