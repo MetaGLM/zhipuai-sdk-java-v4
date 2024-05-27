@@ -334,9 +334,9 @@ public class ChatApiService {
         return responseBodyCall.execute();
     }
 
-    public DocumentDataPage documentList(DocumentListParams documentListParams) {
+    public DocumentDataPage documentList(QueryDocumentRequest queryDocumentRequest) {
 
-        return execute(api.documentList(documentListParams));
+        return execute(api.documentList(queryDocumentRequest));
     }
 
 

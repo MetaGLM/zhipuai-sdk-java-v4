@@ -12,10 +12,7 @@ import com.zhipu.oapi.core.token.TokenManagerV4;
 import com.zhipu.oapi.service.v4.batchs.*;
 import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.knowledge.*;
-import com.zhipu.oapi.service.v4.knowledge.document.DocumentEditParams;
-import com.zhipu.oapi.service.v4.knowledge.document.DocumentObject;
-import com.zhipu.oapi.service.v4.knowledge.document.DocumentResponse;
-import com.zhipu.oapi.service.v4.knowledge.document.FileCreateParams;
+import com.zhipu.oapi.service.v4.knowledge.document.*;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.api.ChatApiService;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
@@ -1021,6 +1018,107 @@ public class ClientV4 {
 
         return knowledgeInfoResponse;
     }
+
+    /**
+     * 知识库文档列表
+     * @param documentEditParams documentEditParams
+     * @return KnowledgeInfoResponse
+     */
+    public QueryDocumentResponse documentList(QueryDocumentRequest documentEditParams) {
+        QueryDocumentResponse queryDocumentResponse = new QueryDocumentResponse();
+
+        try {
+            DocumentDataPage documentDataPage = chatApiService.documentList(documentEditParams);
+            if (documentDataPage!=null) {
+                queryDocumentResponse.setSuccess(true);
+                queryDocumentResponse.setCode(200);
+                queryDocumentResponse.setData(documentDataPage);
+                queryDocumentResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            queryDocumentResponse.setCode(e.statusCode);
+            queryDocumentResponse.setMsg("业务出错");
+            queryDocumentResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            DocumentDataPage documentDataPage = new DocumentDataPage();
+            documentDataPage.setError(chatError);
+            queryDocumentResponse.setData(documentDataPage);
+        }
+
+        return queryDocumentResponse;
+    }
+
+
+    /**
+     * 删除知识库文档
+     * @param documentId createParams
+     * @return DocumentResponse
+     */
+    public DocumentDataResponse deleteDocument(String documentId) {
+        DocumentDataResponse documentResponse = new DocumentDataResponse();
+
+        try {
+            Response<ResponseBody> responseBodyResponse = chatApiService.deleteDocument(documentId);
+            if (responseBodyResponse.isSuccessful()) {
+                documentResponse.setSuccess(true);
+                documentResponse.setCode(200);
+                documentResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            documentResponse.setCode(e.statusCode);
+            documentResponse.setMsg("业务出错");
+            documentResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            DocumentData documentData = new DocumentData();
+            documentData.setError(chatError);
+            documentResponse.setData(documentData);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return documentResponse;
+    }
+
+    /**
+     * 查询知识库文档
+     * @param documentId createParams
+     * @return DocumentResponse
+     */
+    public DocumentDataResponse retrieveDocument(String documentId) {
+        DocumentDataResponse documentResponse = new DocumentDataResponse();
+
+        try {
+            DocumentData documentData = chatApiService.retrieveDocument(documentId);
+            if (documentData!=null) {
+                documentResponse.setSuccess(true);
+                documentResponse.setCode(200);
+                documentResponse.setData(documentData);
+                documentResponse.setMsg("调用成功");
+            }
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            documentResponse.setCode(e.statusCode);
+            documentResponse.setMsg("业务出错");
+            documentResponse.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            DocumentData documentData = new DocumentData();
+            documentData.setError(chatError);
+            documentResponse.setData(documentData);
+        }
+
+        return documentResponse;
+    }
+
 
     public static final class Builder {
         private final ConfigV4 config = new ConfigV4();

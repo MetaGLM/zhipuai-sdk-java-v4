@@ -146,7 +146,7 @@ public interface ChatApi {
                                           @Body DocumentEditParams documentEditParams);
 
     @GET("files")
-    Single<DocumentDataPage> documentList(@QueryMap DocumentListParams params);
+    Single<DocumentDataPage> documentList(@QueryMap QueryDocumentRequest params);
 
     @DELETE("document/{document_id}")
     Call<ResponseBody> deleteDocument(@Path("document_id") String documentId);

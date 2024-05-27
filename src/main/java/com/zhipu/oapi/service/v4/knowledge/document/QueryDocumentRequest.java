@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class DocumentListParams {
+public class QueryDocumentRequest {
 
     @JsonProperty("purpose")
     private String purpose; // 文件用途

@@ -1,6 +1,7 @@
 package com.zhipu.oapi.service.v4.knowledge.document;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.zhipu.oapi.service.v4.model.ChatError;
 import lombok.Data;
 
 import java.util.List;
@@ -35,4 +36,5 @@ public class DocumentData {
     @JsonProperty("failInfo")
     private DocumentDataFailInfo failInfo; // 失败原因 向量化失败embedding_stat=2的时候 会有此值
 
+    private ChatError error;
 }
