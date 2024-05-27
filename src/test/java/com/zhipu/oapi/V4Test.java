@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
-    private static final String API_SECRET_KEY = "";
+    private static final String API_SECRET_KEY = System.getProperty("API_SECRET_KEY", "");
     private static final boolean devMode = false;
 
 
