@@ -15,7 +15,7 @@ Java），让开发者更便捷的调用智谱开放API
         <dependency>
             <groupId>cn.bigmodel.openapi</groupId>
             <artifactId>oapi-java-sdk</artifactId>
-            <version>release-V4-2.0.3</version>
+            <version>release-V4-2.1.0</version>
         </dependency>
 ```
 ### 依赖信息
@@ -59,7 +59,7 @@ private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
 ## 升级内容
 
 
-#### release-V4-2.0.3
+#### release-V4-2.1.0
 - 增加拓展报文序列化工具类
 - 增加测试样例
 - 修改为使用api key鉴权
