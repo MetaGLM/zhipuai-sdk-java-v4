@@ -24,8 +24,7 @@ Java），让开发者更便捷的调用智谱开放API
 okhttp_3.14.9
 java-jwt_4.2.2
 jackson_2.11.3
-retrofit2_2.9.0
-mbknor-jackson-jsonschema_1.0.39
+retrofit2_2.9.0 
 ```
 ## 使用
 - 调用流程：
