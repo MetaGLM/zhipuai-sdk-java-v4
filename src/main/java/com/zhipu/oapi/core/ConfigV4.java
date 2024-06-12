@@ -9,8 +9,6 @@ import okhttp3.OkHttpClient;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.zhipu.oapi.Constants.BASE_URL;
-import static com.zhipu.oapi.Constants.TEST_BASE_URL;
 
 public class ConfigV4 {
     @Getter
@@ -84,11 +82,6 @@ public class ConfigV4 {
     @Setter
     @Getter
     private TimeUnit timeOutTimeUnit;
-
-    // 开发能力
-    @Setter
-    @Getter
-    private boolean devMode;
 
     public ConfigV4() {
     }

@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.zhipu.oapi.Constants.BASE_URL;
-import static com.zhipu.oapi.Constants.TEST_BASE_URL;
 
 
 public class ClientV4 {
@@ -861,16 +860,6 @@ public class ClientV4 {
         }
 
 
-        /**
-         * 设置是否开发模式
-         * @param devMode 是否开发模式
-         * @return Builder
-         */
-        public Builder devMode(boolean devMode) {
-            config.setDevMode(devMode);
-            return this;
-        }
-
 
         private void initCache(ConfigV4 config) {
             if (config.getCache() != null) {
@@ -903,11 +892,7 @@ public class ClientV4 {
             String baseUrl = null;
             if(StringUtils.isEmpty(config.getBaseUrl())){
 
-                if (config.isDevMode()){
-                    baseUrl = TEST_BASE_URL;
-                }else {
-                    baseUrl = BASE_URL;
-                }
+                baseUrl = BASE_URL;
             }else{
                 baseUrl = config.getBaseUrl();
             }
