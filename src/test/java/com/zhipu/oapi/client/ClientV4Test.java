@@ -45,7 +45,6 @@ public class ClientV4Test {
     @Test
     public void testClientV4ApiSecretKey() {
         ClientV4 client = new ClientV4.Builder("a.b")
-                .devMode(false)
                 .enableTokenCache()
                 .networkConfig(30, 10, 10, 10, TimeUnit.SECONDS)
                 .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
@@ -53,7 +52,6 @@ public class ClientV4Test {
 
         ConfigV4 config = client.getConfig();
         assertEquals("a.b", config.getApiSecretKey());
-        assert !config.isDevMode();
         assert !config.isDisableTokenCache();
         assertThat("networkConfig.requestTimeOut is not equal to 30",
                 config.getRequestTimeOut() == 30);

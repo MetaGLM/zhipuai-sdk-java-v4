@@ -7,7 +7,6 @@ import java.time.Duration;
 public class Constants {
 
     public static final String BASE_URL = "https://open.bigmodel.cn/api/paas/v4/";
-    public static final String TEST_BASE_URL = "https://test.bigmodel.cn/stage-api/paas/v4/";
 
     private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(300);
 

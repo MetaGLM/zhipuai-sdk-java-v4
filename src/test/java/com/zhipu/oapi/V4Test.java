@@ -40,11 +40,9 @@ public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
     private static final String API_SECRET_KEY = System.getProperty("ZHIPUAI_API_KEY");
-    private static final boolean devMode = false;
 
 
     private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
-            .devMode(devMode)
             .enableTokenCache()
             .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
             .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
