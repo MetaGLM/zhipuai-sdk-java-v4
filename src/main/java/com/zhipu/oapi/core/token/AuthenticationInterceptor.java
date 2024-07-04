@@ -11,7 +11,8 @@ import java.util.Objects;
 /**
  * OkHttp Interceptor that adds an authorization token header
  */
-public class AuthenticationInterceptor implements Interceptor {
+public class
+AuthenticationInterceptor implements Interceptor {
 
     private final ConfigV4 config;
 
