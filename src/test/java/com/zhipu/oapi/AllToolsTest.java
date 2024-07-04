@@ -12,9 +12,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.model.*;
 import io.reactivex.Flowable;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+
+@Testcontainers
 public class AllToolsTest {
 
     private final static Logger logger = LoggerFactory.getLogger(AllToolsTest.class);
@@ -27,7 +31,10 @@ public class AllToolsTest {
     private static final ObjectMapper mapper = MessageDeserializeFactory.defaultObjectMapper();
     // 请自定义自己的业务id
     private static final String requestIdTemplate = "mycompany-%d";
-    public static void main(String[] args) throws JsonProcessingException {
+
+
+    @Test
+    public void test1() throws JsonProcessingException {
 
 
         List<ChatMessage> messages = new ArrayList<>();
