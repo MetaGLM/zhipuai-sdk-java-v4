@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class AllToolsTest {
 
     private final static Logger logger = LoggerFactory.getLogger(AllToolsTest.class);
-    private static final String API_SECRET_KEY = "ad08946be7341503f164c441f2a247c3.wRDvUO0r3SqRTbrS";
+    private static final String API_SECRET_KEY = System.getProperty("ZHIPUAI_API_KEY");
 
     private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
             .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
