@@ -41,7 +41,7 @@ retrofit2_2.9.0
 - connectionPool：设置连接池
 
 ``` 
-String API_SECRET_KEY = "your api"
+String API_SECRET_KEY = "your api";
 private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY) 
         .enableTokenCache()
         .networkConfig(30, 10, 10, 10, TimeUnit.SECONDS)
