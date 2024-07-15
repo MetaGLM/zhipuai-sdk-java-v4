@@ -1,7 +1,6 @@
 package com.zhipu.oapi.core;
 
 import com.zhipu.oapi.core.cache.ICache;
-import com.zhipu.oapi.service.v4.api.ChatApiService;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.ConnectionPool;

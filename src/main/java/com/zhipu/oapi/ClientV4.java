@@ -1,7 +1,6 @@
 package com.zhipu.oapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zhipu.oapi.core.ConfigV4;
 import com.zhipu.oapi.core.cache.ICache;
 import com.zhipu.oapi.core.cache.LocalCache;
@@ -12,7 +11,7 @@ import com.zhipu.oapi.core.token.TokenManagerV4;
 import com.zhipu.oapi.service.v4.batchs.*;
 import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.model.*;
-import com.zhipu.oapi.service.v4.api.ChatApiService;
+import com.zhipu.oapi.service.v4.api.ClientApiService;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
@@ -47,7 +46,7 @@ public class ClientV4 {
     private ConfigV4 config;
     @Setter
     @Getter
-    private ChatApiService chatApiService;
+    private ClientApiService chatApiService;
 
 
     public ModelApiResponse invokeModelApi(ChatCompletionRequest request) {
@@ -899,7 +898,7 @@ public class ClientV4 {
             }else{
                 baseUrl = config.getBaseUrl();
             }
-            client.setChatApiService(new ChatApiService(config.getHttpClient(),baseUrl));
+            client.setChatApiService(new ClientApiService(config.getHttpClient(),baseUrl));
             return client;
         }
     }
