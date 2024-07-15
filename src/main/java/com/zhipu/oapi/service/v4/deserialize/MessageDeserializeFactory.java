@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.zhipu.oapi.service.v4.model.*;
+import com.zhipu.oapi.service.v4.model.params.CodeGeexContext;
+import com.zhipu.oapi.service.v4.model.params.CodeGeexExtra;
+import com.zhipu.oapi.service.v4.model.params.CodeGeexTarget;
 
 public class MessageDeserializeFactory {
 
@@ -20,6 +23,9 @@ public class MessageDeserializeFactory {
         module.addDeserializer(Delta.class, new DeltaDeserializer());
         module.addDeserializer(ToolCalls.class, new ToolCallsDeserializer());
         module.addDeserializer(ChatFunctionCall.class, new ChatFunctionCallDeserializer());
+        module.addDeserializer(CodeGeexContext.class, new CodeGeexContextDeserializer());
+        module.addDeserializer(CodeGeexExtra.class, new CodeGeexExtraDeserializer());
+        module.addDeserializer(CodeGeexTarget.class, new CodeGeexTargetDeserializer());
         mapper.registerModule(module);
 
         return mapper;

@@ -41,7 +41,6 @@ public class ClientV4 {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientV4.class);
 
-    private static final ObjectMapper mapper = ChatApiService.defaultObjectMapper();
 
     @Setter
     @Getter
@@ -83,6 +82,7 @@ public class ClientV4 {
         paramsMap.put("max_tokens", request.getMaxTokens());
         paramsMap.put("stop", request.getStop());
         paramsMap.put("meta", request.getMeta());
+        paramsMap.put("extra", request.getExtra());
 
         if(request.getExtraJson() !=null){
             paramsMap.putAll(request.getExtraJson());
@@ -129,6 +129,7 @@ public class ClientV4 {
         paramsMap.put("max_tokens", request.getMaxTokens());
         paramsMap.put("stop", request.getStop());
         paramsMap.put("meta", request.getMeta());
+        paramsMap.put("extra", request.getExtra());
         if(request.getExtraJson() !=null){
             paramsMap.putAll(request.getExtraJson());
         }
@@ -173,6 +174,8 @@ public class ClientV4 {
         paramsMap.put("do_sample", request.getDoSample());
         paramsMap.put("max_tokens", request.getMaxTokens());
         paramsMap.put("stop", request.getStop());
+        paramsMap.put("meta", request.getMeta());
+        paramsMap.put("extra", request.getExtra());
         if(request.getExtraJson() !=null){
             paramsMap.putAll(request.getExtraJson());
         }

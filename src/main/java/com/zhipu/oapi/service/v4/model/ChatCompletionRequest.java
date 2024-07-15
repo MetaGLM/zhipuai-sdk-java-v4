@@ -1,6 +1,7 @@
 package com.zhipu.oapi.service.v4.model;
 
 import com.zhipu.oapi.service.v4.CommonRequest;
+import com.zhipu.oapi.service.v4.model.params.CodeGeexExtra;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -87,6 +88,10 @@ public class ChatCompletionRequest extends CommonRequest {
      * 会话元数据
      */
     private ChatMeta meta;
+    /**
+     * 会话元数据
+     */
+    private CodeGeexExtra extra;
 
 
     /**
