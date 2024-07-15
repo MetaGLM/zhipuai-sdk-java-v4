@@ -59,7 +59,7 @@ public class CodeGeexTest {
 
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
                 .model("codegeex-4")
-                .stream(Boolean.FALSE)
+                .stream(Boolean.TRUE)
                 .invokeMethod(Constants.invokeMethod)
                 .messages(messages)
                 .stop(stop)
