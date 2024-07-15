@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
+import com.zhipu.oapi.service.v4.deserialize.tools.WebSearchProDeserializer;
 import com.zhipu.oapi.service.v4.model.ModelData;
 import com.zhipu.oapi.service.v4.model.ZhiPuAiError;
 import com.zhipu.oapi.service.v4.model.ZhiPuAiHttpException;
+import com.zhipu.oapi.service.v4.tools.WebSearchPro;
 import com.zhipu.oapi.utils.StringUtils;
 import io.reactivex.Single;
 import okhttp3.OkHttpClient;
@@ -28,7 +31,7 @@ public class ClientBaseService {
 
     protected final static Logger logger = LoggerFactory.getLogger(ClientBaseService.class);
 
-    protected static final ObjectMapper mapper = defaultObjectMapper();
+    protected static final ObjectMapper mapper = MessageDeserializeFactory.defaultObjectMapper();
 
     protected final Retrofit retrofit;
 
@@ -65,20 +68,6 @@ public class ClientBaseService {
         }
     }
 
-
-    private static ObjectMapper defaultObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
-
-        SimpleModule module = new SimpleModule();
-
-        module.addDeserializer(ModelData.class, new ModelDataDeserializer());
-        mapper.registerModule(module);
-
-        return mapper;
-    }
 
 
     private static Retrofit defaultRetrofit(final String baseUrl,

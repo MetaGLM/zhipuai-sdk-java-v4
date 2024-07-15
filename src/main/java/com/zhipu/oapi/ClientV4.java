@@ -19,8 +19,12 @@ import com.zhipu.oapi.service.v4.file.*;
 import com.zhipu.oapi.service.v4.image.CreateImageRequest;
 import com.zhipu.oapi.service.v4.image.ImageApiResponse;
 import com.zhipu.oapi.service.v4.image.ImageResult;
+import com.zhipu.oapi.service.v4.tools.WebSearchApiResponse;
+import com.zhipu.oapi.service.v4.tools.WebSearchParamsRequest;
+import com.zhipu.oapi.service.v4.tools.WebSearchPro;
 import com.zhipu.oapi.utils.OkHttps;
 import com.zhipu.oapi.utils.StringUtils;
+import io.reactivex.Flowable;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.ConnectionPool;
@@ -781,6 +785,88 @@ public class ClientV4 {
 
         return batchResponse;
     }
+
+
+
+
+    public WebSearchApiResponse webSearchProStreamingInvoke(WebSearchParamsRequest request) {
+        Map<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("request_id", request.getRequestId());
+        paramsMap.put("user_id", request.getUserId());
+        paramsMap.put("messages", request.getMessages());
+        paramsMap.put("model", request.getModel());
+        paramsMap.put("stream", true);
+        paramsMap.put("scope", request.getScope());
+        paramsMap.put("location", request.getLocation());
+        paramsMap.put("recent_days", request.getRecentDays());
+
+        if(request.getExtraJson() !=null){
+            paramsMap.putAll(request.getExtraJson());
+        }
+
+        WebSearchApiResponse resp = new WebSearchApiResponse();
+        try {
+            Flowable<WebSearchPro> webSearchProFlowable = chatApiService.webSearchProStreaming(paramsMap);
+            resp.setCode(200);
+            resp.setMsg("成功");
+            resp.setSuccess(true);
+            if(resp.isSuccess()){
+                resp.setFlowable(webSearchProFlowable);
+            }
+            return resp;
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            resp.setCode(e.statusCode);
+            resp.setMsg("业务出错");
+            resp.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            WebSearchPro webSearchPro = new WebSearchPro();
+            webSearchPro.setError(chatError);
+            resp.setData(webSearchPro);
+        }
+        return resp;
+    }
+
+    public WebSearchApiResponse invokeWebSearchPro(WebSearchParamsRequest request) {
+        Map<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("request_id", request.getRequestId());
+        paramsMap.put("user_id", request.getUserId());
+        paramsMap.put("messages", request.getMessages());
+        paramsMap.put("model", request.getModel());
+        paramsMap.put("stream", false);
+        paramsMap.put("scope", request.getScope());
+        paramsMap.put("location", request.getLocation());
+        paramsMap.put("recent_days", request.getRecentDays());
+        if(request.getExtraJson() !=null){
+            paramsMap.putAll(request.getExtraJson());
+        }
+
+        WebSearchApiResponse resp = new WebSearchApiResponse();
+        try {
+            WebSearchPro webSearchPro = chatApiService.webSearchPro(paramsMap);
+            if (webSearchPro != null) {
+                resp.setCode(200);
+                resp.setMsg("调用成功");
+                resp.setData(webSearchPro);
+            }
+            return resp;
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            resp.setCode(e.statusCode);
+            resp.setMsg("业务出错");
+            resp.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            WebSearchPro webSearchPro = new WebSearchPro();
+            webSearchPro.setError(chatError);
+            resp.setData(webSearchPro);
+        }
+        return resp;
+    }
+
 
     public static final class Builder {
         private final ConfigV4 config = new ConfigV4();

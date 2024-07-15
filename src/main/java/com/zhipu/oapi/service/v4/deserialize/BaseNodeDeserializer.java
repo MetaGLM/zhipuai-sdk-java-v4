@@ -15,57 +15,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
-/*
-/**********************************************************
-/* Specific instances for more accurate types
-/**********************************************************
- */
-
-final class ObjectDeserializer
-        extends BaseNodeDeserializer<ObjectNode> {
-    private static final long serialVersionUID = 1L;
-
-    private final static ObjectDeserializer _instance = new ObjectDeserializer();
-
-    private ObjectDeserializer() {
-        super(ObjectNode.class, true);
-    }
-
-    public static ObjectDeserializer getInstance() {
-        return _instance;
-    }
-
-    @Override
-    public ObjectNode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        if (p.isExpectedStartObjectToken()) {
-            return deserializeObject(p, ctxt, ctxt.getNodeFactory());
-        }
-        if (p.hasToken(JsonToken.FIELD_NAME)) {
-            return deserializeObjectAtName(p, ctxt, ctxt.getNodeFactory());
-        }
-        // 23-Sep-2015, tatu: Ugh. We may also be given END_OBJECT (similar to FIELD_NAME),
-        //    if caller has advanced to the first token of Object, but for empty Object
-        if (p.hasToken(JsonToken.END_OBJECT)) {
-            return ctxt.getNodeFactory().objectNode();
-        }
-        return (ObjectNode) ctxt.handleUnexpectedToken(ObjectNode.class, p);
-    }
-
-    /**
-     * Variant needed to support both root-level `updateValue()` and merging.
-     *
-     * @since 2.9
-     */
-    @Override
-    public ObjectNode deserialize(JsonParser p, DeserializationContext ctxt,
-                                  ObjectNode node) throws IOException {
-        if (p.isExpectedStartObjectToken() || p.hasToken(JsonToken.FIELD_NAME)) {
-            return (ObjectNode) updateObject(p, ctxt, (ObjectNode) node);
-        }
-        return (ObjectNode) ctxt.handleUnexpectedToken(ObjectNode.class, p);
-    }
-}
-
 /**
  * Base class for all actual {@link JsonNode} deserializer
  * implementations

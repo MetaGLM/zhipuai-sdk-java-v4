@@ -9,6 +9,7 @@ import com.zhipu.oapi.service.v4.api.embedding.EmbeddingApi;
 import com.zhipu.oapi.service.v4.api.file.FileApi;
 import com.zhipu.oapi.service.v4.api.fine_tuning.FineTuningApi;
 import com.zhipu.oapi.service.v4.api.images.ImagesApi;
+import com.zhipu.oapi.service.v4.api.tools.ToolsApi;
 import com.zhipu.oapi.service.v4.batchs.Batch;
 import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
 import com.zhipu.oapi.service.v4.batchs.BatchPage;
@@ -20,6 +21,7 @@ import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.file.QueryFileResult;
 import com.zhipu.oapi.service.v4.file.QueryFilesRequest;
 import com.zhipu.oapi.service.v4.image.ImageResult;
+import com.zhipu.oapi.service.v4.tools.WebSearchPro;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import okhttp3.*;
@@ -39,6 +41,7 @@ public class ClientApiService extends ClientBaseService {
     private final FileApi fileApi;
     private final FineTuningApi fineTuningApi;
     private final ImagesApi imagesApi;
+    private final ToolsApi toolsApi;
 
     public ClientApiService(final OkHttpClient client, final String baseUrl) {
         super(client, baseUrl);
@@ -48,6 +51,7 @@ public class ClientApiService extends ClientBaseService {
         this.fileApi = super.retrofit.create(FileApi.class);
         this.fineTuningApi = super.retrofit.create(FineTuningApi.class);
         this.imagesApi = super.retrofit.create(ImagesApi.class);
+        this.toolsApi = super.retrofit.create(ToolsApi.class);
     }
 
 
@@ -202,6 +206,17 @@ public class ClientApiService extends ClientBaseService {
     }
 
 
+
+    public Flowable<WebSearchPro> webSearchProStreaming(Map<String,Object> request) {
+        return stream(toolsApi.webSearchStreaming(request), WebSearchPro.class);
+    }
+
+
+    public WebSearchPro webSearchPro(Map<String,Object> request) {
+        return execute(toolsApi.webSearch(request));
+    }
+
+
     private HttpxBinaryResponseContent fileWrapper(retrofit2.Call<ResponseBody> response) throws IOException {
         Response<ResponseBody> execute = response.execute();
         if (!execute.isSuccessful() || execute.body() == null) {
@@ -209,7 +224,7 @@ public class ClientApiService extends ClientBaseService {
         }
         return new HttpxBinaryResponseContent(execute);
     }
-    private Flowable<ModelData> stream(retrofit2.Call<ResponseBody> apiCall, Class<ModelData> cl) {
+    private <T> Flowable<T> stream(retrofit2.Call<ResponseBody> apiCall, Class<T> cl) {
         return  stream(apiCall).map(sse -> mapper.readValue(sse.getData(), cl));
     }
 

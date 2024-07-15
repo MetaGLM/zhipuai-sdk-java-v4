@@ -2,6 +2,7 @@ package com.zhipu.oapi.service.v4.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zhipu.oapi.service.v4.api.ClientApiService;
+import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import io.reactivex.FlowableEmitter;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
