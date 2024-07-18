@@ -1,17 +1,21 @@
 package com.zhipu.oapi.service.v4.fine_turning;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.zhipu.oapi.core.model.ClientRequest;
 import lombok.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
- * Request to create a fine tuning job
+ * ClientRequest to create a fine tuning job
  */
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class FineTuningJobRequest {
+public class FineTuningJobRequest implements ClientRequest<FineTuningJobRequest> {
 
     /**
      * The ID of an uploaded file that contains training data.
@@ -48,6 +52,12 @@ public class FineTuningJobRequest {
      * 客户请求id
      */
     private String requestId;
+
+    @Override
+    public FineTuningJobRequest getOptions() {
+
+        return this;
+    }
 
 
 }

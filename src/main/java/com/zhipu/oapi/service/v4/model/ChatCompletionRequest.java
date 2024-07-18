@@ -1,10 +1,13 @@
 package com.zhipu.oapi.service.v4.model;
 
+import com.zhipu.oapi.core.model.ClientRequest;
 import com.zhipu.oapi.service.v4.CommonRequest;
 import com.zhipu.oapi.service.v4.model.params.CodeGeexExtra;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +17,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ChatCompletionRequest extends CommonRequest {
+public class ChatCompletionRequest extends CommonRequest  implements ClientRequest<Map<String, Object>> {
 
     /**
      * 所要调用的模型编码
@@ -105,5 +108,27 @@ public class ChatCompletionRequest extends CommonRequest {
     private String invokeMethod;
 
 
-
+    @Override
+    public Map<String, Object> getOptions() {
+        Map<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("request_id", this.getRequestId());
+        paramsMap.put("user_id", this.getUserId());
+        paramsMap.put("messages", this.getMessages());
+        paramsMap.put("model", this.getModel());
+        paramsMap.put("stream", this.getStream());
+        paramsMap.put("tools", this.getTools());
+        paramsMap.put("tool_choice", this.getToolChoice());
+        paramsMap.put("temperature", this.getTemperature());
+        paramsMap.put("top_p", this.getTopP());
+        paramsMap.put("sensitive_word_check", this.getSensitiveWordCheck());
+        paramsMap.put("do_sample", this.getDoSample());
+        paramsMap.put("max_tokens", this.getMaxTokens());
+        paramsMap.put("stop", this.getStop());
+        paramsMap.put("meta", this.getMeta());
+        paramsMap.put("extra", this.getExtra());
+        if(this.getExtraJson() !=null){
+            paramsMap.putAll(this.getExtraJson());
+        }
+        return paramsMap;
+    }
 }

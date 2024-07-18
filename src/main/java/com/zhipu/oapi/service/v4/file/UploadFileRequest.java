@@ -1,5 +1,6 @@
 package com.zhipu.oapi.service.v4.file;
 
+import com.zhipu.oapi.core.model.ClientRequest;
 import com.zhipu.oapi.service.v4.CommonRequest;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -13,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class UploadFileRequest extends CommonRequest {
+public class UploadFileRequest extends CommonRequest implements ClientRequest<UploadFileRequest> {
     /**
      * The purpose of the file
      */
@@ -23,4 +24,8 @@ public class UploadFileRequest extends CommonRequest {
      */
     private String filePath;
 
+    @Override
+    public UploadFileRequest getOptions() {
+        return this;
+    }
 }

@@ -13,20 +13,19 @@ import com.zhipu.oapi.service.v4.api.tools.ToolsApi;
 import com.zhipu.oapi.service.v4.batchs.Batch;
 import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
 import com.zhipu.oapi.service.v4.batchs.BatchPage;
-import com.zhipu.oapi.service.v4.file.FileDeleted;
-import com.zhipu.oapi.service.v4.file.UploadFileRequest;
+import com.zhipu.oapi.service.v4.file.*;
 import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
-import com.zhipu.oapi.service.v4.file.QueryFileResult;
-import com.zhipu.oapi.service.v4.file.QueryFilesRequest;
 import com.zhipu.oapi.service.v4.image.ImageResult;
 import com.zhipu.oapi.service.v4.tools.WebSearchPro;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
@@ -55,100 +54,77 @@ public class ClientApiService extends ClientBaseService {
     }
 
 
-    /**
-     * sse调用只会返回输出结果
-     * @param request
-     * @return RawResponse
-     */
-    public RawResponse sseExecute(Map<String, Object> request){
-
-        RawResponse resp = new RawResponse();
-        Flowable<ModelData> flowable;
-        try {
-            flowable  = this.streamChatCompletion(request);
-        } catch (Exception e) {
-            logger.error("streamChatCompletion error:{}" , e.getMessage());
-            resp.setStatusCode(500);
-            resp.setSuccess(false);
-            return resp;
-        }
-        resp.setSuccess(true);
-        resp.setStatusCode(200);
-        resp.setFlowable(flowable);
-        return resp;
-    }
-
-    public Flowable<ModelData> streamChatCompletion(Map<String,Object> request) {
-        return stream(chatApi.createChatCompletionStream(request), ModelData.class);
+    public Call<ResponseBody> streamChatCompletion(Map<String,Object> request) {
+        return chatApi.createChatCompletionStream(request);
     }
 
 
 
-    public ModelData createChatCompletionAsync(Map<String,Object> request) {
-        return execute(chatApi.createChatCompletionAsync(request));
+    public Single<ModelData> createChatCompletionAsync(Map<String,Object> request) {
+        return chatApi.createChatCompletionAsync(request);
     }
 
 
-    public ModelData createChatCompletion(Map<String,Object> request) {
-        return execute(chatApi.createChatCompletion(request));
+    public Single<ModelData> createChatCompletion(Map<String,Object> request) {
+        return chatApi.createChatCompletion(request);
     }
 
-    public ModelData queryAsyncResult(String id) {
-        return execute(chatApi.queryAsyncResult(id));
+    public Single<ModelData> queryAsyncResult(String id) {
+        return chatApi.queryAsyncResult(id);
     }
 
 
-    public EmbeddingResult createEmbeddings( Map<String, Object> request) {
-        return execute(embeddingApi.createEmbeddings(request));
+    public Single<EmbeddingResult> createEmbeddings( Map<String, Object> request) {
+        return embeddingApi.createEmbeddings(request);
     }
 
-    public QueryFileResult queryFileList(QueryFilesRequest queryFilesRequest) {
-        return execute(fileApi.queryFileList(queryFilesRequest.getAfter(),queryFilesRequest.getPurpose(),queryFilesRequest.getOrder(),queryFilesRequest.getLimit()));
+    public Single<QueryFileResult> queryFileList(QueryFilesRequest queryFilesRequest) {
+        return fileApi.queryFileList(queryFilesRequest.getAfter(),queryFilesRequest.getPurpose(),queryFilesRequest.getOrder(),queryFilesRequest.getLimit());
     }
 
     public HttpxBinaryResponseContent fileContent(String fileId) throws IOException {
         return fileWrapper(fileApi.fileContent(fileId));
     }
 
-    public com.zhipu.oapi.service.v4.file.File retrieveFile(String fileId) {
-        return execute(fileApi.retrieveFile(fileId));
+    public  Single<com.zhipu.oapi.service.v4.file.File> retrieveFile(String fileId) {
+        return fileApi.retrieveFile(fileId);
     }
 
-    public FileDeleted deletedFile(String fileId) {
-        return execute(fileApi.deletedFile(fileId));
-    }
-
-
-    public FineTuningEvent listFineTuningJobEvents(String fineTuningJobId,Integer limit,String after) {
-        return execute(fineTuningApi.listFineTuningJobEvents(fineTuningJobId,limit,after));
-    }
-
-    public FineTuningJob retrieveFineTuningJob(String fineTuningJobId,Integer limit,String after) {
-        return execute(fineTuningApi.retrieveFineTuningJob(fineTuningJobId,limit,after));
+    public  Single<FileDeleted> deletedFile(String fileId) {
+        return fileApi.deletedFile(fileId);
     }
 
 
-    public PersonalFineTuningJob queryPersonalFineTuningJobs(Integer limit,String after) {
-        return execute(fineTuningApi.queryPersonalFineTuningJobs(limit,after));
+    public  Single<FineTuningEvent> listFineTuningJobEvents(String fineTuningJobId,Integer limit,String after) {
+        return fineTuningApi.listFineTuningJobEvents(fineTuningJobId,limit,after);
     }
 
-    public FineTuningJob cancelFineTuningJob(String fineTuningJobId) {
-        return execute(fineTuningApi.cancelFineTuningJob(fineTuningJobId));
+    public Single<FineTuningJob> retrieveFineTuningJob(String fineTuningJobId,Integer limit,String after) {
+        return fineTuningApi.retrieveFineTuningJob(fineTuningJobId,limit,after);
     }
 
-    public FineTuningJob deleteFineTuningJob(String fineTuningJobId) {
-        return execute(fineTuningApi.deleteFineTuningJob(fineTuningJobId));
+
+    public Single<PersonalFineTuningJob> queryPersonalFineTuningJobs(Integer limit,String after) {
+        return fineTuningApi.queryPersonalFineTuningJobs(limit,after);
     }
 
-    public FineTunedModelsStatus deleteFineTuningModel(String fineTunedModel) {
-        return execute(fineTuningApi.deleteFineTuningModel(fineTunedModel));
+    public Single<FineTuningJob> cancelFineTuningJob(String fineTuningJobId) {
+        return fineTuningApi.cancelFineTuningJob(fineTuningJobId);
     }
 
-    public FineTuningJob createFineTuningJob(FineTuningJobRequest request) {
-        return execute(fineTuningApi.createFineTuningJob(request));
+    public Single<FineTuningJob> deleteFineTuningJob(String fineTuningJobId) {
+        return fineTuningApi.deleteFineTuningJob(fineTuningJobId);
     }
 
-    public com.zhipu.oapi.service.v4.file.File uploadFile(UploadFileRequest request) throws JsonProcessingException {
+    public Single<FineTunedModelsStatus> deleteFineTuningModel(String fineTunedModel) {
+        return fineTuningApi.deleteFineTuningModel(fineTunedModel);
+    }
+
+    public Single<FineTuningJob>  createFineTuningJob(FineTuningJobRequest request) {
+        return fineTuningApi.createFineTuningJob(request);
+    }
+
+    public Single<com.zhipu.oapi.service.v4.file.File> uploadFile(UploadFileRequest request) throws JsonProcessingException {
         java.io.File file = new java.io.File(request.getFilePath());
         if(!file.exists()){
             throw new RuntimeException("file not found");
@@ -181,39 +157,39 @@ public class ClientApiService extends ClientBaseService {
             }
         }
         MultipartBody multipartBody = formBodyBuilder.build();
-        return execute(fileApi.uploadFile(multipartBody));
+        return fileApi.uploadFile(multipartBody);
     }
 
-    public ImageResult createImage(Map<String,Object> request) {
-        return execute(imagesApi.createImage(request));
-    }
-
-
-    public Batch batchesCreate(BatchCreateParams batchCreateParams) {
-        return execute(batchesApi.batchesCreate(batchCreateParams));
-    }
-
-    public Batch batchesRetrieve(String batchId) {
-        return execute(batchesApi.batchesRetrieve(batchId));
-    }
-
-    public BatchPage batchesList(Integer limit, String after) {
-        return execute(batchesApi.batchesList(after,limit));
-    }
-
-    public Batch batchesCancel(String batchId) {
-        return execute(batchesApi.batchesCancel(batchId));
+    public Single<ImageResult> createImage(Map<String,Object> request) {
+        return imagesApi.createImage(request);
     }
 
 
+    public Single<Batch> batchesCreate(BatchCreateParams batchCreateParams) {
+        return batchesApi.batchesCreate(batchCreateParams);
+    }
 
-    public Flowable<WebSearchPro> webSearchProStreaming(Map<String,Object> request) {
-        return stream(toolsApi.webSearchStreaming(request), WebSearchPro.class);
+    public Single<Batch> batchesRetrieve(String batchId) {
+        return batchesApi.batchesRetrieve(batchId);
+    }
+
+    public Single<BatchPage> batchesList(Integer limit, String after) {
+        return batchesApi.batchesList(after,limit);
+    }
+
+    public Single<Batch> batchesCancel(String batchId) {
+        return batchesApi.batchesCancel(batchId);
     }
 
 
-    public WebSearchPro webSearchPro(Map<String,Object> request) {
-        return execute(toolsApi.webSearch(request));
+
+    public Call<ResponseBody> webSearchProStreaming(Map<String,Object> request) {
+        return toolsApi.webSearchStreaming(request);
+    }
+
+
+    public Single<WebSearchPro> webSearchPro(Map<String,Object> request) {
+        return toolsApi.webSearch(request);
     }
 
 
@@ -223,19 +199,6 @@ public class ClientApiService extends ClientBaseService {
             throw new IOException("Failed to get the file content");
         }
         return new HttpxBinaryResponseContent(execute);
-    }
-    private <T> Flowable<T> stream(retrofit2.Call<ResponseBody> apiCall, Class<T> cl) {
-        return  stream(apiCall).map(sse -> mapper.readValue(sse.getData(), cl));
-    }
-
-
-    public static Flowable<SSE> stream(retrofit2.Call<ResponseBody> apiCall) {
-        return stream(apiCall, false);
-    }
-
-
-    public static Flowable<SSE> stream(retrofit2.Call<ResponseBody> apiCall, boolean emitDone) {
-        return Flowable.create(emitter -> apiCall.enqueue(new ResponseBodyCallback(emitter, emitDone)), BackpressureStrategy.BUFFER);
     }
 
 

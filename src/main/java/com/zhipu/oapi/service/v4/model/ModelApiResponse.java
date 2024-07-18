@@ -1,8 +1,12 @@
 package com.zhipu.oapi.service.v4.model;
 
+import com.zhipu.oapi.core.model.ClientResponse;
+import com.zhipu.oapi.core.model.FlowableClientResponse;
 import io.reactivex.Flowable;
+import lombok.Data;
 
-public class ModelApiResponse {
+@Data
+public class ModelApiResponse  implements FlowableClientResponse<ModelData> {
     private int code;
     private String msg;
     private boolean success;
@@ -10,6 +14,8 @@ public class ModelApiResponse {
     private ModelData data;
 
     private Flowable<ModelData> flowable;
+
+    private ChatError error;
 
     public ModelApiResponse() {
     }
@@ -19,49 +25,4 @@ public class ModelApiResponse {
         this.msg = msg;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-        if (this.code == 200) {
-            setSuccess(true);
-        } else {
-            setSuccess(false);
-        }
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public ModelData getData() {
-        return data;
-    }
-
-    public void setData(ModelData data) {
-        this.data = data;
-    }
-
-
-    public Flowable<ModelData> getFlowable() {
-        return flowable;
-    }
-
-    public void setFlowable(Flowable<ModelData> flowable) {
-        this.flowable = flowable;
-    }
 }

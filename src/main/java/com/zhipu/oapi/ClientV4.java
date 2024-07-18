@@ -1,14 +1,20 @@
 package com.zhipu.oapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zhipu.oapi.core.ConfigV4;
 import com.zhipu.oapi.core.cache.ICache;
 import com.zhipu.oapi.core.cache.LocalCache;
+import com.zhipu.oapi.core.model.ClientRequest;
+import com.zhipu.oapi.core.model.ClientResponse;
+import com.zhipu.oapi.core.model.FlowableClientResponse;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.core.response.RawResponse;
 import com.zhipu.oapi.core.token.GlobalTokenManager;
 import com.zhipu.oapi.core.token.TokenManagerV4;
+import com.zhipu.oapi.service.v4.api.ClientBaseService;
 import com.zhipu.oapi.service.v4.batchs.*;
+import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.api.ClientApiService;
@@ -22,25 +28,92 @@ import com.zhipu.oapi.service.v4.image.ImageResult;
 import com.zhipu.oapi.service.v4.tools.WebSearchApiResponse;
 import com.zhipu.oapi.service.v4.tools.WebSearchParamsRequest;
 import com.zhipu.oapi.service.v4.tools.WebSearchPro;
+import com.zhipu.oapi.utils.FlowableRequestSupplier;
 import com.zhipu.oapi.utils.OkHttps;
+import com.zhipu.oapi.utils.RequestSupplier;
 import com.zhipu.oapi.utils.StringUtils;
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit2.Call;
+import retrofit2.adapter.rxjava2.HttpException;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collector;
 
 import static com.zhipu.oapi.Constants.BASE_URL;
 
+// 抽象类
+abstract class AbstractClientBaseService {
 
-public class ClientV4 {
+    protected final static Logger logger = LoggerFactory.getLogger(AbstractClientBaseService.class);
+
+    protected static final ObjectMapper mapper = MessageDeserializeFactory.defaultObjectMapper();
+
+    // 抽象方法，接受 TReq 和 RequestSupplier，返回 TResp
+    public abstract  <Data, Param, TReq extends ClientRequest<Param>, TResp extends ClientResponse<Data>>
+                        TResp executeRequest(TReq request,
+                                         RequestSupplier<Param, Data> requestSupplier,
+                                         Class<TResp> tRespClass);
+
+    // 抽象方法，接受 TReq 和 RequestSupplier，返回 TResp
+    public abstract  <Data, Param, TReq extends ClientRequest<Param>, TResp extends FlowableClientResponse<Data>>
+                        TResp streamRequest(TReq request,
+                                            FlowableRequestSupplier<Param, retrofit2.Call<ResponseBody>> requestSupplier,
+                                            Class<TResp> tRespClass,
+                                            Class<Data> tDataClass);
+
+    public static <T> T execute(Single<T> apiCall) {
+        try {
+            return apiCall.blockingGet();
+        } catch (HttpException e) {
+            logger.error("HTTP exception: {}", e.getMessage());
+            try {
+                if (e.response() == null || e.response().errorBody() == null) {
+                    throw e;
+                }
+                String errorBody = e.response().errorBody().string();
+
+                ZhiPuAiError error = mapper.readValue(errorBody, ZhiPuAiError.class);
+
+                throw new ZhiPuAiHttpException(error, e, e.code());
+            } catch (IOException ex) {
+                // couldn't parse ZhiPuAiError error
+                throw e;
+            }
+        }
+    }
+
+    public  <T> Flowable<T> stream(retrofit2.Call<ResponseBody> apiCall, Class<T> cl) {
+        return  stream(apiCall).map(sse -> mapper.readValue(sse.getData(), cl));
+    }
+
+
+    public static Flowable<SSE> stream(retrofit2.Call<ResponseBody> apiCall) {
+        return stream(apiCall, false);
+    }
+
+
+    public static Flowable<SSE> stream(retrofit2.Call<ResponseBody> apiCall, boolean emitDone) {
+        return Flowable.create(emitter -> apiCall.enqueue(new ResponseBodyCallback(emitter, emitDone)), BackpressureStrategy.BUFFER);
+    }
+
+}
+
+public class ClientV4 extends AbstractClientBaseService{
 
     private static final Logger logger = LoggerFactory.getLogger(ClientV4.class);
 
@@ -67,208 +140,57 @@ public class ClientV4 {
         }
         return null;
     }
-
+//
 
     private ModelApiResponse sseInvoke(ChatCompletionRequest request) {
-        Map<String, Object> paramsMap = new HashMap<>();
-        paramsMap.put("request_id", request.getRequestId());
-        paramsMap.put("user_id", request.getUserId());
-        paramsMap.put("messages", request.getMessages());
-        paramsMap.put("model", request.getModel());
-        paramsMap.put("stream", true);
-        paramsMap.put("tools", request.getTools());
-        paramsMap.put("tool_choice", request.getToolChoice());
-        paramsMap.put("temperature", request.getTemperature());
-        paramsMap.put("top_p", request.getTopP());
-        paramsMap.put("sensitive_word_check", request.getSensitiveWordCheck());
-        paramsMap.put("do_sample", request.getDoSample());
-        paramsMap.put("max_tokens", request.getMaxTokens());
-        paramsMap.put("stop", request.getStop());
-        paramsMap.put("meta", request.getMeta());
-        paramsMap.put("extra", request.getExtra());
 
-        if(request.getExtraJson() !=null){
-            paramsMap.putAll(request.getExtraJson());
-        }
-
-        ModelApiResponse resp = new ModelApiResponse();
-        try {
-            RawResponse rawResp = chatApiService.sseExecute(paramsMap);
-            resp.setCode(rawResp.getStatusCode());
-            resp.setMsg(rawResp.getMsg());
-            resp.setSuccess(rawResp.isSuccess());
-            if(resp.isSuccess()){
-                resp.setFlowable(rawResp.getFlowable());
-            }
-            return resp;
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            resp.setCode(e.statusCode);
-            resp.setMsg("业务出错");
-            resp.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            ModelData modelData = new ModelData();
-            modelData.setError(chatError);
-            resp.setData(modelData);
-        }
-        return resp;
+        FlowableRequestSupplier<Map<String,Object>, retrofit2.Call<ResponseBody>> supplier = params ->  chatApiService.streamChatCompletion(params);
+        return streamRequest(
+                request,
+                supplier,
+                ModelApiResponse.class,
+                ModelData.class
+        );
     }
 
     private ModelApiResponse invoke(ChatCompletionRequest request) {
-        Map<String, Object> paramsMap = new HashMap<>();
-        paramsMap.put("request_id", request.getRequestId());
-        paramsMap.put("user_id", request.getUserId());
-        paramsMap.put("messages", request.getMessages());
-        paramsMap.put("model", request.getModel());
-        paramsMap.put("stream", false);
-        paramsMap.put("tools", request.getTools());
-        paramsMap.put("tool_choice", request.getToolChoice());
-        paramsMap.put("temperature", request.getTemperature());
-        paramsMap.put("top_p", request.getTopP());
-        paramsMap.put("sensitive_word_check", request.getSensitiveWordCheck());
-        paramsMap.put("do_sample", request.getDoSample());
-        paramsMap.put("max_tokens", request.getMaxTokens());
-        paramsMap.put("stop", request.getStop());
-        paramsMap.put("meta", request.getMeta());
-        paramsMap.put("extra", request.getExtra());
-        if(request.getExtraJson() !=null){
-            paramsMap.putAll(request.getExtraJson());
-        }
 
-        ModelApiResponse resp = new ModelApiResponse();
-        try {
-            ModelData modelData = chatApiService.createChatCompletion(paramsMap);
-            if (modelData != null) {
-                resp.setCode(200);
-                resp.setMsg("调用成功");
-                resp.setData(modelData);
-            }
-            return resp;
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            resp.setCode(e.statusCode);
-            resp.setMsg("业务出错");
-            resp.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            ModelData modelData = new ModelData();
-            modelData.setError(chatError);
-            resp.setData(modelData);
-        }
-        return resp;
+        RequestSupplier< Map<String, Object>, ModelData> supplier = (params) -> chatApiService.createChatCompletion(
+                params
+        );
+        // 处理响应
+        return this.executeRequest(request, supplier, ModelApiResponse.class);
     }
 
 
     private ModelApiResponse asyncInvoke(ChatCompletionRequest request) {
-        Map<String, Object> paramsMap = new HashMap<>();
-        paramsMap.put("request_id", request.getRequestId());
-        paramsMap.put("user_id", request.getUserId());
-        paramsMap.put("messages", request.getMessages());
-        paramsMap.put("model", request.getModel());
-        paramsMap.put("stream", false);
-        paramsMap.put("tools", request.getTools());
-        paramsMap.put("tool_choice", request.getToolChoice());
-        paramsMap.put("temperature", request.getTemperature());
-        paramsMap.put("top_p", request.getTopP());
-        paramsMap.put("sensitive_word_check", request.getSensitiveWordCheck());
-        paramsMap.put("do_sample", request.getDoSample());
-        paramsMap.put("max_tokens", request.getMaxTokens());
-        paramsMap.put("stop", request.getStop());
-        paramsMap.put("meta", request.getMeta());
-        paramsMap.put("extra", request.getExtra());
-        if(request.getExtraJson() !=null){
-            paramsMap.putAll(request.getExtraJson());
-        }
 
-        ModelApiResponse resp = new ModelApiResponse();
-        try {
-            ModelData modelData = chatApiService.createChatCompletionAsync(paramsMap);
-            if (modelData != null) {
-                resp.setCode(200);
-                resp.setMsg("调用成功");
-                resp.setData(modelData);
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            resp.setCode(e.statusCode);
-            resp.setMsg("业务出错");
-            resp.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            ModelData modelData = new ModelData();
-            modelData.setError(chatError);
-            resp.setData(modelData);
-        }
-        return resp;
+
+        RequestSupplier< Map<String, Object>, ModelData> supplier = (params) -> chatApiService.createChatCompletionAsync(
+                params
+        );
+        // 处理响应
+        return this.executeRequest(request, supplier, ModelApiResponse.class);
 
     }
 
     public QueryModelResultResponse queryModelResult(QueryModelResultRequest request) {
-        QueryModelResultResponse resp = new QueryModelResultResponse();
 
-        try {
-            ModelData modelData = chatApiService.queryAsyncResult(request.getTaskId());
-            if (modelData != null) {
-                resp.setCode(200);
-                resp.setMsg("调用成功");
-                resp.setSuccess(true);
-                modelData.setCreated(null);
-                modelData.setModel(modelData.getModel());
-                modelData.setRequestId(modelData.getRequestId());
-                modelData.setTaskStatus(modelData.getTaskStatus());
-                resp.setData(modelData);
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            resp.setCode(e.statusCode);
-            resp.setMsg("业务出错");
-            resp.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            ModelData modelData = new ModelData();
-            modelData.setError(chatError);
-            resp.setData(modelData);
-        }
-        return resp;
+
+        RequestSupplier<String, ModelData> supplier = (params) -> chatApiService.queryAsyncResult(
+                params
+        );
+        // 处理响应
+        return this.executeRequest(request, supplier, QueryModelResultResponse.class);
     }
 
     public ImageApiResponse createImage(CreateImageRequest createImageRequest) {
-        ImageApiResponse imageApiResponse = new ImageApiResponse();
 
-        Map<String, Object> request = new HashMap<>();
-        request.put("request_id", createImageRequest.getRequestId());
-        request.put("user_id", createImageRequest.getUserId());
-        request.put("prompt", createImageRequest.getPrompt());
-        request.put("model", createImageRequest.getModel());
-        try {
-            if(createImageRequest.getExtraJson() !=null){
-                request.replaceAll((s, v) -> createImageRequest.getExtraJson().get(s));
-            }
-            ImageResult image = chatApiService.createImage(request);
-            if (image != null) {
-                imageApiResponse.setMsg("调用成功");
-                imageApiResponse.setCode(200);
-                imageApiResponse.setSuccess(true);
-                imageApiResponse.setData(image);
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            imageApiResponse.setCode(e.statusCode);
-            imageApiResponse.setMsg("业务出错");
-            imageApiResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            ImageResult imageResult = new ImageResult();
-            imageResult.setError(chatError);
-            imageApiResponse.setData(imageResult);
-        }
-        return imageApiResponse;
+        RequestSupplier<Map<String, Object>, ImageResult> supplier = (params) -> chatApiService.createImage(
+                params
+        );
+        // 处理响应
+        return this.executeRequest(createImageRequest, supplier, ImageApiResponse.class);
     }
 
     private String validateParams(ChatCompletionRequest request) {
@@ -294,178 +216,106 @@ public class ClientV4 {
     }
 
     public EmbeddingApiResponse invokeEmbeddingsApi(EmbeddingRequest request) {
-        EmbeddingApiResponse embeddingApiResponse = new EmbeddingApiResponse();
 
-        try {
-            Map<String, Object> paramsMap = new HashMap<>();
-            paramsMap.put("request_id", request.getRequestId());
-            paramsMap.put("user_id", request.getUserId());
-            paramsMap.put("input", request.getInput());
-            paramsMap.put("model", request.getModel());
-            if(request.getExtraJson() !=null){
-                paramsMap.putAll(request.getExtraJson());
-            }
-            EmbeddingResult embeddingResult = chatApiService.createEmbeddings(paramsMap);
-            if (embeddingResult != null) {
-                embeddingApiResponse.setCode(200);
-                embeddingApiResponse.setMsg("调用成功");
-                embeddingApiResponse.setSuccess(true);
-                embeddingApiResponse.setData(embeddingResult);
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            embeddingApiResponse.setCode(e.statusCode);
-            embeddingApiResponse.setMsg("业务出错");
-            embeddingApiResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            EmbeddingResult embeddingResult = new EmbeddingResult();
-            embeddingResult.setError(chatError);
-            embeddingApiResponse.setData(embeddingResult);
-        }
-        return embeddingApiResponse;
+        RequestSupplier<Map<String, Object>, EmbeddingResult> supplier = (params) -> chatApiService.createEmbeddings(
+                params
+        );
+        // 处理响应
+        return this.executeRequest(request, supplier, EmbeddingApiResponse.class);
     }
 
     public FileApiResponse invokeUploadFileApi(UploadFileRequest request) {
-        FileApiResponse fileApiResponse = new FileApiResponse();
-
-        try {
-            File file = chatApiService.uploadFile(request);
-            if (file != null) {
-                fileApiResponse.setCode(200);
-                fileApiResponse.setSuccess(true);
-                fileApiResponse.setMsg("调用成功");
-                fileApiResponse.setData(file);
+        RequestSupplier<UploadFileRequest, File> supplier = (params) -> {
+            try {
+                return chatApiService.uploadFile(
+                        params
+                );
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
             }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            fileApiResponse.setCode(e.statusCode);
-            fileApiResponse.setMsg("业务出错");
-            fileApiResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            File file = new File();
-            file.setError(chatError);
-            fileApiResponse.setData(file);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        return fileApiResponse;
+        };
+        // 处理响应
+        return this.executeRequest(request, supplier, FileApiResponse.class);
+
     }
 
     public QueryFileApiResponse queryFilesApi(QueryFilesRequest queryFilesRequest) {
-        QueryFileApiResponse queryFileApiResponse = new QueryFileApiResponse();
 
-        try {
-            QueryFileResult queryFileResult = chatApiService.queryFileList(queryFilesRequest);
-            if (queryFileResult != null) {
-                queryFileApiResponse.setCode(200);
-                queryFileApiResponse.setSuccess(true);
-                queryFileApiResponse.setMsg("调用成功");
-                queryFileApiResponse.setData(queryFileResult);
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            queryFileApiResponse.setCode(e.statusCode);
-            queryFileApiResponse.setMsg("业务出错");
-            queryFileApiResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            QueryFileResult queryFileResult = new QueryFileResult();
-            queryFileResult.setError(chatError);
-            queryFileApiResponse.setData(queryFileResult);
-        }
-        return queryFileApiResponse;
+
+        RequestSupplier<QueryFilesRequest, QueryFileResult> supplier = (params) -> chatApiService.queryFileList(
+                params
+        );
+        // 处理响应
+        return this.executeRequest(queryFilesRequest, supplier, QueryFileApiResponse.class);
     }
 
 
     public HttpxBinaryResponseContent fileContent(String fileId) throws IOException {
         return chatApiService.fileContent(fileId);
     }
-
 //
-//    public  FileApiResponse retrieveFile(String fileId) throws IOException {
+////
+////    public  FileApiResponse retrieveFile(String fileId) throws IOException {
+////
+////        FileApiResponse fileApiResponse = new FileApiResponse();
+////
+////        try {
+////            File file = chatApiService.retrieveFile(fileId);
+////            if (file != null) {
+////                fileApiResponse.setCode(200);
+////                fileApiResponse.setSuccess(true);
+////                fileApiResponse.setMsg("调用成功");
+////                fileApiResponse.setData(file);
+////            }
+////        } catch (ZhiPuAiHttpException e) {
+////            logger.error("业务出错", e);
+////            fileApiResponse.setCode(e.statusCode);
+////            fileApiResponse.setMsg("业务出错");
+////            fileApiResponse.setSuccess(false);
+////            ChatError chatError = new ChatError();
+////            chatError.setCode(Integer.parseInt(e.code));
+////            chatError.setMessage(e.getMessage());
+////            File file = new File();
+////            file.setError(chatError);
+////            fileApiResponse.setData(file);
+////        }
+////        return fileApiResponse;
+////    }
 //
-//        FileApiResponse fileApiResponse = new FileApiResponse();
+////    public  FileDelResponse deletedFile(String fileId) throws IOException {
+////        FileDelResponse fileDelResponse = new FileDelResponse();
+////
+////        try {
+////            FileDeleted deleted = chatApiService.deletedFile(fileId);
+////            if (deleted != null) {
+////                fileDelResponse.setCode(200);
+////                fileDelResponse.setSuccess(true);
+////                fileDelResponse.setMsg("调用成功");
+////                fileDelResponse.setData(deleted);
+////            }
+////        } catch (ZhiPuAiHttpException e) {
+////            logger.error("业务出错", e);
+////            fileDelResponse.setCode(e.statusCode);
+////            fileDelResponse.setMsg("业务出错");
+////            fileDelResponse.setSuccess(false);
+////            ChatError chatError = new ChatError();
+////            chatError.setCode(Integer.parseInt(e.code));
+////            chatError.setMessage(e.getMessage());
+////            FileDeleted file = new FileDeleted();
+////            file.setError(chatError);
+////            fileDelResponse.setData(file);
+////        }
+////        return fileDelResponse;
+////    }
 //
-//        try {
-//            File file = chatApiService.retrieveFile(fileId);
-//            if (file != null) {
-//                fileApiResponse.setCode(200);
-//                fileApiResponse.setSuccess(true);
-//                fileApiResponse.setMsg("调用成功");
-//                fileApiResponse.setData(file);
-//            }
-//        } catch (ZhiPuAiHttpException e) {
-//            logger.error("业务出错", e);
-//            fileApiResponse.setCode(e.statusCode);
-//            fileApiResponse.setMsg("业务出错");
-//            fileApiResponse.setSuccess(false);
-//            ChatError chatError = new ChatError();
-//            chatError.setCode(Integer.parseInt(e.code));
-//            chatError.setMessage(e.getMessage());
-//            File file = new File();
-//            file.setError(chatError);
-//            fileApiResponse.setData(file);
-//        }
-//        return fileApiResponse;
-//    }
-
-//    public  FileDelResponse deletedFile(String fileId) throws IOException {
-//        FileDelResponse fileDelResponse = new FileDelResponse();
-//
-//        try {
-//            FileDeleted deleted = chatApiService.deletedFile(fileId);
-//            if (deleted != null) {
-//                fileDelResponse.setCode(200);
-//                fileDelResponse.setSuccess(true);
-//                fileDelResponse.setMsg("调用成功");
-//                fileDelResponse.setData(deleted);
-//            }
-//        } catch (ZhiPuAiHttpException e) {
-//            logger.error("业务出错", e);
-//            fileDelResponse.setCode(e.statusCode);
-//            fileDelResponse.setMsg("业务出错");
-//            fileDelResponse.setSuccess(false);
-//            ChatError chatError = new ChatError();
-//            chatError.setCode(Integer.parseInt(e.code));
-//            chatError.setMessage(e.getMessage());
-//            FileDeleted file = new FileDeleted();
-//            file.setError(chatError);
-//            fileDelResponse.setData(file);
-//        }
-//        return fileDelResponse;
-//    }
-
 
     public CreateFineTuningJobApiResponse createFineTuningJob(FineTuningJobRequest request) {
-        CreateFineTuningJobApiResponse createFineTuningJobApiResponse = new CreateFineTuningJobApiResponse();
 
-        FineTuningJob fineTuningJob = null;
-        try {
-            fineTuningJob = chatApiService.createFineTuningJob(request);
-            if (fineTuningJob != null) {
-                createFineTuningJobApiResponse.setMsg("调用成功");
-                createFineTuningJobApiResponse.setData(fineTuningJob);
-                createFineTuningJobApiResponse.setSuccess(true);
-                createFineTuningJobApiResponse.setCode(200);
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            createFineTuningJobApiResponse.setCode(e.statusCode);
-            createFineTuningJobApiResponse.setMsg("业务出错");
-            createFineTuningJobApiResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            fineTuningJob = new FineTuningJob();
-            fineTuningJob.setError(chatError);
-            createFineTuningJobApiResponse.setData(fineTuningJob);
-        }
-        return createFineTuningJobApiResponse;
+        RequestSupplier<FineTuningJobRequest, FineTuningJob> supplier = (params) -> chatApiService.createFineTuningJob(
+                params
+        );
+        // 处理响应
+        return this.executeRequest(request, supplier, CreateFineTuningJobApiResponse.class);
     }
 
     /**
@@ -474,29 +324,14 @@ public class ClientV4 {
      * @return QueryFineTuningEventApiResponse
      */
     public QueryFineTuningEventApiResponse queryFineTuningJobsEvents(QueryFineTuningJobRequest queryFineTuningJobRequest) {
-        QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = new QueryFineTuningEventApiResponse();
 
-        try {
-            FineTuningEvent fineTuningEvent = chatApiService.listFineTuningJobEvents(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
-            if (fineTuningEvent != null) {
-                queryFineTuningEventApiResponse.setSuccess(true);
-                queryFineTuningEventApiResponse.setData(fineTuningEvent);
-                queryFineTuningEventApiResponse.setCode(200);
-                queryFineTuningEventApiResponse.setMsg("调用成功");
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            queryFineTuningEventApiResponse.setCode(e.statusCode);
-            queryFineTuningEventApiResponse.setMsg("业务出错");
-            queryFineTuningEventApiResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            FineTuningEvent fineTuningEvent = new FineTuningEvent();
-            fineTuningEvent.setError(chatError);
-            queryFineTuningEventApiResponse.setData(fineTuningEvent);
-        }
-        return queryFineTuningEventApiResponse;
+        RequestSupplier<Map<String,Object>, FineTuningEvent> supplier = (params) -> chatApiService.listFineTuningJobEvents(
+                (String) params.get("job_id"),
+                (Integer) params.get("limit"),
+                (String) params.get("after")
+        );
+        // 处理响应
+        return this.executeRequest(queryFineTuningJobRequest, supplier, QueryFineTuningEventApiResponse.class);
     }
 
     /**
@@ -505,30 +340,14 @@ public class ClientV4 {
      * @return QueryFineTuningJobApiResponse
      */
     public QueryFineTuningJobApiResponse retrieveFineTuningJobs(QueryFineTuningJobRequest queryFineTuningJobRequest) {
-        QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = new QueryFineTuningJobApiResponse();
 
-        try {
-            FineTuningJob fineTuningJob = chatApiService.retrieveFineTuningJob(queryFineTuningJobRequest.getJobId(),queryFineTuningJobRequest.getLimit(),queryFineTuningJobRequest.getAfter());
-            if (fineTuningJob != null) {
-                queryFineTuningJobApiResponse.setSuccess(true);
-                queryFineTuningJobApiResponse.setData(fineTuningJob);
-                queryFineTuningJobApiResponse.setCode(200);
-                queryFineTuningJobApiResponse.setMsg("调用成功");
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            queryFineTuningJobApiResponse.setCode(e.statusCode);
-            queryFineTuningJobApiResponse.setMsg("业务出错");
-            queryFineTuningJobApiResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            FineTuningJob fineTuningJob = new FineTuningJob();
-            fineTuningJob.setError(chatError);
-            queryFineTuningJobApiResponse.setData(fineTuningJob);
-        }
-
-        return queryFineTuningJobApiResponse;
+        RequestSupplier<Map<String,Object>, FineTuningJob> supplier = (params) -> chatApiService.retrieveFineTuningJob(
+                (String) params.get("job_id"),
+                (Integer) params.get("limit"),
+                (String) params.get("after")
+        );
+        // 处理响应
+        return this.executeRequest(queryFineTuningJobRequest, supplier, QueryFineTuningJobApiResponse.class);
     }
 
     /**
@@ -537,29 +356,12 @@ public class ClientV4 {
      * @return QueryPersonalFineTuningJobApiResponse
      */
     public QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobs(QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest) {
-        QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = new QueryPersonalFineTuningJobApiResponse();
-
-        try {
-            PersonalFineTuningJob personalFineTuningJob = chatApiService.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest.getLimit(), queryPersonalFineTuningJobRequest.getAfter());
-            if (personalFineTuningJob != null) {
-                queryPersonalFineTuningJobApiResponse.setSuccess(true);
-                queryPersonalFineTuningJobApiResponse.setData(personalFineTuningJob);
-                queryPersonalFineTuningJobApiResponse.setMsg("调用成功");
-                queryPersonalFineTuningJobApiResponse.setCode(200);
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            queryPersonalFineTuningJobApiResponse.setCode(e.statusCode);
-            queryPersonalFineTuningJobApiResponse.setMsg("业务出错");
-            queryPersonalFineTuningJobApiResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            PersonalFineTuningJob personalFineTuningJob = new PersonalFineTuningJob();
-            personalFineTuningJob.setError(chatError);
-            queryPersonalFineTuningJobApiResponse.setData(personalFineTuningJob);
-        }
-        return queryPersonalFineTuningJobApiResponse;
+        RequestSupplier<Map<String,Object>, PersonalFineTuningJob> supplier = (params) -> chatApiService.queryPersonalFineTuningJobs(
+                (Integer) params.get("limit"),
+                (String) params.get("after")
+        );
+        // 处理响应
+        return this.executeRequest(queryPersonalFineTuningJobRequest, supplier, QueryPersonalFineTuningJobApiResponse.class);
     }
 
 
@@ -569,30 +371,10 @@ public class ClientV4 {
      * @return QueryFineTuningJobApiResponse
      */
     public QueryFineTuningJobApiResponse cancelFineTuningJob(FineTuningJobIdRequest fineTuningJobIdRequest) {
-        QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = new QueryFineTuningJobApiResponse();
 
-        try {
-            FineTuningJob fineTuningJob = chatApiService.cancelFineTuningJob(fineTuningJobIdRequest.getJobId());
-            if (fineTuningJob != null) {
-                queryFineTuningJobApiResponse.setSuccess(true);
-                queryFineTuningJobApiResponse.setData(fineTuningJob);
-                queryFineTuningJobApiResponse.setCode(200);
-                queryFineTuningJobApiResponse.setMsg("调用成功");
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            queryFineTuningJobApiResponse.setCode(e.statusCode);
-            queryFineTuningJobApiResponse.setMsg("业务出错");
-            queryFineTuningJobApiResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            FineTuningJob fineTuningJob = new FineTuningJob();
-            fineTuningJob.setError(chatError);
-            queryFineTuningJobApiResponse.setData(fineTuningJob);
-        }
-
-        return queryFineTuningJobApiResponse;
+        RequestSupplier<Map<String,Object>, FineTuningJob> supplier = (params) -> chatApiService.cancelFineTuningJob((String) params.get("job_id"));
+        // 处理响应
+        return this.executeRequest(fineTuningJobIdRequest, supplier, QueryFineTuningJobApiResponse.class);
     }
 
 
@@ -602,30 +384,11 @@ public class ClientV4 {
      * @return QueryFineTuningJobApiResponse
      */
     public QueryFineTuningJobApiResponse deleteFineTuningJob(FineTuningJobIdRequest fineTuningJobIdRequest) {
-        QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = new QueryFineTuningJobApiResponse();
 
-        try {
-            FineTuningJob fineTuningJob = chatApiService.deleteFineTuningJob(fineTuningJobIdRequest.getJobId());
-            if (fineTuningJob != null) {
-                queryFineTuningJobApiResponse.setSuccess(true);
-                queryFineTuningJobApiResponse.setData(fineTuningJob);
-                queryFineTuningJobApiResponse.setCode(200);
-                queryFineTuningJobApiResponse.setMsg("调用成功");
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            queryFineTuningJobApiResponse.setCode(e.statusCode);
-            queryFineTuningJobApiResponse.setMsg("业务出错");
-            queryFineTuningJobApiResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            FineTuningJob fineTuningJob = new FineTuningJob();
-            fineTuningJob.setError(chatError);
-            queryFineTuningJobApiResponse.setData(fineTuningJob);
-        }
 
-        return queryFineTuningJobApiResponse;
+        RequestSupplier<Map<String,Object>, FineTuningJob> supplier = (params) -> chatApiService.deleteFineTuningJob((String) params.get("job_id"));
+        // 处理响应
+        return this.executeRequest(fineTuningJobIdRequest, supplier, QueryFineTuningJobApiResponse.class);
     }
 
 
@@ -635,27 +398,9 @@ public class ClientV4 {
      * @return FineTunedModelsStatusResponse
      */
     public FineTunedModelsStatusResponse deleteFineTuningModel(FineTuningJobModelRequest fineTuningJobModelRequest) {
-        FineTunedModelsStatusResponse fineTunedModelsStatusResponse = new FineTunedModelsStatusResponse();
-
-        try {
-            FineTunedModelsStatus fineTunedModelsStatus = chatApiService.deleteFineTuningModel(fineTuningJobModelRequest.getFineTunedModel());
-            if (fineTunedModelsStatus != null) {
-                fineTunedModelsStatusResponse.setSuccess(true);
-                fineTunedModelsStatusResponse.setData(fineTunedModelsStatus);
-                fineTunedModelsStatusResponse.setCode(200);
-                fineTunedModelsStatusResponse.setMsg("调用成功");
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            fineTunedModelsStatusResponse.setCode(e.statusCode);
-            fineTunedModelsStatusResponse.setMsg("业务出错");
-            fineTunedModelsStatusResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-        }
-
-        return fineTunedModelsStatusResponse;
+        RequestSupplier<Map<String,Object>, FineTunedModelsStatus> supplier = (params) -> chatApiService.deleteFineTuningModel((String) params.get("fine_tuned_model"));
+        // 处理响应
+        return this.executeRequest(fineTuningJobModelRequest, supplier, FineTunedModelsStatusResponse.class);
     }
 
     /**
@@ -664,30 +409,10 @@ public class ClientV4 {
      * @return BatchResponse
      */
     public BatchResponse batchesCreate(BatchCreateParams batchCreateParams) {
-        BatchResponse batchResponse = new BatchResponse();
 
-        try {
-            Batch batch = chatApiService.batchesCreate(batchCreateParams);
-            if (batch != null) {
-                batchResponse.setSuccess(true);
-                batchResponse.setData(batch);
-                batchResponse.setCode(200);
-                batchResponse.setMsg("调用成功");
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            batchResponse.setCode(e.statusCode);
-            batchResponse.setMsg("业务出错");
-            batchResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            Batch batch = new Batch();
-            batch.setError(chatError);
-            batchResponse.setData(batch);
-        }
-
-        return batchResponse;
+        RequestSupplier<BatchCreateParams, Batch> supplier = (params) -> chatApiService.batchesCreate(params);
+        // 处理响应
+        return this.executeRequest(batchCreateParams, supplier, BatchResponse.class);
     }
     /**
      * 检索批量请求
@@ -695,30 +420,11 @@ public class ClientV4 {
      * @return BatchResponse
      */
     public BatchResponse batchesRetrieve(String batchId) {
-        BatchResponse batchResponse = new BatchResponse();
 
-        try {
-            Batch batch = chatApiService.batchesRetrieve(batchId);
-            if (batch != null) {
-                batchResponse.setSuccess(true);
-                batchResponse.setData(batch);
-                batchResponse.setCode(200);
-                batchResponse.setMsg("调用成功");
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            batchResponse.setCode(e.statusCode);
-            batchResponse.setMsg("业务出错");
-            batchResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            Batch batch = new Batch();
-            batch.setError(chatError);
-            batchResponse.setData(batch);
-        }
-
-        return batchResponse;
+        BatchRequest request = BatchRequest.builder().batchId(batchId).build();
+        RequestSupplier<Map<String,Object>, Batch> supplier = (params) -> chatApiService.batchesRetrieve((String) params.get("batchId"));
+        // 处理响应
+        return this.executeRequest(request, supplier, BatchResponse.class);
     }
 
     /**
@@ -727,30 +433,13 @@ public class ClientV4 {
      * @return QueryBatchResponse
      */
     public QueryBatchResponse batchesList(QueryBatchRequest queryBatchRequest) {
-        QueryBatchResponse batchResponse = new QueryBatchResponse();
 
-        try {
-            BatchPage batchPage = chatApiService.batchesList(queryBatchRequest.getLimit(), queryBatchRequest.getAfter());
-            if (batchPage != null) {
-                batchResponse.setSuccess(true);
-                batchResponse.setData(batchPage);
-                batchResponse.setCode(200);
-                batchResponse.setMsg("调用成功");
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            batchResponse.setCode(e.statusCode);
-            batchResponse.setMsg("业务出错");
-            batchResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            BatchPage batch = new BatchPage();
-            batch.setError(chatError);
-            batchResponse.setData(batch);
-        }
-
-        return batchResponse;
+        RequestSupplier<Map<String,Object>, BatchPage> supplier = (params) -> chatApiService.batchesList(
+                (Integer) params.get("limit"),
+                (String) params.get("after")
+        );;
+        // 处理响应
+        return this.executeRequest(queryBatchRequest, supplier, QueryBatchResponse.class);
     }
 
 
@@ -760,114 +449,104 @@ public class ClientV4 {
      * @return BatchResponse
      */
     public BatchResponse batchesCancel(String batchId) {
-        BatchResponse batchResponse = new BatchResponse();
-
-        try {
-            Batch batch = chatApiService.batchesCancel(batchId);
-            if (batch != null) {
-                batchResponse.setSuccess(true);
-                batchResponse.setData(batch);
-                batchResponse.setCode(200);
-                batchResponse.setMsg("调用成功");
-            }
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            batchResponse.setCode(e.statusCode);
-            batchResponse.setMsg("业务出错");
-            batchResponse.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            Batch batch = new Batch();
-            batch.setError(chatError);
-            batchResponse.setData(batch);
-        }
-
-        return batchResponse;
+        BatchRequest request = BatchRequest.builder().batchId(batchId).build();
+        RequestSupplier<Map<String,Object>, Batch> supplier = (params) -> chatApiService.batchesCancel((String) params.get("batchId"));
+        // 处理响应
+        return this.executeRequest(request, supplier, BatchResponse.class);
     }
 
 
 
 
     public WebSearchApiResponse webSearchProStreamingInvoke(WebSearchParamsRequest request) {
-        Map<String, Object> paramsMap = new HashMap<>();
-        paramsMap.put("request_id", request.getRequestId());
-        paramsMap.put("user_id", request.getUserId());
-        paramsMap.put("messages", request.getMessages());
-        paramsMap.put("model", request.getModel());
-        paramsMap.put("stream", true);
-        paramsMap.put("scope", request.getScope());
-        paramsMap.put("location", request.getLocation());
-        paramsMap.put("recent_days", request.getRecentDays());
-
-        if(request.getExtraJson() !=null){
-            paramsMap.putAll(request.getExtraJson());
-        }
-
-        WebSearchApiResponse resp = new WebSearchApiResponse();
-        try {
-            Flowable<WebSearchPro> webSearchProFlowable = chatApiService.webSearchProStreaming(paramsMap);
-            resp.setCode(200);
-            resp.setMsg("成功");
-            resp.setSuccess(true);
-            if(resp.isSuccess()){
-                resp.setFlowable(webSearchProFlowable);
-            }
-            return resp;
-        } catch (ZhiPuAiHttpException e) {
-            logger.error("业务出错", e);
-            resp.setCode(e.statusCode);
-            resp.setMsg("业务出错");
-            resp.setSuccess(false);
-            ChatError chatError = new ChatError();
-            chatError.setCode(Integer.parseInt(e.code));
-            chatError.setMessage(e.getMessage());
-            WebSearchPro webSearchPro = new WebSearchPro();
-            webSearchPro.setError(chatError);
-            resp.setData(webSearchPro);
-        }
-        return resp;
+        FlowableRequestSupplier<Map<String,Object>, retrofit2.Call<ResponseBody>> supplier = params ->  chatApiService.webSearchProStreaming(params);
+        return streamRequest(
+                request,
+                supplier,
+                WebSearchApiResponse.class,
+                WebSearchPro.class
+        );
     }
 
     public WebSearchApiResponse invokeWebSearchPro(WebSearchParamsRequest request) {
-        Map<String, Object> paramsMap = new HashMap<>();
-        paramsMap.put("request_id", request.getRequestId());
-        paramsMap.put("user_id", request.getUserId());
-        paramsMap.put("messages", request.getMessages());
-        paramsMap.put("model", request.getModel());
-        paramsMap.put("stream", false);
-        paramsMap.put("scope", request.getScope());
-        paramsMap.put("location", request.getLocation());
-        paramsMap.put("recent_days", request.getRecentDays());
-        if(request.getExtraJson() !=null){
-            paramsMap.putAll(request.getExtraJson());
-        }
+        RequestSupplier<Map<String,Object>, WebSearchPro> supplier = (params) -> chatApiService.webSearchPro(params);
 
-        WebSearchApiResponse resp = new WebSearchApiResponse();
+        // 处理响应
+        return this.executeRequest(request, supplier, WebSearchApiResponse.class);
+    }
+
+    @Override
+    public  <Data, Param, TReq extends ClientRequest<Param>, TResp extends ClientResponse<Data>>
+    TResp executeRequest(TReq request,
+                         RequestSupplier<Param,Data> requestSupplier,
+                         Class<TResp> tRespClass){
+        Single<Data> apiCall = requestSupplier.get(request.getOptions());
+
+
+        TResp tResp =  convertToClientResponse(tRespClass);
         try {
-            WebSearchPro webSearchPro = chatApiService.webSearchPro(paramsMap);
-            if (webSearchPro != null) {
-                resp.setCode(200);
-                resp.setMsg("调用成功");
-                resp.setData(webSearchPro);
-            }
-            return resp;
+
+
+            // 使用 execute 方法执行 API 调用
+            Data response = execute(apiCall);
+
+            tResp.setCode(200);
+            tResp.setMsg("调用成功");
+            tResp.setData(response);
         } catch (ZhiPuAiHttpException e) {
             logger.error("业务出错", e);
-            resp.setCode(e.statusCode);
-            resp.setMsg("业务出错");
-            resp.setSuccess(false);
+            tResp.setCode(e.statusCode);
+            tResp.setMsg("业务出错");
+            tResp.setSuccess(false);
             ChatError chatError = new ChatError();
             chatError.setCode(Integer.parseInt(e.code));
             chatError.setMessage(e.getMessage());
-            WebSearchPro webSearchPro = new WebSearchPro();
-            webSearchPro.setError(chatError);
-            resp.setData(webSearchPro);
+            tResp.setError(chatError);
         }
-        return resp;
+        return tResp;
     }
 
 
+    @Override
+    public  <Data, Param, TReq extends ClientRequest<Param>, TResp extends FlowableClientResponse<Data>>
+    TResp streamRequest(TReq request,
+                        FlowableRequestSupplier<Param,retrofit2.Call<ResponseBody>> requestSupplier,
+                        Class<TResp> tRespClass,
+                        Class<Data> tDataClass){
+        retrofit2.Call<ResponseBody> apiCall = requestSupplier.get(request.getOptions());
+
+        TResp tResp =  convertToClientResponse(tRespClass);
+        try {
+            // 使用 stream 方法执行 API 调用
+            Flowable<Data> stream = stream(apiCall, tDataClass);
+            tResp.setCode(200);
+            tResp.setMsg("调用成功");
+            tResp.setCode(200);
+            tResp.setMsg("成功");
+            tResp.setSuccess(true);
+            tResp.setFlowable(stream);
+
+        } catch (ZhiPuAiHttpException e) {
+            logger.error("业务出错", e);
+            tResp.setCode(e.statusCode);
+            tResp.setMsg("业务出错");
+            tResp.setSuccess(false);
+            ChatError chatError = new ChatError();
+            chatError.setCode(Integer.parseInt(e.code));
+            chatError.setMessage(e.getMessage());
+            tResp.setError(chatError);
+        }
+        return tResp;
+    }
+    // 转换方法
+    private <Data, TResp extends ClientResponse<Data>> TResp convertToClientResponse(Class<TResp> tRespClass) {
+        try {
+            // 根据实际情况填充 clientResponse 对象的字段
+            return tRespClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            throw new RuntimeException("Failed to create response object", e);
+        }
+    }
     public static final class Builder {
         private final ConfigV4 config = new ConfigV4();
 

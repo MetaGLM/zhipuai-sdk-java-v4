@@ -1,11 +1,14 @@
 package com.zhipu.oapi.service.v4.tools;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.zhipu.oapi.core.model.ClientRequest;
 import com.zhipu.oapi.service.v4.CommonRequest;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @EqualsAndHashCode(callSuper = true)
@@ -13,10 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class WebSearchParamsRequest extends CommonRequest {
+public class WebSearchParamsRequest extends CommonRequest implements ClientRequest<Map<String,Object>> {
     /**
      * 工具名：web-search-pro参数类型定义
-     *
      * Attributes:
      * 模型名称
      */
@@ -55,4 +57,21 @@ public class WebSearchParamsRequest extends CommonRequest {
     @JsonProperty("recent_days")
     private Integer recentDays;
 
+    @Override
+    public Map<String, Object> getOptions() {
+        Map<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("request_id", this.getRequestId());
+        paramsMap.put("user_id", this.getUserId());
+        paramsMap.put("messages", this.getMessages());
+        paramsMap.put("model", this.getModel());
+        paramsMap.put("stream", this.getStream());
+        paramsMap.put("scope", this.getScope());
+        paramsMap.put("location", this.getLocation());
+        paramsMap.put("recent_days", this.getRecentDays());
+        if(this.getExtraJson() !=null){
+            paramsMap.putAll(this.getExtraJson());
+        }
+        return paramsMap;
+
+    }
 }

@@ -28,7 +28,6 @@ public final class ModelData extends ObjectNode {
     private Long created;
     private String model;
     private String id;
-    private ChatError error;
 
 
     public ModelData() {
@@ -76,12 +75,6 @@ public final class ModelData extends ObjectNode {
         } else {
             this.setId(null);
         }
-        if(objectNode.get("error") != null) {
-            this.setError(objectMapper.convertValue(objectNode.get("error"), ChatError.class));
-        } else {
-            this.setError(null);
-        }
-
 
         Iterator<String> fieldNames = objectNode.fieldNames();
 
@@ -144,8 +137,4 @@ public final class ModelData extends ObjectNode {
         this.put("id", id);
     }
 
-    public void setError(ChatError error) {
-        this.error = error;
-        this.putPOJO("error", error);
-    }
 }
