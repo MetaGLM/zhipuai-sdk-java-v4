@@ -69,8 +69,6 @@ public class Batch {
     @JsonProperty("request_counts")
     private BatchRequestCounts requestCounts;
 
-
-    private ChatError error;
 }
 
 @Data

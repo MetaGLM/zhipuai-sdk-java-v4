@@ -39,8 +39,6 @@ public class WebSearchPro extends ObjectNode {
     @JsonProperty("id")
     private String id;
 
-    @Getter
-    private ChatError error;
 
     public WebSearchPro() {
         super(JsonNodeFactory.instance);
@@ -71,11 +69,6 @@ public class WebSearchPro extends ObjectNode {
             this.setId(null);
         }
 
-        if(objectNode.get("error") != null) {
-            this.setError(objectMapper.convertValue(objectNode.get("error"), ChatError.class));
-        } else {
-            this.setError(null);
-        }
 
         Iterator<String> fieldNames = objectNode.fieldNames();
         while (fieldNames.hasNext()) {
@@ -86,7 +79,6 @@ public class WebSearchPro extends ObjectNode {
     }
 
     // Getters and Setters
-
     public Integer getCreated() {
         return created;
     }
@@ -119,8 +111,4 @@ public class WebSearchPro extends ObjectNode {
         this.put("id", id);
     }
 
-    public void setError(ChatError error) {
-        this.error = error;
-        this.putPOJO("error", error);
-    }
 }

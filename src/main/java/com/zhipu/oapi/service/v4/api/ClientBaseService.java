@@ -47,26 +47,6 @@ public class ClientBaseService {
         ExecutorService executorService = client.dispatcher().executorService();
     }
 
-    public static <T> T execute(Single<T> apiCall) {
-        try {
-            return apiCall.blockingGet();
-        } catch (HttpException e) {
-            logger.error("HTTP exception: {}", e.getMessage());
-            try {
-                if (e.response() == null || e.response().errorBody() == null) {
-                    throw e;
-                }
-                String errorBody = e.response().errorBody().string();
-
-                ZhiPuAiError error = mapper.readValue(errorBody, ZhiPuAiError.class);
-
-                throw new ZhiPuAiHttpException(error, e, e.code());
-            } catch (IOException ex) {
-                // couldn't parse ZhiPuAiError error
-                throw e;
-            }
-        }
-    }
 
 
 

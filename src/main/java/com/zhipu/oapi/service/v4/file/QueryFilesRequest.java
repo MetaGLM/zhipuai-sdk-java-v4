@@ -1,9 +1,12 @@
 package com.zhipu.oapi.service.v4.file;
 
 
+import com.zhipu.oapi.core.model.ClientRequest;
 import com.zhipu.oapi.service.v4.CommonRequest;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.Map;
 
 /**
  * 查询文件列表
@@ -13,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class QueryFilesRequest extends CommonRequest {
+public class QueryFilesRequest extends CommonRequest  implements ClientRequest<QueryFilesRequest> {
 
 
     private String purpose;
@@ -24,5 +27,8 @@ public class QueryFilesRequest extends CommonRequest {
 
     private String order;
 
-
+    @Override
+    public QueryFilesRequest getOptions() {
+        return this;
+    }
 }

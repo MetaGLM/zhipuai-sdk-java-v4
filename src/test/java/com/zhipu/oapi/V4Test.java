@@ -345,7 +345,7 @@ public class V4Test {
         testQueryResult(taskId);
     }
 
-
+//
     /**
      * 文生图
      */
@@ -358,40 +358,40 @@ public class V4Test {
         logger.info("imageApiResponse: {}", mapper.writeValueAsString(imageApiResponse));
     }
 
-
-    /**
-     * 图生文
-     */
-    @Test
-    public void testImageToWord() throws JsonProcessingException {
-        List<ChatMessage> messages = new ArrayList<>();
-        List<Map<String, Object>> contentList = new ArrayList<>();
-        Map<String, Object> textMap = new HashMap<>();
-        textMap.put("type", "text");
-        textMap.put("text", "图里有什么");
-        Map<String, Object> typeMap = new HashMap<>();
-        typeMap.put("type", "image_url");
-        Map<String, Object> urlMap = new HashMap<>();
-        urlMap.put("url", "https://sfile.chatglm.cn/testpath/275ae5b6-5390-51ca-a81a-60332d1a7cac_0.png");
-        typeMap.put("image_url", urlMap);
-        contentList.add(textMap);
-        contentList.add(typeMap);
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), contentList);
-        messages.add(chatMessage);
-        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
-
-
-        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                .model(Constants.ModelChatGLM4V)
-                .stream(Boolean.FALSE)
-                .invokeMethod(Constants.invokeMethod)
-                .messages(messages)
-                .requestId(requestId)
-                .build();
-        ModelApiResponse modelApiResponse = client.invokeModelApi(chatCompletionRequest);
-        logger.info("model output: {}", mapper.writeValueAsString(modelApiResponse));
-    }
-
+//
+//    /**
+//     * 图生文
+//     */
+//    @Test
+//    public void testImageToWord() throws JsonProcessingException {
+//        List<ChatMessage> messages = new ArrayList<>();
+//        List<Map<String, Object>> contentList = new ArrayList<>();
+//        Map<String, Object> textMap = new HashMap<>();
+//        textMap.put("type", "text");
+//        textMap.put("text", "图里有什么");
+//        Map<String, Object> typeMap = new HashMap<>();
+//        typeMap.put("type", "image_url");
+//        Map<String, Object> urlMap = new HashMap<>();
+//        urlMap.put("url", "https://sfile.chatglm.cn/testpath/275ae5b6-5390-51ca-a81a-60332d1a7cac_0.png");
+//        typeMap.put("image_url", urlMap);
+//        contentList.add(textMap);
+//        contentList.add(typeMap);
+//        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), contentList);
+//        messages.add(chatMessage);
+//        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+//
+//
+//        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+//                .model(Constants.ModelChatGLM4V)
+//                .stream(Boolean.FALSE)
+//                .invokeMethod(Constants.invokeMethod)
+//                .messages(messages)
+//                .requestId(requestId)
+//                .build();
+//        ModelApiResponse modelApiResponse = client.invokeModelApi(chatCompletionRequest);
+//        logger.info("model output: {}", mapper.writeValueAsString(modelApiResponse));
+//    }
+//
 
     /**
      * 向量模型V4
@@ -450,15 +450,15 @@ public class V4Test {
         }
     }
 
-//    @Test
-//    public void deletedFile() throws IOException {
-//        FileDelResponse fileDelResponse = client.deletedFile("20240514_ea19d21b-d256-4586-b0df-e80a45e3c286");
+////    @Test
+////    public void deletedFile() throws IOException {
+////        FileDelResponse fileDelResponse = client.deletedFile("20240514_ea19d21b-d256-4586-b0df-e80a45e3c286");
+////
+////        logger.info("model output: {}", mapper.writeValueAsString(fileDelResponse));
+////
+////    }
 //
-//        logger.info("model output: {}", mapper.writeValueAsString(fileDelResponse));
 //
-//    }
-
-
     /**
      * 微调V4-创建微调任务
      */
@@ -531,9 +531,33 @@ public class V4Test {
     }
 
     @Test
+    public void testDeleteFineTuningJob() {
+        FineTuningJobIdRequest request = FineTuningJobIdRequest.builder().jobId("test").build();
+        QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.deleteFineTuningJob(request);
+        logger.info("output: {}", queryFineTuningJobApiResponse);
+
+    }
+
+    @Test
+    public void testCancelFineTuningJob() {
+        FineTuningJobIdRequest request = FineTuningJobIdRequest.builder().jobId("test").build();
+        QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.cancelFineTuningJob(request);
+        logger.info("output: {}", queryFineTuningJobApiResponse);
+
+    }
+    @Test
     public void testBatchesRetrieve() {
         BatchResponse batchResponse = client.batchesRetrieve("batch_1791021399316246528");
         logger.info("output: {}", batchResponse);
+
+    }
+
+    @Test
+    public void testDeleteFineTuningModel() {
+        FineTuningJobModelRequest request = FineTuningJobModelRequest.builder().fineTunedModel("test").build();
+
+        FineTunedModelsStatusResponse fineTunedModelsStatusResponse = client.deleteFineTuningModel(request);
+        logger.info("output: {}", fineTunedModelsStatusResponse);
 //        output: BatchResponse(code=200, msg=调用成功, success=true, data=Batch(id=batch_1791021399316246528, completionWindow=24h, createdAt=1715847752000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=validating, cancelledAt=null, cancellingAt=null, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null))
 
     }

@@ -1,10 +1,14 @@
 package com.zhipu.oapi.service.v4.embedding;
 
+import com.zhipu.oapi.core.model.ClientRequest;
 import com.zhipu.oapi.service.v4.CommonRequest;
+import com.zhipu.oapi.service.v4.file.UploadFileRequest;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Creates an embedding vector representing the input text.
@@ -14,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class EmbeddingRequest extends CommonRequest {
+public class EmbeddingRequest extends CommonRequest  implements ClientRequest<Map<String, Object>> {
 
     /**
      * The name of the model to use.
@@ -33,4 +37,16 @@ public class EmbeddingRequest extends CommonRequest {
 
     private String input;
 
+    @Override
+    public Map<String, Object> getOptions() {
+        Map<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("request_id", this.getRequestId());
+        paramsMap.put("user_id", this.getUserId());
+        paramsMap.put("input", this.getInput());
+        paramsMap.put("model", this.getModel());
+        if(this.getExtraJson() !=null){
+            paramsMap.putAll(this.getExtraJson());
+        }
+        return paramsMap;
+    }
 }

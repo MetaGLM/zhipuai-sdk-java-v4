@@ -1,12 +1,18 @@
 package com.zhipu.oapi.service.v4.batchs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
+import com.zhipu.oapi.core.model.ClientRequest;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
-@Getter
-public class BatchCreateParams {
+@EqualsAndHashCode(callSuper = false)
+@SuperBuilder
+@Data
+public class BatchCreateParams  implements ClientRequest<BatchCreateParams> {
 
     @JsonProperty("completion_window")
     private String completionWindow;  // 必须是 "24h"
@@ -16,6 +22,9 @@ public class BatchCreateParams {
     private String inputFileId;  // 必须是上传文件的ID
     @JsonProperty("metadata")
     private Map<String, String> metadata;  // 可选的自定义元数据
+
+    public BatchCreateParams() {
+    }
 
     public BatchCreateParams(String completionWindow, String endpoint, String inputFileId, Map<String, String> metadata) {
         if (!"24h".equals(completionWindow)) {
@@ -30,4 +39,8 @@ public class BatchCreateParams {
         this.metadata = metadata;
     }
 
+    @Override
+    public BatchCreateParams getOptions() {
+        return this;
+    }
 }

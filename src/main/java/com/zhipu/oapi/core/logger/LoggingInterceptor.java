@@ -14,9 +14,9 @@ public class LoggingInterceptor implements Interceptor {
 
         // Log the request
         System.out.println("Sending request to " + request.url());
-        System.out.println("Request headers: " + request.headers());
+        System.out.println("ClientRequest headers: " + request.headers());
         if (request.body() != null) {
-            System.out.println("Request body: " + request.body().toString());
+            System.out.println("ClientRequest body: " + request.body().toString());
         }
 
         Response response = chain.proceed(request);
