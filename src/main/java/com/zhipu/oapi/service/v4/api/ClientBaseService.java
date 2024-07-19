@@ -1,17 +1,7 @@
 package com.zhipu.oapi.service.v4.api;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
-import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
-import com.zhipu.oapi.service.v4.deserialize.tools.WebSearchProDeserializer;
-import com.zhipu.oapi.service.v4.model.ModelData;
-import com.zhipu.oapi.service.v4.model.ZhiPuAiError;
-import com.zhipu.oapi.service.v4.model.ZhiPuAiHttpException;
-import com.zhipu.oapi.service.v4.tools.WebSearchPro;
 import com.zhipu.oapi.utils.StringUtils;
 import io.reactivex.Single;
 import okhttp3.OkHttpClient;
@@ -27,7 +17,7 @@ import java.util.concurrent.ExecutorService;
 
 import static com.zhipu.oapi.Constants.BASE_URL;
 
-public class ClientBaseService {
+public abstract class ClientBaseService {
 
     protected final static Logger logger = LoggerFactory.getLogger(ClientBaseService.class);
 
@@ -60,5 +50,6 @@ public class ClientBaseService {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
     }
+
 
 }
