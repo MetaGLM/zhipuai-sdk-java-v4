@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.sun.org.apache.xml.internal.serializer.utils.Utils.messages;
 
 
 @Testcontainers
