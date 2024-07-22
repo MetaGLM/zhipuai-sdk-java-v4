@@ -45,6 +45,11 @@ public class VideoObject extends ObjectNode {
      */
     @JsonProperty("task_status")
     private String taskStatus;
+    /**
+     * 如进行bpo，返回优化后的prompt
+     */
+    @JsonProperty("optimized_prompt")
+    private String optimizedPrompt;
 
     /**
      * 用户在客户端请求时提交的任务编号或者平台生成的任务编号
@@ -79,6 +84,11 @@ public class VideoObject extends ObjectNode {
             this.setTaskStatus(objectNode.get("task_status").asText());
         } else {
             this.setTaskStatus(null);
+        }
+        if (objectNode.get("optimized_prompt") != null) {
+            this.setOptimizedPrompt(objectNode.get("optimized_prompt").asText());
+        } else {
+            this.setOptimizedPrompt(null);
         }
         if (objectNode.get("request_id") != null) {
             this.setRequestId(objectNode.get("request_id").asText());
@@ -132,5 +142,10 @@ public class VideoObject extends ObjectNode {
     public void setRequestId(String requestId) {
         this.requestId = requestId;
         this.put("request_id", requestId);
+    }
+
+    public void setOptimizedPrompt(String optimizedPrompt) {
+        this.optimizedPrompt = optimizedPrompt;
+        this.put("optimized_prompt", optimizedPrompt);
     }
 }
