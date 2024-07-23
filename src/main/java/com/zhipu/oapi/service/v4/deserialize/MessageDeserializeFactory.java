@@ -30,8 +30,6 @@ public class MessageDeserializeFactory {
         module.addDeserializer(ToolCalls.class, new ToolCallsDeserializer());
         module.addDeserializer(ChatFunctionCall.class, new ChatFunctionCallDeserializer());
         module.addDeserializer(CodeGeexContext.class, new CodeGeexContextDeserializer());
-        module.addDeserializer(CodeGeexExtra.class, new CodeGeexExtraDeserializer());
-        module.addDeserializer(CodeGeexTarget.class, new CodeGeexTargetDeserializer());
         module.addDeserializer(ChoiceDelta.class, new ChoiceDeltaDeserializer());
         module.addDeserializer(ChoiceDeltaToolCall.class, new ChoiceDeltaToolCallDeserializer());
         module.addDeserializer(SearchChatMessage.class, new SearchChatMessageDeserializer());

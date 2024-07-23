@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.zhipu.oapi.service.v4.deserialize.CodeGeexTargetDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.DeltaDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import lombok.*;
