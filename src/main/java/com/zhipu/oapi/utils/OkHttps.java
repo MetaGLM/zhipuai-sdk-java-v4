@@ -1,7 +1,6 @@
 package com.zhipu.oapi.utils;
 
 import com.zhipu.oapi.core.ConfigV4;
-import com.zhipu.oapi.core.logger.LoggingInterceptor;
 import com.zhipu.oapi.core.token.AuthenticationInterceptor;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
@@ -48,10 +47,9 @@ public class OkHttps {
             builder.connectionPool(new ConnectionPool(5, 1, TimeUnit.SECONDS));
         }
 
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        builder.addInterceptor(logging);
-        builder.addInterceptor(new LoggingInterceptor());
+//        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+//        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+//        builder.addInterceptor(logging);
 
 
         return builder.build();
