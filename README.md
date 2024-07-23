@@ -50,7 +50,48 @@ private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
  
 ```
 
+### spring Controller 示例
+```java
+package com.zhipu.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wd.common.core.domain.R;
+import com.zhipu.oapi.ClientV4;
+import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
+import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
+import com.zhipu.oapi.service.v4.model.ModelApiResponse;
+import com.zhipu.oapi.service.v4.model.ModelData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.TimeUnit;
+
+@RestController
+public class TestController {
+
+    private final static Logger logger = LoggerFactory.getLogger(TestController.class);
+    private static final String API_SECRET_KEY = System.getProperty("ZHIPUAI_API_KEY");
+
+    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
+            .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
+            .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
+            .build();
+    private static final ObjectMapper mapper = MessageDeserializeFactory.defaultObjectMapper();
+
+
+    @RequestMapping("/test")
+    public R<ModelData> test(@RequestBody ChatCompletionRequest chatCompletionRequest) {
+        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+
+        return R.ok(sseModelApiResp.getData());
+    }
+}
+
+```
 
 
 ## 升级内容
