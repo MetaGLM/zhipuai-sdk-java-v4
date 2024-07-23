@@ -26,6 +26,11 @@ public class VideoResult extends ObjectNode {
      */
     @JsonProperty("url")
     private String url;
+    /**
+     * 预览图
+     */
+    @JsonProperty("cover_image_url")
+    private String coverImageUrl;
 
     public VideoResult() {
         super(JsonNodeFactory.instance);
@@ -39,6 +44,11 @@ public class VideoResult extends ObjectNode {
         } else {
             this.setUrl(null);
         }
+        if (objectNode.get("cover_image_url") != null) {
+            this.setCoverImageUrl(objectNode.get("cover_image_url").asText());
+        } else {
+            this.setCoverImageUrl(null);
+        }
     }
 
     // Getters and Setters
@@ -46,5 +56,10 @@ public class VideoResult extends ObjectNode {
     public void setUrl(String url) {
         this.url = url;
         this.put("url", url);
+    }
+
+    public void setCoverImageUrl(String coverImageUrl){
+        this.coverImageUrl = coverImageUrl;
+        this.put("cover_image_url",coverImageUrl);
     }
 }
