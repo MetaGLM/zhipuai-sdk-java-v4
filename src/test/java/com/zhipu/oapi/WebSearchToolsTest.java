@@ -30,7 +30,7 @@ public class WebSearchToolsTest {
             .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
             .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
             .build();
-    private static final ObjectMapper mapper = MessageDeserializeFactory.defaultObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
     // 请自定义自己的业务id
     private static final String requestIdTemplate = "mycompany-%d";
 

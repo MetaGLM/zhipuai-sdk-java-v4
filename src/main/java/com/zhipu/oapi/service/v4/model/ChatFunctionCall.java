@@ -8,7 +8,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.zhipu.oapi.service.v4.deserialize.ChatFunctionCallDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
+import com.zhipu.oapi.service.v4.deserialize.videos.VideoResultDeserializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -19,6 +21,7 @@ import java.util.Iterator;
 
 
 @Getter
+@JsonDeserialize(using = ChatFunctionCallDeserializer.class)
 public class ChatFunctionCall extends ObjectNode {
 
     /**

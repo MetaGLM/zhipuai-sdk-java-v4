@@ -5,10 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
+import com.zhipu.oapi.service.v4.deserialize.videos.VideoObjectDeserializer;
 import lombok.Getter;
 
 import java.util.Iterator;
@@ -19,6 +21,7 @@ import java.util.List;
  */
 
 @Getter
+@JsonDeserialize(using = VideoObjectDeserializer.class)
 public class VideoObject extends ObjectNode {
 
     /**

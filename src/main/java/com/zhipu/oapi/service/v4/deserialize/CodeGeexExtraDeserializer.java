@@ -12,7 +12,7 @@ import com.zhipu.oapi.service.v4.model.params.CodeGeexTarget;
 
 import java.io.IOException;
 
-class CodeGeexExtraDeserializer extends BaseNodeDeserializer<CodeGeexExtra> {
+public class CodeGeexExtraDeserializer extends BaseNodeDeserializer<CodeGeexExtra> {
 
     private static final CodeGeexExtraDeserializer instance = new CodeGeexExtraDeserializer();
 

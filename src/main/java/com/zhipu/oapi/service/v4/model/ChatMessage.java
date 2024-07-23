@@ -4,9 +4,12 @@ package com.zhipu.oapi.service.v4.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.zhipu.oapi.service.v4.deserialize.ChatFunctionCallDeserializer;
+import com.zhipu.oapi.service.v4.deserialize.ChatMessageDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import lombok.*;
 
@@ -14,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @Getter
+@JsonDeserialize(using = ChatMessageDeserializer.class)
 public class ChatMessage extends ObjectNode {
 
 

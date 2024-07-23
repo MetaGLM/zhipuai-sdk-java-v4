@@ -3,13 +3,18 @@ package com.zhipu.oapi.service.v4.tools;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
+import com.zhipu.oapi.service.v4.deserialize.tools.ChoiceDeltaToolCallDeserializer;
+import com.zhipu.oapi.service.v4.deserialize.tools.SearchChatMessageDeserializer;
 import lombok.Getter;
 
 import java.util.Iterator;
 
+
+@JsonDeserialize(using = SearchChatMessageDeserializer.class)
 @Getter
 public class SearchChatMessage extends ObjectNode {
 

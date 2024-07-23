@@ -2,8 +2,10 @@ package com.zhipu.oapi.service.v4.model.params;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.zhipu.oapi.service.v4.deserialize.CodeGeexContextDeserializer;
 import lombok.Getter;
 
 import java.util.Iterator;
@@ -12,6 +14,7 @@ import java.util.Map;
 
 
 @Getter
+@JsonDeserialize(using = CodeGeexContextDeserializer.class)
 public class CodeGeexContext extends ObjectNode {
     @JsonProperty("path")
     private String path;

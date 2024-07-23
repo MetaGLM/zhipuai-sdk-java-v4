@@ -4,10 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.zhipu.oapi.service.v4.deserialize.DeltaDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
+import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -15,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
+@JsonDeserialize(using = ModelDataDeserializer.class)
 @Getter
 public final class ModelData extends ObjectNode {
     @JsonProperty("choices")

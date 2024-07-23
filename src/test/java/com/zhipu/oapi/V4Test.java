@@ -50,7 +50,7 @@ public class V4Test {
     // 请自定义自己的业务id
     private static final String requestIdTemplate = "mycompany-%d";
 
-    private static final ObjectMapper mapper = defaultObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
 
 
     public static ObjectMapper defaultObjectMapper() {

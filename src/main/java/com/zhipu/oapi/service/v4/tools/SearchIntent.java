@@ -3,12 +3,16 @@ package com.zhipu.oapi.service.v4.tools;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
+import com.zhipu.oapi.service.v4.deserialize.tools.SearchChatMessageDeserializer;
+import com.zhipu.oapi.service.v4.deserialize.tools.SearchIntentDeserializer;
 
 import java.util.Iterator;
 
+@JsonDeserialize(using = SearchIntentDeserializer.class)
 public class SearchIntent extends ObjectNode {
 
     /**

@@ -4,9 +4,12 @@ package com.zhipu.oapi.service.v4.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
+import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
+import com.zhipu.oapi.service.v4.deserialize.ToolCallsDeserializer;
 import lombok.*;
 
 import java.util.Iterator;
@@ -14,6 +17,7 @@ import java.util.Map;
 
 
 @Getter
+@JsonDeserialize(using = ToolCallsDeserializer.class)
 public class ToolCalls extends ObjectNode {
 
 
