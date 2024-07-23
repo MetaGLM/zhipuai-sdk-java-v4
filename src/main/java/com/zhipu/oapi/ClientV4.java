@@ -493,6 +493,7 @@ public class ClientV4 extends AbstractClientBaseService{
             tResp.setCode(200);
             tResp.setMsg("调用成功");
             tResp.setData(response);
+            tResp.setSuccess(true);
         } catch (ZhiPuAiHttpException e) {
             logger.error("业务出错", e);
             tResp.setCode(e.statusCode);
