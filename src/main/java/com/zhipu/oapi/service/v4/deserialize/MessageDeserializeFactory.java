@@ -4,9 +4,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.zhipu.oapi.service.v4.deserialize.image.ImageDeserializer;
+import com.zhipu.oapi.service.v4.deserialize.image.ImageResultDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.tools.*;
 import com.zhipu.oapi.service.v4.deserialize.videos.VideoObjectDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.videos.VideoResultDeserializer;
+import com.zhipu.oapi.service.v4.image.Image;
+import com.zhipu.oapi.service.v4.image.ImageResult;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.model.params.CodeGeexContext;
 import com.zhipu.oapi.service.v4.model.params.CodeGeexExtra;
@@ -42,6 +46,8 @@ public class MessageDeserializeFactory {
         module.addDeserializer(WebSearchPro.class, new WebSearchProDeserializer());
         module.addDeserializer(VideoResult.class, new VideoResultDeserializer());
         module.addDeserializer(VideoObject.class, new VideoObjectDeserializer());
+        module.addDeserializer(Image.class, new ImageDeserializer());
+        module.addDeserializer(ImageResult.class, new ImageResultDeserializer());
         mapper.registerModule(module);
 
         return mapper;

@@ -354,6 +354,7 @@ public class V4Test {
         CreateImageRequest createImageRequest = new CreateImageRequest();
         createImageRequest.setModel(Constants.ModelCogView);
         createImageRequest.setPrompt("画一个温顺可爱的小狗");
+        createImageRequest.setRequestId("test11111111111111");
         ImageApiResponse imageApiResponse = client.createImage(createImageRequest);
         logger.info("imageApiResponse: {}", mapper.writeValueAsString(imageApiResponse));
     }
