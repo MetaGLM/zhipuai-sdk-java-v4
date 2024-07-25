@@ -47,6 +47,11 @@ public class VideoCreateParams implements ClientRequest<VideoCreateParams> {
      */
     @JsonProperty("request_id")
     private String requestId;
+    /**
+     * 用户端
+     */
+    @JsonProperty("user_id")
+    private String userId;
 
     @Override
     public VideoCreateParams getOptions() {
