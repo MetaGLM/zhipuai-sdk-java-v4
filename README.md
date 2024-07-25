@@ -15,7 +15,7 @@ Java），让开发者更便捷的调用智谱开放API
         <dependency>
             <groupId>cn.bigmodel.openapi</groupId>
             <artifactId>oapi-java-sdk</artifactId>
-            <version>release-V4-2.1.0</version>
+            <version>release-V4-2.2.0</version>
         </dependency>
 ```
 ### 依赖信息
@@ -95,6 +95,12 @@ public class TestController {
 
 
 ## 升级内容
+
+#### release-V4-2.2.0
+- 重构代码
+- 高级检索接口
+- codegeex接口
+- 视频生成功能
 
 
 #### release-V4-2.1.0
