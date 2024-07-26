@@ -60,13 +60,12 @@ public class TestVideosClientApiService {
     @Test
     public void testVideoByImage() throws IOException {
         Base64.Encoder encoder = Base64.getEncoder();
-        String file = ClassLoader.getSystemResource("test_1.png").getFile();
+        String file = ClassLoader.getSystemResource("20.png").getFile();
         byte[] bytes = FileUtils.readFileToByteArray(new File(file));
         String imageUrl  = encoder.encodeToString( bytes);
         VideoCreateParams build = VideoCreateParams.builder()
                 .prompt(
-                        "她将头上的草帽拿了下来。这顶草帽有编织纹理，宽边，颜色自然，饰有复杂的图案，显得古朴又典雅。草帽的设计简单，但非常精致，材质透气，边缘略显磨损，\n" +
-                        "一个坐着的K-pop偶像，她有着粉色的长发，佩戴着日本传统的头饰，肩膀裸露，穿着带有装饰的和服。她的头发飘逸而闪亮，紫色的眼睛如同夜空中的星星，耳朵上挂着闪亮的耳环\n")
+                          "这个场景描绘了一个充满魔法气息的场景。在一个被绿色植物和橙色小花环绕的石桌上，一本古老的书籍摊开着，书页似乎刚刚被翻动过。书籍的旁边放置着一个透明的魔法球，魔法球中充满了闪烁的光点和流动的光影，仿佛有一种神秘的能量在其中流转。魔法球下方的底座散发出微弱的光芒，周围的空气中漂浮着一些细小的光粒，增强了场景的神秘感和魔幻氛围。背景中隐约可见一些模糊的建筑结构，进一步烘托出这个场景的奇幻与神秘。")
                 .imageUrl(imageUrl)
                 .model("cogvideo")
                 .build();
@@ -81,9 +80,8 @@ public class TestVideosClientApiService {
     public void testVideoGenerationsResult(){
 
         VideoCreateParams build = VideoCreateParams.builder()
-//                .id("1014908871935376263701590")
-//                .id("1014908871935376263701654")
-                .id("1014908871935376263701667")
+
+                .id("1000088872446167827091899")
                 .build();
         VideosResponse apply = new VideosClientApiService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
                 .videoGenerationsResult(build)

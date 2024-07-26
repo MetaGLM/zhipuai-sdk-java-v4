@@ -4,11 +4,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.zhipu.oapi.service.v4.deserialize.embedding.EmbeddingDeserializer;
+import com.zhipu.oapi.service.v4.deserialize.embedding.EmbeddingResultDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.image.ImageDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.image.ImageResultDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.tools.*;
 import com.zhipu.oapi.service.v4.deserialize.videos.VideoObjectDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.videos.VideoResultDeserializer;
+import com.zhipu.oapi.service.v4.embedding.Embedding;
+import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.image.Image;
 import com.zhipu.oapi.service.v4.image.ImageResult;
 import com.zhipu.oapi.service.v4.model.*;
@@ -48,6 +52,8 @@ public class MessageDeserializeFactory {
         module.addDeserializer(VideoObject.class, new VideoObjectDeserializer());
         module.addDeserializer(Image.class, new ImageDeserializer());
         module.addDeserializer(ImageResult.class, new ImageResultDeserializer());
+        module.addDeserializer(EmbeddingResult.class, new EmbeddingResultDeserializer());
+        module.addDeserializer(Embedding.class, new EmbeddingDeserializer());
         mapper.registerModule(module);
 
         return mapper;

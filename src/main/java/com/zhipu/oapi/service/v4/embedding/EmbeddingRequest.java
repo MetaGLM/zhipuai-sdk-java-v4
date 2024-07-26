@@ -35,7 +35,20 @@ public class EmbeddingRequest extends CommonRequest  implements ClientRequest<Ma
      * as we have observed inferior results when newlines are present.
      */
 
-    private String input;
+    private Object input;
+    private Integer dimensions;
+
+    public void setInput(String input) {
+        this.input = input;
+    }
+
+    public void setInput(List<String> input) throws IllegalArgumentException {
+        if (input == null || input.isEmpty()) {
+            throw new IllegalArgumentException("Input cannot be null or empty");
+        }
+
+        this.input = input;
+    }
 
     @Override
     public Map<String, Object> getOptions() {
@@ -44,6 +57,7 @@ public class EmbeddingRequest extends CommonRequest  implements ClientRequest<Ma
         paramsMap.put("user_id", this.getUserId());
         paramsMap.put("input", this.getInput());
         paramsMap.put("model", this.getModel());
+        paramsMap.put("dimensions", this.getDimensions());
         if(this.getExtraJson() !=null){
             paramsMap.putAll(this.getExtraJson());
         }
