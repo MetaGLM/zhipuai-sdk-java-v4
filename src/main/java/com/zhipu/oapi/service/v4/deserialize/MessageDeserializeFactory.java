@@ -62,6 +62,8 @@ public class MessageDeserializeFactory {
         module.addDeserializer(VideoObject.class, new VideoObjectDeserializer());
         module.addDeserializer(Image.class, new ImageDeserializer());
         module.addDeserializer(ImageResult.class, new ImageResultDeserializer());
+        module.addDeserializer(EmbeddingResult.class, new EmbeddingResultDeserializer());
+        module.addDeserializer(Embedding.class, new EmbeddingDeserializer());
         module.addDeserializer(KnowledgeInfo.class, new KnowledgeInfoDeserializer());
         module.addDeserializer(KnowledgeUsed.class, new KnowledgeUsedDeserializer());
         module.addDeserializer(KnowledgeStatistics.class, new KnowledgeStatisticsDeserializer());
