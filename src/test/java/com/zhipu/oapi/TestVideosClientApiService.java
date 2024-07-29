@@ -49,7 +49,7 @@ public class TestVideosClientApiService {
 
         VideoCreateParams build = VideoCreateParams.builder()
                 .prompt("一个开船的人")
-                .model("cogvideo")
+                .model("cogvideox")
                 .build();
         VideosResponse apply = new VideosClientApiService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
                 .videoGenerations(build)
@@ -68,7 +68,7 @@ public class TestVideosClientApiService {
                         "她将头上的草帽拿了下来。这顶草帽有编织纹理，宽边，颜色自然，饰有复杂的图案，显得古朴又典雅。草帽的设计简单，但非常精致，材质透气，边缘略显磨损，\n" +
                         "一个坐着的K-pop偶像，她有着粉色的长发，佩戴着日本传统的头饰，肩膀裸露，穿着带有装饰的和服。她的头发飘逸而闪亮，紫色的眼睛如同夜空中的星星，耳朵上挂着闪亮的耳环\n")
                 .imageUrl(imageUrl)
-                .model("cogvideo")
+                .model("cogvideox")
                 .build();
         VideosResponse apply = new VideosClientApiService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
                 .videoGenerations(build)
