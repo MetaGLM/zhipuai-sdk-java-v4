@@ -43,6 +43,7 @@ import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.adapter.rxjava2.HttpException;
 
 import java.io.IOException;
@@ -78,7 +79,14 @@ abstract class AbstractClientBaseService {
 
     public static <T> T execute(Single<T> apiCall) {
         try {
-            return apiCall.blockingGet();
+            T response = apiCall.blockingGet();
+
+            // 如果返回的是 Response 类型对象，可以进行状态码的判断
+            if (response instanceof Response) {
+                handleResponse((Response<?>) response);
+            }
+
+            return response;
         } catch (HttpException e) {
             logger.error("HTTP exception: {}", e.getMessage());
             try {
@@ -94,6 +102,12 @@ abstract class AbstractClientBaseService {
                 // couldn't parse ZhiPuAiError error
                 throw e;
             }
+        }
+    }
+    private static void handleResponse(Response<?> response) {
+        if (!response.isSuccessful()) {
+
+            throw new HttpException(response);
         }
     }
 
