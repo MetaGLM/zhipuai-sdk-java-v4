@@ -10,6 +10,7 @@ import com.zhipu.oapi.service.v4.deserialize.knowledge.KnowledgeInfoDeserializer
 import com.zhipu.oapi.service.v4.deserialize.knowledge.KnowledgePageDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.knowledge.KnowledgeStatisticsDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.knowledge.KnowledgeUsedDeserializer;
+import com.zhipu.oapi.service.v4.deserialize.knowledge.document.*;
 import com.zhipu.oapi.service.v4.deserialize.tools.*;
 import com.zhipu.oapi.service.v4.deserialize.videos.VideoObjectDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.videos.VideoResultDeserializer;
@@ -19,6 +20,7 @@ import com.zhipu.oapi.service.v4.knowledge.KnowledgeInfo;
 import com.zhipu.oapi.service.v4.knowledge.KnowledgePage;
 import com.zhipu.oapi.service.v4.knowledge.KnowledgeStatistics;
 import com.zhipu.oapi.service.v4.knowledge.KnowledgeUsed;
+import com.zhipu.oapi.service.v4.knowledge.document.*;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.model.params.CodeGeexContext;
 import com.zhipu.oapi.service.v4.model.params.CodeGeexExtra;
@@ -60,6 +62,12 @@ public class MessageDeserializeFactory {
         module.addDeserializer(KnowledgeUsed.class, new KnowledgeUsedDeserializer());
         module.addDeserializer(KnowledgeStatistics.class, new KnowledgeStatisticsDeserializer());
         module.addDeserializer(KnowledgePage.class, new KnowledgePageDeserializer());
+        module.addDeserializer(DocumentFailedInfo.class, new DocumentFailedInfoDeserializer());
+        module.addDeserializer(DocumentObject.class, new DocumentObjectDeserializer());
+        module.addDeserializer(DocumentSuccessInfo.class, new DocumentSuccessInfoDeserializer());
+        module.addDeserializer(DocumentData.class, new DocumentDataDeserializer());
+        module.addDeserializer(DocumentDataFailInfo.class, new DocumentDataFailInfoDeserializer());
+        module.addDeserializer(DocumentPage.class, new DocumentPageDeserializer());
         mapper.registerModule(module);
 
         return mapper;
