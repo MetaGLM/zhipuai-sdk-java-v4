@@ -75,17 +75,6 @@ public class MessageDeserializeFactory {
         module.addDeserializer(EmbeddingResult.class, new EmbeddingResultDeserializer());
         module.addDeserializer(Embedding.class, new EmbeddingDeserializer());
         module.addDeserializer(KnowledgeInfo.class, new KnowledgeInfoDeserializer());
-        module.addDeserializer(KnowledgeUsed.class, new KnowledgeUsedDeserializer());
-        module.addDeserializer(KnowledgeStatistics.class, new KnowledgeStatisticsDeserializer());
-        module.addDeserializer(KnowledgePage.class, new KnowledgePageDeserializer());
-        module.addDeserializer(DocumentFailedInfo.class, new DocumentFailedInfoDeserializer());
-        module.addDeserializer(DocumentObject.class, new DocumentObjectDeserializer());
-        module.addDeserializer(DocumentSuccessInfo.class, new DocumentSuccessInfoDeserializer());
-        module.addDeserializer(DocumentData.class, new DocumentDataDeserializer());
-        module.addDeserializer(DocumentDataFailInfo.class, new DocumentDataFailInfoDeserializer());
-        module.addDeserializer(DocumentPage.class, new DocumentPageDeserializer());
-        module.addDeserializer(EmbeddingResult.class, new EmbeddingResultDeserializer());
-        module.addDeserializer(Embedding.class, new EmbeddingDeserializer());
         mapper.registerModule(module);
 
         return mapper;
