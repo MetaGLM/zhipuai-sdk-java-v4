@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.zhipu.oapi.service.v4.deserialize.embedding.EmbeddingDeserializer;
+import com.zhipu.oapi.service.v4.deserialize.embedding.EmbeddingResultDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.image.ImageDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.image.ImageResultDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.knowledge.KnowledgeInfoDeserializer;
@@ -14,6 +16,8 @@ import com.zhipu.oapi.service.v4.deserialize.knowledge.document.*;
 import com.zhipu.oapi.service.v4.deserialize.tools.*;
 import com.zhipu.oapi.service.v4.deserialize.videos.VideoObjectDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.videos.VideoResultDeserializer;
+import com.zhipu.oapi.service.v4.embedding.Embedding;
+import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.image.Image;
 import com.zhipu.oapi.service.v4.image.ImageResult;
 import com.zhipu.oapi.service.v4.knowledge.KnowledgeInfo;
@@ -68,6 +72,9 @@ public class MessageDeserializeFactory {
         module.addDeserializer(DocumentData.class, new DocumentDataDeserializer());
         module.addDeserializer(DocumentDataFailInfo.class, new DocumentDataFailInfoDeserializer());
         module.addDeserializer(DocumentPage.class, new DocumentPageDeserializer());
+        module.addDeserializer(EmbeddingResult.class, new EmbeddingResultDeserializer());
+        module.addDeserializer(Embedding.class, new EmbeddingDeserializer());
+        module.addDeserializer(KnowledgeInfo.class, new KnowledgeInfoDeserializer());
         mapper.registerModule(module);
 
         return mapper;
