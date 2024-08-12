@@ -5,7 +5,15 @@ import com.zhipu.oapi.service.v4.api.assistant.AssistantApi;
 import com.zhipu.oapi.service.v4.assistant.AssistantApiResponse;
 import com.zhipu.oapi.service.v4.assistant.AssistantCompletion;
 import com.zhipu.oapi.service.v4.assistant.AssistantParameters;
+import com.zhipu.oapi.service.v4.assistant.conversation.ConversationParameters;
+import com.zhipu.oapi.service.v4.assistant.conversation.ConversationUsageListResponse;
+import com.zhipu.oapi.service.v4.assistant.conversation.ConversationUsageListStatus;
+import com.zhipu.oapi.service.v4.assistant.query_support.AssistantSupportResponse;
+import com.zhipu.oapi.service.v4.assistant.query_support.AssistantSupportStatus;
+import com.zhipu.oapi.service.v4.assistant.query_support.QuerySupportParams;
 import com.zhipu.oapi.utils.FlowableRequestSupplier;
+import com.zhipu.oapi.utils.RequestSupplier;
+import io.reactivex.Single;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -26,11 +34,24 @@ public class AssistantClientService extends ClientBaseService {
     }
 
 
-
+    // 修改 assistantCompletionStream 方法，使其返回 AssistantGenerationChain
     public AssistantGenerationChain assistantCompletionStream(AssistantParameters request) {
 
         Call<ResponseBody> responseBodyCall = assistantApi.assistantCompletionStream(request.getOptions());
         return new AssistantGenerationChain(request, responseBodyCall);
+    }
+
+
+    // 修改 querySupport 方法，使其返回 AssistantSupportChain
+    public AssistantSupportChain querySupport(QuerySupportParams request) {
+        Single<AssistantSupportStatus> assistantSupportStatusSingle = assistantApi.querySupport(request.getOptions());
+        return new AssistantSupportChain(request, assistantSupportStatusSingle);
+    }
+
+    // 修改 queryConversationUsage 方法，使其返回 ConversationChain
+    public ConversationChain queryConversationUsage(ConversationParameters request) {
+        Single<ConversationUsageListStatus> statusSingle = assistantApi.queryConversationUsage(request.getOptions());
+        return new ConversationChain(request, statusSingle);
     }
 
 
@@ -55,6 +76,47 @@ public class AssistantClientService extends ClientBaseService {
                     AssistantApiResponse.class,
                     AssistantCompletion.class
             );
+        }
+
+    }
+    public static class AssistantSupportChain extends GenerationChain<AssistantSupportStatus, AssistantSupportResponse> {
+        private final QuerySupportParams params;
+        private final Single<AssistantSupportStatus> objectSingle;
+
+        public AssistantSupportChain(QuerySupportParams params,
+                                           Single<AssistantSupportStatus> objectSingle
+                                        ) {
+            this.params = params;
+            this.objectSingle = objectSingle;
+        }
+
+        public  AssistantSupportResponse apply(final ClientV4 clientV4) {
+            RequestSupplier<QuerySupportParams, AssistantSupportStatus> supplier = (params) -> {
+                return objectSingle;
+            };
+            return clientV4.executeRequest(params, supplier, AssistantSupportResponse.class);
+
+        }
+
+    }
+
+    public static class ConversationChain extends GenerationChain<ConversationUsageListStatus, ConversationUsageListResponse> {
+        private final ConversationParameters params;
+        private final Single<ConversationUsageListStatus> objectSingle;
+
+        public ConversationChain(ConversationParameters params,
+                                 Single<ConversationUsageListStatus> objectSingle
+                                        ) {
+            this.params = params;
+            this.objectSingle = objectSingle;
+        }
+
+        public  ConversationUsageListResponse apply(final ClientV4 clientV4) {
+            RequestSupplier<ConversationParameters, ConversationUsageListStatus> supplier = (params) -> {
+                return objectSingle;
+            };
+            return clientV4.executeRequest(params, supplier, ConversationUsageListResponse.class);
+
         }
 
     }

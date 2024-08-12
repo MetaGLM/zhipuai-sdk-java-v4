@@ -4,7 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zhipu.oapi.service.v4.api.AssistantClientService;
 import com.zhipu.oapi.service.v4.assistant.*;
+import com.zhipu.oapi.service.v4.assistant.conversation.ConversationParameters;
+import com.zhipu.oapi.service.v4.assistant.conversation.ConversationUsageListResponse;
+import com.zhipu.oapi.service.v4.assistant.conversation.ConversationUsageListStatus;
 import com.zhipu.oapi.service.v4.assistant.message.MessageContent;
+import com.zhipu.oapi.service.v4.assistant.query_support.AssistantSupportResponse;
+import com.zhipu.oapi.service.v4.assistant.query_support.QuerySupportParams;
 import com.zhipu.oapi.service.v4.tools.ChoiceDelta;
 import com.zhipu.oapi.service.v4.tools.WebSearchPro;
 import com.zhipu.oapi.utils.StringUtils;
@@ -98,13 +103,30 @@ public class TestAssistantClientApiService {
             apply.setData(assistantCompletion);
         }
         logger.info("apply output: {}", mapper.writeValueAsString(apply));
-        client.getConfig().getHttpClient().dispatcher().executorService().shutdown();
 
-        client.getConfig().getHttpClient().connectionPool().evictAll();
-        // List all active threads
-        for (Thread t : Thread.getAllStackTraces().keySet()) {
-            logger.info("Thread: " + t.getName() + " State: " + t.getState());
-        }
 
+    }
+    @Test
+    @Order(2)
+    public void testQuerySupport(){
+        QuerySupportParams build = QuerySupportParams.builder()
+                .assistantIdList(Collections.singletonList("659e54b1b8006379b4b2abd6"))
+                .build();
+        AssistantSupportResponse apply = new AssistantClientService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
+                .querySupport(build)
+                .apply(client);
+        logger.info("apply output: {}", apply);
+    }
+
+    @Test
+    @Order(3)
+    public void testQueryConversationUsage(){
+        ConversationParameters build = ConversationParameters.builder()
+                .assistantId("659e54b1b8006379b4b2abd6")
+                .build();
+        ConversationUsageListResponse apply = new AssistantClientService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
+                .queryConversationUsage(build)
+                .apply(client);
+        logger.info("apply output: {}", apply);
     }
 }
