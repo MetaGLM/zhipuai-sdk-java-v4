@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.zhipu.oapi.core.model.ClientRequest;
 import com.zhipu.oapi.service.v4.CommonRequest;
 import com.zhipu.oapi.service.v4.file.UploadFileRequest;
+import com.zhipu.oapi.service.v4.model.SensitiveWordCheckRequest;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -33,6 +34,12 @@ public class CreateImageRequest extends CommonRequest  implements ClientRequest<
      */
     private String model;
 
+    /**
+     * 敏感词检测控制
+     */
+    @JsonProperty("sensitive_word_check")
+    private SensitiveWordCheckRequest sensitiveWordCheck;
+
     @Override
     public Map<String, Object> getOptions() {
         Map<String, Object> request = new HashMap<>();
@@ -40,9 +47,10 @@ public class CreateImageRequest extends CommonRequest  implements ClientRequest<
         request.put("user_id", this.getUserId());
         request.put("prompt", this.getPrompt());
         request.put("model", this.getModel());
+        request.put("sensitive_word_check", this.getSensitiveWordCheck());
 
         if(this.getExtraJson() !=null){
-            request.replaceAll((s, v) -> this.getExtraJson().get(s));
+            request.putAll(this.getExtraJson());
         }
         return request;
     }
