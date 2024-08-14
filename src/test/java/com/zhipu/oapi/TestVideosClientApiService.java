@@ -1,6 +1,7 @@
 package com.zhipu.oapi;
 
 import com.zhipu.oapi.service.v4.api.VideosClientApiService;
+import com.zhipu.oapi.service.v4.model.SensitiveWordCheckRequest;
 import com.zhipu.oapi.service.v4.videos.VideoCreateParams;
 import com.zhipu.oapi.service.v4.videos.VideosResponse;
 import com.zhipu.oapi.utils.StringUtils;
@@ -57,6 +58,26 @@ public class TestVideosClientApiService {
 
         logger.info("apply:{}",apply);
     }
+
+    @Test
+    public void testVideoSensitiveWordCheck(){
+        SensitiveWordCheckRequest sensitiveWordCheckRequest = SensitiveWordCheckRequest.builder()
+                .type("ALL")
+                .status("DISABLE")
+                .build();
+
+        VideoCreateParams build = VideoCreateParams.builder()
+                .prompt("一个开船的人")
+                .model("cogvideox")
+                .sensitiveWordCheck(sensitiveWordCheckRequest)
+                .build();
+        VideosResponse apply = new VideosClientApiService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
+                .videoGenerations(build)
+                .apply(client);
+
+        logger.info("apply:{}",apply);
+    }
+
     @Test
     public void testVideoByImage() throws IOException {
         Base64.Encoder encoder = Base64.getEncoder();

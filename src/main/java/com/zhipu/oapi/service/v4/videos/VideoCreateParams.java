@@ -3,6 +3,7 @@ package com.zhipu.oapi.service.v4.videos;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.zhipu.oapi.core.model.ClientRequest;
 import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
+import com.zhipu.oapi.service.v4.model.SensitiveWordCheckRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
@@ -52,6 +53,12 @@ public class VideoCreateParams implements ClientRequest<VideoCreateParams> {
      */
     @JsonProperty("user_id")
     private String userId;
+
+    /**
+     * 敏感词检测控制
+     */
+    @JsonProperty("sensitive_word_check")
+    private SensitiveWordCheckRequest sensitiveWordCheck;
 
     @Override
     public VideoCreateParams getOptions() {
