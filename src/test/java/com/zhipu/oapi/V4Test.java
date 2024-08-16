@@ -353,7 +353,13 @@ public class V4Test {
     public void testCreateImage() throws JsonProcessingException {
         CreateImageRequest createImageRequest = new CreateImageRequest();
         createImageRequest.setModel(Constants.ModelCogView);
-        createImageRequest.setPrompt("画一个温顺可爱的小狗");
+        createImageRequest.setPrompt("Futuristic cloud data center, showcasing advanced technologgy and a high-tech atmosp\n" +
+                "here. The image should depict a spacious, well-lit interior with rows of server racks, glo\n" +
+                "wing lights, and digital displays. Include abstract representattions of data streams and\n" +
+                "onnectivity, symbolizing the essence of cloud computing. Thee style should be modern a\n" +
+                "nd sleek, with a focus on creating a sense of innovaticon and cutting-edge technology\n" +
+                "The overall ambiance should convey the power and effciency of cloud services in a visu\n" +
+                "ally engaging way.");
         createImageRequest.setRequestId("test11111111111111");
         ImageApiResponse imageApiResponse = client.createImage(createImageRequest);
         logger.info("imageApiResponse: {}", mapper.writeValueAsString(imageApiResponse));
