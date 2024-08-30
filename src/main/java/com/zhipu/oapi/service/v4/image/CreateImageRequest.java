@@ -35,6 +35,11 @@ public class CreateImageRequest extends CommonRequest  implements ClientRequest<
     private String model;
 
     /**
+     * The size of the image to generate. Defaults to "256x256".
+     */
+    private String size;
+
+    /**
      * 敏感词检测控制
      */
     @JsonProperty("sensitive_word_check")
@@ -47,6 +52,7 @@ public class CreateImageRequest extends CommonRequest  implements ClientRequest<
         request.put("user_id", this.getUserId());
         request.put("prompt", this.getPrompt());
         request.put("model", this.getModel());
+        request.put("size", this.getSize());
         request.put("sensitive_word_check", this.getSensitiveWordCheck());
 
         if(this.getExtraJson() !=null){
