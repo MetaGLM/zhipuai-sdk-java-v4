@@ -1,6 +1,7 @@
 package com.zhipu.oapi.service.v4.tools;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -11,6 +12,7 @@ import com.zhipu.oapi.service.v4.deserialize.tools.WebSearchMessageDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.tools.WebSearchMessageToolCallDeserializer;
 
 import java.util.Iterator;
+import java.util.List;
 
 @JsonDeserialize(using = WebSearchMessageToolCallDeserializer.class)
 public class WebSearchMessageToolCall extends ObjectNode {
@@ -25,13 +27,13 @@ public class WebSearchMessageToolCall extends ObjectNode {
      * 搜索意图
      */
     @JsonProperty("search_intent")
-    private SearchIntent searchIntent;
+    private List<SearchIntent> searchIntent;
 
     /**
      * 搜索结果
      */
     @JsonProperty("search_result")
-    private SearchResult searchResult;
+    private List<SearchResult> searchResult;
 
     /**
      * 推荐query
@@ -58,13 +60,16 @@ public class WebSearchMessageToolCall extends ObjectNode {
             this.setId(null);
         }
         if (objectNode.get("search_intent") != null) {
-            this.setSearchIntent(objectMapper.convertValue(objectNode.get("search_intent"), SearchIntent.class));
+
+            this.setSearchIntent(objectMapper.convertValue(objectNode.get("search_intent"), new TypeReference<List<SearchIntent>>() {}));
+
         } else {
             this.setSearchIntent(null);
         }
 
         if (objectNode.get("search_result") != null) {
-            this.setSearchResult(objectMapper.convertValue(objectNode.get("search_result"), SearchResult.class));
+
+            this.setSearchResult(objectMapper.convertValue(objectNode.get("search_result"), new TypeReference<List<SearchResult>>() {}));
         } else {
             this.setSearchResult(null);
         }
@@ -98,22 +103,22 @@ public class WebSearchMessageToolCall extends ObjectNode {
         this.put("id", id);
     }
 
-    public SearchIntent getSearchIntent() {
+    public List<SearchIntent> getSearchIntent() {
         return searchIntent;
     }
 
-    public void setSearchIntent(SearchIntent searchIntent) {
+    public void setSearchIntent(List<SearchIntent> searchIntent) {
         this.searchIntent = searchIntent;
-        this.set("search_intent", searchIntent);
+        this.putPOJO("search_intent", searchIntent);
     }
 
-    public SearchResult getSearchResult() {
+    public List<SearchResult> getSearchResult() {
         return searchResult;
     }
 
-    public void setSearchResult(SearchResult searchResult) {
+    public void setSearchResult(List<SearchResult> searchResult) {
         this.searchResult = searchResult;
-        this.set("search_result", searchResult);
+        this.putPOJO("search_result", searchResult);
     }
 
     public SearchRecommend getSearchRecommend() {
