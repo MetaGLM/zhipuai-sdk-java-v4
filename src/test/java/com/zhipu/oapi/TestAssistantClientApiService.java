@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class TestAssistantClientApiService {
     private final static Logger logger = LoggerFactory.getLogger(TestAssistantClientApiService.class);
-    private static final String ZHIPUAI_API_KEY = System.getProperty("ZHIPUAI_API_KEY");
-    private static final String ZHIPUAI_BASE_URL = System.getProperty("ZHIPUAI_BASE_URL");
+    private static final String ZHIPUAI_API_KEY = Constants.getApiKey();
+    private static final String ZHIPUAI_BASE_URL = Constants.getBaseUrl();
     private static ClientV4 client = null;
 
     private static final ObjectMapper mapper = new ObjectMapper();
