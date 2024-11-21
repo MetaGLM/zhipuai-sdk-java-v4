@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class WebSearchToolsTest {
 
     private final static Logger logger = LoggerFactory.getLogger(WebSearchToolsTest.class);
-    private static final String API_SECRET_KEY = System.getProperty("ZHIPUAI_API_KEY");
+    private static final String API_SECRET_KEY = Constants.getApiKey();
 
     private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
             .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)

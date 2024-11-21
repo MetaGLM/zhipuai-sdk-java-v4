@@ -4,10 +4,8 @@ package com.zhipu.oapi;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
 import com.zhipu.oapi.service.v4.batchs.BatchResponse;
@@ -26,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
-    private static final String API_SECRET_KEY = System.getProperty("ZHIPUAI_API_KEY");
+    private static final String API_SECRET_KEY = Constants.getApiKey();
 
 
     private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
@@ -62,9 +59,10 @@ public class V4Test {
     }
 
     @Test
-    public void test(){
+    public void test() {
 
     }
+
     /**
      * sse-V4：function调用
      */
@@ -346,6 +344,7 @@ public class V4Test {
     }
 
 //
+
     /**
      * 文生图
      */
@@ -450,9 +449,9 @@ public class V4Test {
             String filePath = "demo_output.jsonl";
             String resourcePath = V4Test.class.getClassLoader().getResource("").getPath();
 
-            httpxBinaryResponseContent.streamToFile(resourcePath+"1" +filePath,1000);
+            httpxBinaryResponseContent.streamToFile(resourcePath + "1" + filePath, 1000);
 
-        }catch (IOException e){
+        } catch (IOException e) {
             logger.error("file content error", e);
         }
     }
@@ -466,6 +465,7 @@ public class V4Test {
 ////    }
 //
 //
+
     /**
      * 微调V4-创建微调任务
      */
@@ -521,7 +521,7 @@ public class V4Test {
 
 
     @Test
-    public void testBatchesCreate(){
+    public void testBatchesCreate() {
         BatchCreateParams batchCreateParams = new BatchCreateParams(
                 "24h",
                 "/v4/chat/completions",
@@ -552,6 +552,7 @@ public class V4Test {
         logger.info("output: {}", queryFineTuningJobApiResponse);
 
     }
+
     @Test
     public void testBatchesRetrieve() {
         BatchResponse batchResponse = client.batchesRetrieve("batch_1791021399316246528");
@@ -568,6 +569,7 @@ public class V4Test {
 //        output: BatchResponse(code=200, msg=调用成功, success=true, data=Batch(id=batch_1791021399316246528, completionWindow=24h, createdAt=1715847752000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=validating, cancelledAt=null, cancellingAt=null, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null))
 
     }
+
     @Test
     public void testBatchesList() {
         QueryBatchRequest queryBatchRequest = new QueryBatchRequest();
@@ -577,8 +579,9 @@ public class V4Test {
 // output: QueryBatchResponse(code=200, msg=调用成功, success=true, data=BatchPage(object=list, data=[Batch(id=batch_1790291013237211136, completionWindow=24h, createdAt=1715673614000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=completed, cancelledAt=null, cancellingAt=1715673699000, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={description=job test}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null), Batch(id=batch_1790292763050508288, completionWindow=24h, createdAt=1715674031000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=completed, cancelledAt=null, cancellingAt=null, completedAt=1715766416000, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=1715754569000, inProgressAt=null, metadata={description=job test}, outputFileId=1715766415_e5a77222855a406ca8a082de28549c99, requestCounts=BatchRequestCounts(completed=2, failed=0, total=2), error=null), Batch(id=batch_1791021114887909376, completionWindow=24h, createdAt=1715847684000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=validating, cancelledAt=null, cancellingAt=null, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null), Batch(id=batch_1791021399316246528, completionWindow=24h, createdAt=1715847752000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=validating, cancelledAt=null, cancellingAt=null, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null)], error=null))
 
     }
+
     @Test
-    public void testBatchesCancel(){
+    public void testBatchesCancel() {
         BatchResponse batchResponse = client.batchesCancel("batch_1791021399316246528");
         logger.info("output: {}", batchResponse);
 //         BatchResponse(code=200, msg=调用成功, success=true, data=Batch(id=batch_1791021399316246528, completionWindow=24h, createdAt=1715847752000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=cancelled, cancelledAt=1715847965600, cancellingAt=1715847965600, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null))

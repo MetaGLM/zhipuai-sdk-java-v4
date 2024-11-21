@@ -24,8 +24,8 @@ import java.util.concurrent.TimeUnit;
 @Testcontainers
 public class TestVideosClientApiService {
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
-    private static final String ZHIPUAI_API_KEY = System.getProperty("ZHIPUAI_API_KEY");
-    private static final String ZHIPUAI_BASE_URL = System.getProperty("ZHIPUAI_BASE_URL");
+    private static final String ZHIPUAI_API_KEY = Constants.getApiKey();
+    private static final String ZHIPUAI_BASE_URL = Constants.getBaseUrl();
     private static ClientV4 client = null;
     static {
         if (StringUtils.isNotEmpty(ZHIPUAI_BASE_URL)){

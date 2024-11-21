@@ -18,6 +18,11 @@ Java），让开发者更便捷的调用智谱开放API
             <version>release-V4-2.3.0</version>
         </dependency>
 ```
+- 运行单元测试依赖您环境变量中的APIKey和BaseUrl信息，建议您提前设置好环境变量；运行过程中会消耗APIKey对应账户下的少量token
+```
+  export ZHIPUAI_BASE_URL=https://open.bigmodel.cn/api/paas/v4/ # 默认智谱开放平台API地址
+  export ZHIPUAI_API_KEY=6082424a4dxxxxxxxxxxb9d.svyyyyyyyyyK8K # 替换为你自己的APIKey
+```
 ### 依赖信息
 
 ```text
@@ -51,6 +56,7 @@ private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
 ```
 
 ### spring Controller 示例
+
 ```java
 package com.zhipu.controller;
 
@@ -58,6 +64,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wd.common.core.domain.R;
 import com.zhipu.oapi.ClientV4;
+import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.model.ChatCompletionRequest;
 import com.zhipu.oapi.service.v4.model.ModelApiResponse;
@@ -73,22 +80,22 @@ import java.util.concurrent.TimeUnit;
 @RestController
 public class TestController {
 
-    private final static Logger logger = LoggerFactory.getLogger(TestController.class);
-    private static final String API_SECRET_KEY = System.getProperty("ZHIPUAI_API_KEY");
+  private final static Logger logger = LoggerFactory.getLogger(TestController.class);
+  private static final String API_SECRET_KEY = Constants.getApiKey();
 
-    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
-            .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
-            .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
-            .build();
-    private static final ObjectMapper mapper = MessageDeserializeFactory.defaultObjectMapper();
+  private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
+          .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
+          .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
+          .build();
+  private static final ObjectMapper mapper = MessageDeserializeFactory.defaultObjectMapper();
 
 
-    @RequestMapping("/test")
-    public R<ModelData> test(@RequestBody ChatCompletionRequest chatCompletionRequest) {
-        ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+  @RequestMapping("/test")
+  public R<ModelData> test(@RequestBody ChatCompletionRequest chatCompletionRequest) {
+    ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
 
-        return R.ok(sseModelApiResp.getData());
-    }
+    return R.ok(sseModelApiResp.getData());
+  }
 }
 
 ```
