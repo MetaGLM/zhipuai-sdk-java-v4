@@ -2,7 +2,6 @@ package com.zhipu.oapi.service.v4.videos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.zhipu.oapi.core.model.ClientRequest;
-import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
 import com.zhipu.oapi.service.v4.model.SensitiveWordCheckRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -53,6 +52,21 @@ public class VideoCreateParams implements ClientRequest<VideoCreateParams> {
      */
     @JsonProperty("user_id")
     private String userId;
+
+    @JsonProperty("quality")
+    private String quality;
+
+    @JsonProperty("with_audio")
+    private Boolean withAudio;
+
+    @JsonProperty("size")
+    private String size;
+
+    @JsonProperty("duration")
+    private Integer duration;
+
+    @JsonProperty("fps")
+    private Integer fps;
 
     /**
      * 敏感词检测控制

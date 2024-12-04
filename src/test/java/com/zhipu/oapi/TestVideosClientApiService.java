@@ -51,6 +51,8 @@ public class TestVideosClientApiService {
         VideoCreateParams build = VideoCreateParams.builder()
                 .prompt("一个开船的人")
                 .model("cogvideox")
+                .withAudio(Boolean.TRUE)
+                .quality("quality")
                 .build();
         VideosResponse apply = new VideosClientApiService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
                 .videoGenerations(build)
