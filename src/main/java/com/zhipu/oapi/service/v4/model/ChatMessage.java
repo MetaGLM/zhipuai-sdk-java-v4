@@ -1,6 +1,7 @@
 package com.zhipu.oapi.service.v4.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +24,7 @@ public class ChatMessage extends ObjectNode {
 
     private String role;
     private Object content;
-
+    private Audio audio;
     private String name;
 
     @JsonProperty("tool_calls")
@@ -114,5 +115,21 @@ public class ChatMessage extends ObjectNode {
     public void setTool_call_id(String tool_call_id) {
         this.tool_call_id = tool_call_id;
         this.put("tool_call_id", tool_call_id);
+    }
+
+    public void setAudio(Audio audio) {
+        this.audio = audio;
+        this.putPOJO("audio", audio);
+    }
+
+    @Data
+    public static class Audio {
+
+        private String id;
+
+        private String data;
+
+        private Long expires_at;
+
     }
 }
