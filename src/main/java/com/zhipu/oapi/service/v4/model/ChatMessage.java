@@ -120,14 +120,4 @@ public class ChatMessage extends ObjectNode {
         this.putPOJO("audio", audio);
     }
 
-    @Data
-    public static class Audio {
-
-        private String id;
-
-        private String data;
-
-        private Long expires_at;
-
-    }
 }
