@@ -2,7 +2,7 @@ package com.zhipu.oapi.service.v4.api;
 
 import com.fasterxml.jackson.core.*;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
-import com.zhipu.oapi.core.response.RawResponse;
+import com.zhipu.oapi.service.v4.api.audio.AudioApi;
 import com.zhipu.oapi.service.v4.api.batches.BatchesApi;
 import com.zhipu.oapi.service.v4.api.chat.ChatApi;
 import com.zhipu.oapi.service.v4.api.embedding.EmbeddingApi;
@@ -19,16 +19,16 @@ import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.image.ImageResult;
 import com.zhipu.oapi.service.v4.tools.WebSearchPro;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
 import io.reactivex.Single;
 import okhttp3.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 
@@ -41,6 +41,7 @@ public class ClientApiService extends ClientBaseService {
     private final FineTuningApi fineTuningApi;
     private final ImagesApi imagesApi;
     private final ToolsApi toolsApi;
+    private final AudioApi audioApi;
 
     public ClientApiService(final OkHttpClient client, final String baseUrl) {
         super(client, baseUrl);
@@ -51,6 +52,7 @@ public class ClientApiService extends ClientBaseService {
         this.fineTuningApi = super.retrofit.create(FineTuningApi.class);
         this.imagesApi = super.retrofit.create(ImagesApi.class);
         this.toolsApi = super.retrofit.create(ToolsApi.class);
+        this.audioApi = super.retrofit.create(AudioApi.class);
     }
 
 
@@ -190,6 +192,29 @@ public class ClientApiService extends ClientBaseService {
 
     public Single<WebSearchPro> webSearchPro(Map<String,Object> request) {
         return toolsApi.webSearch(request);
+    }
+
+    public Single<java.io.File> audioSpeech(Map<String,Object> request) throws IOException {
+        Single<ResponseBody> responseBody = audioApi.audioSpeech(request);
+        Path tempDirectory = Files.createTempFile("audio_speech" + UUID.randomUUID(),".wav");
+        java.io.File file = tempDirectory.toFile();
+        writeResponseBodyToFile(responseBody.blockingGet(), file);
+        return Single.just(file);
+    }
+
+    private void writeResponseBodyToFile(ResponseBody body, java.io.File file) {
+        try (InputStream inputStream = body.byteStream();
+             OutputStream outputStream = Files.newOutputStream(file.toPath())) {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            outputStream.flush();
+        } catch (IOException e) {
+            logger.error("writeResponseBodyToFile error,msg:{}",e.getMessage(),e);
+            e.printStackTrace();
+        }
     }
 
 
