@@ -202,6 +202,26 @@ public class ClientApiService extends ClientBaseService {
         return Single.just(file);
     }
 
+    public Single<java.io.File> audioCustomization(Map<String,Object> request) throws IOException {
+        java.io.File voiceFile = (java.io.File)request.get("voice_data");
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), voiceFile);
+        MultipartBody.Part voiceData = MultipartBody.Part.createFormData("voice_data", voiceFile.getName(), requestFile);
+        request.remove("voice_data");
+
+        // 设置请求参数
+        Map<String, RequestBody> requestMap = new HashMap<>();
+        //遍历request
+        for (String key : request.keySet()) {
+            requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
+
+        }
+        Single<ResponseBody> responseBody = audioApi.audioCustomization(requestMap,voiceData);
+        Path tempDirectory = Files.createTempFile("audio_customization" + UUID.randomUUID(),".wav");
+        java.io.File file = tempDirectory.toFile();
+        writeResponseBodyToFile(responseBody.blockingGet(), file);
+        return Single.just(file);
+    }
+
     private void writeResponseBodyToFile(ResponseBody body, java.io.File file) {
         try (InputStream inputStream = body.byteStream();
              OutputStream outputStream = Files.newOutputStream(file.toPath())) {

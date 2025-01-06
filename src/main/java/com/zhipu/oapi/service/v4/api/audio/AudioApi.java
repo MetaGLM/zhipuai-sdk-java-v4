@@ -1,6 +1,8 @@
 package com.zhipu.oapi.service.v4.api.audio;
 
 import io.reactivex.Single;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.http.*;
 
@@ -23,7 +25,10 @@ public interface AudioApi {
      * @param request
      * @return
      */
+    @Multipart
     @POST("audio/customization")
-    Single<ResponseBody> audioCustomization(@Body Map<String,Object> request);
+    Single<ResponseBody> audioCustomization(
+            @PartMap Map<String, RequestBody> request,
+            @Part MultipartBody.Part voiceData);
 
 }

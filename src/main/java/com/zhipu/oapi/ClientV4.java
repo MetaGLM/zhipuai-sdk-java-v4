@@ -426,6 +426,24 @@ public class ClientV4 extends AbstractClientBaseService{
         return this.executeRequest(request, supplier, AudioSpeechApiResponse.class);
     }
 
+    /**
+     * tts接口(语音克隆)
+     * @param request
+     * @return
+     */
+    public AudioCustomizationApiResponse audioCustomization(AudioCustomizationRequest request){
+        RequestSupplier<Map<String, Object>, java.io.File> supplier = (params) -> {
+            try {
+                return chatApiService.audioCustomization(
+                        params
+                );
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        return this.executeRequest(request, supplier, AudioCustomizationApiResponse.class);
+    }
+
     public WebSearchApiResponse webSearchProStreamingInvoke(WebSearchParamsRequest request) {
         FlowableRequestSupplier<Map<String,Object>, retrofit2.Call<ResponseBody>> supplier = params ->  chatApiService.webSearchProStreaming(params);
         return streamRequest(

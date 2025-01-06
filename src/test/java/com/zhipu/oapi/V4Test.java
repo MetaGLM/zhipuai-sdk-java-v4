@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
+import com.zhipu.oapi.service.v4.audio.AudioCustomizationApiResponse;
+import com.zhipu.oapi.service.v4.audio.AudioCustomizationRequest;
 import com.zhipu.oapi.service.v4.audio.AudioSpeechApiResponse;
 import com.zhipu.oapi.service.v4.audio.AudioSpeechRequest;
 import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
@@ -604,8 +606,23 @@ public class V4Test {
         File file = audioSpeechApiResponse.getData();
         file.createNewFile();
 
-        logger.info("tts file generation,fileName:{},filePath:{}",audioSpeechApiResponse.getData().getName(),audioSpeechApiResponse.getData().getAbsolutePath());
+        logger.info("testAudioSpeech file generation,fileName:{},filePath:{}",audioSpeechApiResponse.getData().getName(),audioSpeechApiResponse.getData().getAbsolutePath());
 
+    }
+
+    @Test
+    public void testAudioCustomization() throws IOException {
+        AudioCustomizationRequest audioCustomizationRequest = AudioCustomizationRequest.builder()
+                .model(Constants.ModelTTS)
+                .input("智谱，你好呀")
+                .voiceText("这是一条测试用例")
+                .voiceData(new File("/Users/jhy/Desktop/tts/test_case_8s.wav"))
+                .responseFormat("wav")
+                .build();
+        AudioCustomizationApiResponse audioCustomizationApiResponse = client.audioCustomization(audioCustomizationRequest);
+        File file = audioCustomizationApiResponse.getData();
+        file.createNewFile();
+        logger.info("testAudioCustomization file generation,fileName:{},filePath:{}",audioCustomizationApiResponse.getData().getName(),audioCustomizationApiResponse.getData().getAbsolutePath());
     }
 
     private static String getAsyncTaskId() throws JsonProcessingException {
