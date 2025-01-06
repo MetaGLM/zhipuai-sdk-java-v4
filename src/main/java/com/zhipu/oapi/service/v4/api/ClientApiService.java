@@ -207,10 +207,7 @@ public class ClientApiService extends ClientBaseService {
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), voiceFile);
         MultipartBody.Part voiceData = MultipartBody.Part.createFormData("voice_data", voiceFile.getName(), requestFile);
         request.remove("voice_data");
-
-        // 设置请求参数
         Map<String, RequestBody> requestMap = new HashMap<>();
-        //遍历request
         for (String key : request.keySet()) {
             requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
 
