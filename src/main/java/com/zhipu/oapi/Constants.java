@@ -42,6 +42,9 @@ public class Constants {
     @Deprecated
     public static final String ModelChatGLM3TURBO= "glm-3-turbo";
 
+    //tts模型
+    public static final String ModelTTS = "cogtts";
+
     // invoke methods
     public static final String invokeMethodAsync = "async-invoke";
     public static final String invokeMethodSse = "sse-invoke";
