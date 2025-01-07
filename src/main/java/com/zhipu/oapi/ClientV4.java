@@ -413,7 +413,7 @@ public class ClientV4 extends AbstractClientBaseService{
      * @param request
      * @return
      */
-    public AudioSpeechApiResponse audioSpeech(AudioSpeechRequest request){
+    public AudioSpeechApiResponse speech(AudioSpeechRequest request){
         RequestSupplier<Map<String, Object>, java.io.File> supplier = (params) -> {
             try {
                 return chatApiService.audioSpeech(
@@ -431,7 +431,7 @@ public class ClientV4 extends AbstractClientBaseService{
      * @param request
      * @return
      */
-    public AudioCustomizationApiResponse audioCustomization(AudioCustomizationRequest request){
+    public AudioCustomizationApiResponse customization(AudioCustomizationRequest request){
         RequestSupplier<Map<String, Object>, java.io.File> supplier = (params) -> {
             try {
                 return chatApiService.audioCustomization(
