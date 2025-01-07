@@ -631,7 +631,7 @@ public class V4Test {
                 .voice("child")
                 .responseFormat("wav")
                 .build();
-        AudioSpeechApiResponse audioSpeechApiResponse = client.audioSpeech(audioSpeechRequest);
+        AudioSpeechApiResponse audioSpeechApiResponse = client.speech(audioSpeechRequest);
         File file = audioSpeechApiResponse.getData();
         file.createNewFile();
 
@@ -648,7 +648,7 @@ public class V4Test {
                 .voiceData(new File("/Users/jhy/Desktop/tts/test_case_8s.wav"))
                 .responseFormat("wav")
                 .build();
-        AudioCustomizationApiResponse audioCustomizationApiResponse = client.audioCustomization(audioCustomizationRequest);
+        AudioCustomizationApiResponse audioCustomizationApiResponse = client.customization(audioCustomizationRequest);
         File file = audioCustomizationApiResponse.getData();
         file.createNewFile();
         logger.info("testAudioCustomization file generation,fileName:{},filePath:{}",audioCustomizationApiResponse.getData().getName(),audioCustomizationApiResponse.getData().getAbsolutePath());
