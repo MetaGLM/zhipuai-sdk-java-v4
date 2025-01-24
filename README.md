@@ -4,19 +4,24 @@
 Java），让开发者更便捷的调用智谱开放API
 
 ## 简介
-- <font color="red">**java sdk仍在开发测试阶段，有bug请留言联系**</font>
+- <font color="red">**Java SDK仍在开发测试阶段，有bug请留言联系**</font>
+- Java SDK当前不支持Android
 - 对所有接口进行了类型封装，无需查阅API文档即可完成接入
 
 ## 安装
 
 - 运行环境：JDK1.8+
 - maven坐标
-```
+```xml
         <dependency>
             <groupId>cn.bigmodel.openapi</groupId>
             <artifactId>oapi-java-sdk</artifactId>
             <version>release-V4-2.3.0</version>
         </dependency>
+```
+
+```groovy
+implementation 'cn.bigmodel.openapi:oapi-java-sdk:release-V4-2.3.0'
 ```
 - 运行单元测试依赖您环境变量中的APIKey和BaseUrl信息，建议您提前设置好环境变量；运行过程中会消耗APIKey对应账户下的少量token
 ```
