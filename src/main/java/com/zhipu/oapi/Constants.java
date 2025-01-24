@@ -37,7 +37,7 @@ public class Constants {
     // 拟人模型
     public static final String ModelCharGLM3= "charglm-3";
 
-    // 历史模型，建议尽快迁移至信模型
+    // 历史模型，建议尽快迁移至新模型
     @Deprecated
     public static final String ModelChatGLM3TURBO= "glm-3-turbo";
 
