@@ -21,7 +21,9 @@ Java），让开发者更便捷的调用智谱开放API
 ```
 
 ```groovy
-implementation 'cn.bigmodel.openapi:oapi-java-sdk:release-V4-2.3.0'
+dependencies {
+    implementation 'cn.bigmodel.openapi:oapi-java-sdk:release-V4-2.3.0'
+}
 ```
 - 运行单元测试依赖您环境变量中的APIKey和BaseUrl信息，建议您提前设置好环境变量；运行过程中会消耗APIKey对应账户下的少量token
 ```
