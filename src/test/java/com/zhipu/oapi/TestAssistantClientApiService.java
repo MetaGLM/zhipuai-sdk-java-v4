@@ -6,22 +6,16 @@ import com.zhipu.oapi.service.v4.api.AssistantClientService;
 import com.zhipu.oapi.service.v4.assistant.*;
 import com.zhipu.oapi.service.v4.assistant.conversation.ConversationParameters;
 import com.zhipu.oapi.service.v4.assistant.conversation.ConversationUsageListResponse;
-import com.zhipu.oapi.service.v4.assistant.conversation.ConversationUsageListStatus;
 import com.zhipu.oapi.service.v4.assistant.message.MessageContent;
 import com.zhipu.oapi.service.v4.assistant.query_support.AssistantSupportResponse;
 import com.zhipu.oapi.service.v4.assistant.query_support.QuerySupportParams;
-import com.zhipu.oapi.service.v4.tools.ChoiceDelta;
-import com.zhipu.oapi.service.v4.tools.WebSearchPro;
 import com.zhipu.oapi.utils.StringUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -53,7 +47,6 @@ public class TestAssistantClientApiService {
     @Test
     @Order(1)
     public void testAssistantCompletionStream() throws JsonProcessingException {
-
 
         MessageTextContent textContent = MessageTextContent.builder()
                 .text("帮我搜索下智谱的cogvideox发布时间")
@@ -104,7 +97,6 @@ public class TestAssistantClientApiService {
         }
         logger.info("apply output: {}", mapper.writeValueAsString(apply));
 
-
     }
     @Test
     @Order(2)
@@ -128,5 +120,93 @@ public class TestAssistantClientApiService {
                 .queryConversationUsage(build)
                 .apply(client);
         logger.info("apply output: {}", apply);
+    }
+
+
+    @Test
+    @Order(1)
+    public void testTranslateAssistantCompletionStream() throws JsonProcessingException {
+
+        MessageTextContent textContent = MessageTextContent.builder()
+                .text("你好呀")
+                .type("text")
+                .build();
+
+        ConversationMessage messages = ConversationMessage.builder()
+                .role("user")
+                .content(Collections.singletonList(textContent))
+                .build();
+
+        AssistantParameters build = AssistantParameters.builder()
+                .assistantId("111111")
+                .model("glm-4-assistant")
+                .stream(true)
+                .messages(Collections.singletonList(messages))
+                .build();
+        // 设置params的相关属性
+        AssistantApiResponse apply = new AssistantClientService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
+                .assistantCompletionStream(build)
+                .apply(client);
+        if (apply.isSuccess()) {
+            AtomicBoolean isFirst = new AtomicBoolean(true);
+            List<MessageContent> choices = new ArrayList<>();
+            AtomicReference<AssistantCompletion> lastAccumulator = new AtomicReference<>();
+
+            apply.getFlowable().map(result -> result)
+                    .doOnNext(accumulator -> {
+                        {
+                            if (isFirst.getAndSet(false)) {
+                                logger.info("Response: ");
+                            }
+                            MessageContent delta = accumulator.getChoices().get(0).getDelta();
+                            logger.info("MessageContent: {}", mapper.writeValueAsString(delta));
+                            choices.add(delta);
+                            lastAccumulator.set(accumulator);
+
+                        }
+                    })
+                    .doOnComplete(() -> System.out.println("Stream completed."))
+                    .doOnError(throwable -> System.err.println("Error: " + throwable)) // Handle errors
+                    .blockingSubscribe();// Use blockingSubscribe instead of blockingGet()
+
+            AssistantCompletion assistantCompletion = lastAccumulator.get();
+
+            apply.setFlowable(null);// 打印前置空
+            apply.setData(assistantCompletion);
+        }
+        logger.info("apply output: {}", mapper.writeValueAsString(apply));
+    }
+
+    @Test
+    public void testNonFunctionInvoke() throws JsonProcessingException {
+        MessageTextContent textContent = MessageTextContent.builder()
+                .text("你好呀")
+                .type("text")
+                .build();
+
+        ConversationMessage messages = ConversationMessage.builder()
+                .role("user")
+                .content(Collections.singletonList(textContent))
+                .build();
+
+        AssistantExtraParameters assistantExtraParameters = new AssistantExtraParameters();
+        assistantExtraParameters.setTranslate(TranslateParameters.builder()
+                .from("zh")
+                .to("en")
+                .build());
+
+        AssistantParameters build = AssistantParameters.builder()
+                .assistantId("111111")
+                .model("glm-4-assistant")
+                .stream(false)
+                .messages(Collections.singletonList(messages))
+                .extraParameters(assistantExtraParameters)
+                .build();
+
+        // 设置params的相关属性
+        AssistantApiResponse apply = new AssistantClientService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
+                .assistantCompletion(build)
+                .apply(client);
+        logger.info("model output: {}", mapper.writeValueAsString(apply));
     }
 }
