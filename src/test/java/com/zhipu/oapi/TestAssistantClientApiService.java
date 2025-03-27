@@ -137,11 +137,17 @@ public class TestAssistantClientApiService {
                 .content(Collections.singletonList(textContent))
                 .build();
 
+        AssistantExtraParameters assistantExtraParameters = new AssistantExtraParameters();
+        TranslateParameters translateParameters = new TranslateParameters();
+        translateParameters.setFrom("zh");
+        translateParameters.setTo("en");
+        assistantExtraParameters.setTranslate(translateParameters);
         AssistantParameters build = AssistantParameters.builder()
                 .assistantId("111111")
                 .model("glm-4-assistant")
                 .stream(true)
                 .messages(Collections.singletonList(messages))
+                .extraParameters(assistantExtraParameters)
                 .build();
         // 设置params的相关属性
         AssistantApiResponse apply = new AssistantClientService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
