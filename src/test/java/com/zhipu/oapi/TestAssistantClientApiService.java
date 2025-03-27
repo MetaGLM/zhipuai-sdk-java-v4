@@ -143,7 +143,7 @@ public class TestAssistantClientApiService {
         translateParameters.setTo("en");
         assistantExtraParameters.setTranslate(translateParameters);
         AssistantParameters build = AssistantParameters.builder()
-                .assistantId("111111")
+                .assistantId("9996ijk789lmn012o345p999")
                 .model("glm-4-assistant")
                 .stream(true)
                 .messages(Collections.singletonList(messages))
@@ -184,7 +184,7 @@ public class TestAssistantClientApiService {
     }
 
     @Test
-    public void testNonFunctionInvoke() throws JsonProcessingException {
+    public void testTranslateAssistantCompletion() throws JsonProcessingException {
         MessageTextContent textContent = MessageTextContent.builder()
                 .text("你好呀")
                 .type("text")
@@ -202,7 +202,7 @@ public class TestAssistantClientApiService {
                 .build());
 
         AssistantParameters build = AssistantParameters.builder()
-                .assistantId("111111")
+                .assistantId("9996ijk789lmn012o345p999")
                 .model("glm-4-assistant")
                 .stream(false)
                 .messages(Collections.singletonList(messages))
