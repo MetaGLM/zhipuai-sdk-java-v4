@@ -15,12 +15,14 @@ public interface AudioApi {
 
     @Streaming
     @POST("audio/transcriptions")
+    @Multipart
     Call<ResponseBody> audioTranscriptionsStream(@PartMap Map<String, RequestBody> request,
                                                  @Part MultipartBody.Part file);
 
 
     @POST("audio/transcriptions")
+    @Multipart
     Single<ModelData> audioTranscriptions(@PartMap Map<String, RequestBody> request,
-                                                 @Part MultipartBody.Part file);
+                                          @Part MultipartBody.Part file);
 
 }

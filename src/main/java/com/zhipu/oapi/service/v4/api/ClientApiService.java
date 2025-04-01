@@ -30,6 +30,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 
 
@@ -197,28 +198,33 @@ public class ClientApiService extends ClientBaseService {
     }
 
 
-    public Call<ResponseBody> audioTranscriptionsStream(Map<String,Object> request) {
+    public Call<ResponseBody> audioTranscriptionsStream(Map<String,Object> request) throws IOException {
         java.io.File file = (java.io.File)request.get("file");
-        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        String contentType = Files.probeContentType(file.toPath());
+        RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
         MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
         request.remove("file");
         Map<String, RequestBody> requestMap = new HashMap<>();
         for (String key : request.keySet()) {
-            requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
-
+            if(request.get(key) != null){
+                requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
+            }
         }
         return audioApi.audioTranscriptionsStream(requestMap, fileData);
     }
 
 
-    public Single<ModelData> audioTranscriptions(Map<String,Object> request) {
+    public Single<ModelData> audioTranscriptions(Map<String,Object> request) throws IOException {
         java.io.File file = (java.io.File)request.get("file");
-        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        String contentType = Files.probeContentType(file.toPath());
+        RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
         MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
         request.remove("file");
         Map<String, RequestBody> requestMap = new HashMap<>();
         for (String key : request.keySet()) {
-            requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
+            if(request.get(key) != null){
+                requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
+            }
         }
         return audioApi.audioTranscriptions(requestMap, fileData);
     }

@@ -32,6 +32,10 @@ public final class ModelData extends ObjectNode {
     private String model;
     private String id;
 
+    private String type;
+    private String text;
+    private List<Segment> segments;
+
 
     public ModelData() {
         super(JsonNodeFactory.instance);
@@ -78,6 +82,24 @@ public final class ModelData extends ObjectNode {
         } else {
             this.setId(null);
         }
+        if(objectNode.get("text") != null){
+            this.setText(objectNode.get("text").asText());
+        }else {
+            this.setText(null);
+        }
+        if(objectNode.get("type") != null){
+            this.setType(objectNode.get("type").asText());
+        }else {
+            this.setType(null);
+        }
+        if (objectNode.get("segments") != null) {
+            List<Segment> segments =
+                    objectMapper.convertValue(objectNode.get("segments"), new TypeReference<List<Segment>>() {});
+            this.setSegments(segments);
+        } else {
+            this.setSegments(null);
+        }
+
 
         Iterator<String> fieldNames = objectNode.fieldNames();
 
@@ -138,6 +160,22 @@ public final class ModelData extends ObjectNode {
     public void setId(String id) {
         this.id = id;
         this.put("id", id);
+    }
+
+    public void setText(String text) {
+        this.text = text;
+        this.put("text", text);
+    }
+
+    public void setType(String type) {
+        this.type = type;
+        this.put("type", type);
+    }
+
+
+    public void setSegments(List<Segment> segments) {
+        this.segments = segments;
+        this.putPOJO("segments", segments);
     }
 
 }
