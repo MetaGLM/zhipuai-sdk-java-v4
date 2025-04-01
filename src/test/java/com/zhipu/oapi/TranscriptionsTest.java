@@ -20,12 +20,7 @@ public class TranscriptionsTest {
     private final static Logger logger = LoggerFactory.getLogger(TranscriptionsTest.class);
     private static final String API_SECRET_KEY = Constants.getApiKey();
 
-//    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
-//            .enableTokenCache()
-//            .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
-//            .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
-//            .build();
-    private static final ClientV4 client = new ClientV4.Builder("https://test.bigmodel.cn/stage-api/paas/v4/","e6cd54169ce348550af2e0eb63816635.TkzFcBWBlCcCGVuy")
+    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
             .enableTokenCache()
             .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
             .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
