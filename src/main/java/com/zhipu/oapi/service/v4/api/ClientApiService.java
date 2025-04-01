@@ -3,6 +3,7 @@ package com.zhipu.oapi.service.v4.api;
 import com.fasterxml.jackson.core.*;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.core.response.RawResponse;
+import com.zhipu.oapi.service.v4.api.audio.AudioApi;
 import com.zhipu.oapi.service.v4.api.batches.BatchesApi;
 import com.zhipu.oapi.service.v4.api.chat.ChatApi;
 import com.zhipu.oapi.service.v4.api.embedding.EmbeddingApi;
@@ -42,6 +43,8 @@ public class ClientApiService extends ClientBaseService {
     private final ImagesApi imagesApi;
     private final ToolsApi toolsApi;
 
+    private final AudioApi audioApi;
+
     public ClientApiService(final OkHttpClient client, final String baseUrl) {
         super(client, baseUrl);
         this.chatApi = super.retrofit.create(ChatApi.class);
@@ -51,6 +54,7 @@ public class ClientApiService extends ClientBaseService {
         this.fineTuningApi = super.retrofit.create(FineTuningApi.class);
         this.imagesApi = super.retrofit.create(ImagesApi.class);
         this.toolsApi = super.retrofit.create(ToolsApi.class);
+        this.audioApi = super.retrofit.create(AudioApi.class);
     }
 
 
@@ -192,6 +196,32 @@ public class ClientApiService extends ClientBaseService {
         return toolsApi.webSearch(request);
     }
 
+
+    public Call<ResponseBody> audioTranscriptionsStream(Map<String,Object> request) {
+        java.io.File file = (java.io.File)request.get("file");
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+        request.remove("file");
+        Map<String, RequestBody> requestMap = new HashMap<>();
+        for (String key : request.keySet()) {
+            requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
+
+        }
+        return audioApi.audioTranscriptionsStream(requestMap, fileData);
+    }
+
+
+    public Single<ModelData> audioTranscriptions(Map<String,Object> request) {
+        java.io.File file = (java.io.File)request.get("file");
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+        request.remove("file");
+        Map<String, RequestBody> requestMap = new HashMap<>();
+        for (String key : request.keySet()) {
+            requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
+        }
+        return audioApi.audioTranscriptions(requestMap, fileData);
+    }
 
     private HttpxBinaryResponseContent fileWrapper(retrofit2.Call<ResponseBody> response) throws IOException {
         Response<ResponseBody> execute = response.execute();
