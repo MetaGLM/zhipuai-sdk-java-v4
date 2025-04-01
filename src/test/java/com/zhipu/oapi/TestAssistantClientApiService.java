@@ -60,7 +60,6 @@ public class TestAssistantClientApiService {
 
         AssistantParameters build = AssistantParameters.builder()
                 .assistantId("659e54b1b8006379b4b2abd6")
-                .model("glm-4-assistant")
                 .stream(true)
                 .messages(Collections.singletonList(messages))
                 .build();
@@ -144,7 +143,6 @@ public class TestAssistantClientApiService {
         assistantExtraParameters.setTranslate(translateParameters);
         AssistantParameters build = AssistantParameters.builder()
                 .assistantId("9996ijk789lmn012o345p999")
-                .model("glm-4-assistant")
                 .stream(true)
                 .messages(Collections.singletonList(messages))
                 .extraParameters(assistantExtraParameters)
@@ -203,7 +201,6 @@ public class TestAssistantClientApiService {
 
         AssistantParameters build = AssistantParameters.builder()
                 .assistantId("9996ijk789lmn012o345p999")
-                .model("glm-4-assistant")
                 .stream(false)
                 .messages(Collections.singletonList(messages))
                 .extraParameters(assistantExtraParameters)
