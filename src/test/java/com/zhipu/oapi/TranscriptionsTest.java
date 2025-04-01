@@ -6,54 +6,25 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.service.v4.audio.AudioTranscriptionsRequest;
-import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
-import com.zhipu.oapi.service.v4.batchs.BatchResponse;
-import com.zhipu.oapi.service.v4.batchs.QueryBatchResponse;
-import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
-import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
-import com.zhipu.oapi.service.v4.file.*;
-import com.zhipu.oapi.service.v4.fine_turning.*;
-import com.zhipu.oapi.service.v4.image.CreateImageRequest;
-import com.zhipu.oapi.service.v4.image.ImageApiResponse;
 import com.zhipu.oapi.service.v4.model.*;
-import io.reactivex.Flowable;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-
 @Testcontainers
 public class TranscriptionsTest {
 
     private final static Logger logger = LoggerFactory.getLogger(TranscriptionsTest.class);
     private static final String API_SECRET_KEY = Constants.getApiKey();
 
-
-//    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
-//            .enableTokenCache()
-//            .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
-//            .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
-//            .build();
-
-    private static final ClientV4 client = new ClientV4.Builder("https://test.bigmodel.cn/stage-api/paas/v4/","57298e69a19671743e7cb72475c29e24.lfZPBXJc1ImgiwFg")
+    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
             .enableTokenCache()
             .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
             .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
             .build();
-
-    // 请自定义自己的业务id
-    private static final String requestIdTemplate = "mycompany-%d";
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
