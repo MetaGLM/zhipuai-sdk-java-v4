@@ -3,6 +3,7 @@ package com.zhipu.oapi.service.v4.api;
 import com.fasterxml.jackson.core.*;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.service.v4.api.audio.AudioApi;
+import com.zhipu.oapi.service.v4.api.audio.AudioApi;
 import com.zhipu.oapi.service.v4.api.batches.BatchesApi;
 import com.zhipu.oapi.service.v4.api.chat.ChatApi;
 import com.zhipu.oapi.service.v4.api.embedding.EmbeddingApi;
@@ -29,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Files;
 import java.util.*;
 
 
@@ -234,6 +236,37 @@ public class ClientApiService extends ClientBaseService {
         }
     }
 
+
+    public Call<ResponseBody> audioTranscriptionsStream(Map<String,Object> request) throws IOException {
+        java.io.File file = (java.io.File)request.get("file");
+        String contentType = Files.probeContentType(file.toPath());
+        RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
+        MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+        request.remove("file");
+        Map<String, RequestBody> requestMap = new HashMap<>();
+        for (String key : request.keySet()) {
+            if(request.get(key) != null){
+                requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
+            }
+        }
+        return audioApi.audioTranscriptionsStream(requestMap, fileData);
+    }
+
+
+    public Single<ModelData> audioTranscriptions(Map<String,Object> request) throws IOException {
+        java.io.File file = (java.io.File)request.get("file");
+        String contentType = Files.probeContentType(file.toPath());
+        RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
+        MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+        request.remove("file");
+        Map<String, RequestBody> requestMap = new HashMap<>();
+        for (String key : request.keySet()) {
+            if(request.get(key) != null){
+                requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
+            }
+        }
+        return audioApi.audioTranscriptions(requestMap, fileData);
+    }
 
     private HttpxBinaryResponseContent fileWrapper(retrofit2.Call<ResponseBody> response) throws IOException {
         Response<ResponseBody> execute = response.execute();
