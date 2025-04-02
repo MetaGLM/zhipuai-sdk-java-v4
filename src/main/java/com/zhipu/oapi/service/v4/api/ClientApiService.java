@@ -20,17 +20,13 @@ import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.image.ImageResult;
 import com.zhipu.oapi.service.v4.tools.WebSearchPro;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
 import io.reactivex.Single;
 import okhttp3.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.tika.Tika;
 import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 
 
@@ -200,7 +196,8 @@ public class ClientApiService extends ClientBaseService {
 
     public Call<ResponseBody> audioTranscriptionsStream(Map<String,Object> request) throws IOException {
         java.io.File file = (java.io.File)request.get("file");
-        String contentType = Files.probeContentType(file.toPath());
+        Tika tika = new Tika();
+        String contentType = tika.detect(file);
         RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
         MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
         request.remove("file");
@@ -216,7 +213,8 @@ public class ClientApiService extends ClientBaseService {
 
     public Single<ModelData> audioTranscriptions(Map<String,Object> request) throws IOException {
         java.io.File file = (java.io.File)request.get("file");
-        String contentType = Files.probeContentType(file.toPath());
+        Tika tika = new Tika();
+        String contentType = tika.detect(file);
         RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
         MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
         request.remove("file");
