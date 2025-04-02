@@ -35,6 +35,7 @@ public final class ModelData extends ObjectNode {
     private String type;
     private String text;
     private List<Segment> segments;
+    private String delta;
 
 
     public ModelData() {
@@ -98,6 +99,11 @@ public final class ModelData extends ObjectNode {
             this.setSegments(segments);
         } else {
             this.setSegments(null);
+        }
+        if (objectNode.get("delta") != null) {
+            this.setDelta(objectMapper.convertValue(objectNode.get("delta"), String.class));
+        } else {
+            this.setDelta(null);
         }
 
 
@@ -176,6 +182,10 @@ public final class ModelData extends ObjectNode {
     public void setSegments(List<Segment> segments) {
         this.segments = segments;
         this.putPOJO("segments", segments);
+    }
+    public void setDelta(String delta) {
+        this.delta = delta;
+        this.put("delta", delta);
     }
 
 }
