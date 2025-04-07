@@ -60,7 +60,6 @@ public class TestAssistantClientApiService {
 
         AssistantParameters build = AssistantParameters.builder()
                 .assistantId("659e54b1b8006379b4b2abd6")
-                .model("glm-4-assistant")
                 .stream(true)
                 .messages(Collections.singletonList(messages))
                 .build();
@@ -137,11 +136,16 @@ public class TestAssistantClientApiService {
                 .content(Collections.singletonList(textContent))
                 .build();
 
+        AssistantExtraParameters assistantExtraParameters = new AssistantExtraParameters();
+        TranslateParameters translateParameters = new TranslateParameters();
+        translateParameters.setFrom("zh");
+        translateParameters.setTo("en");
+        assistantExtraParameters.setTranslate(translateParameters);
         AssistantParameters build = AssistantParameters.builder()
-                .assistantId("111111")
-                .model("glm-4-assistant")
+                .assistantId("9996ijk789lmn012o345p999")
                 .stream(true)
                 .messages(Collections.singletonList(messages))
+                .extraParameters(assistantExtraParameters)
                 .build();
         // 设置params的相关属性
         AssistantApiResponse apply = new AssistantClientService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
@@ -178,7 +182,7 @@ public class TestAssistantClientApiService {
     }
 
     @Test
-    public void testNonFunctionInvoke() throws JsonProcessingException {
+    public void testTranslateAssistantCompletion() throws JsonProcessingException {
         MessageTextContent textContent = MessageTextContent.builder()
                 .text("你好呀")
                 .type("text")
@@ -196,8 +200,7 @@ public class TestAssistantClientApiService {
                 .build());
 
         AssistantParameters build = AssistantParameters.builder()
-                .assistantId("111111")
-                .model("glm-4-assistant")
+                .assistantId("9996ijk789lmn012o345p999")
                 .stream(false)
                 .messages(Collections.singletonList(messages))
                 .extraParameters(assistantExtraParameters)
