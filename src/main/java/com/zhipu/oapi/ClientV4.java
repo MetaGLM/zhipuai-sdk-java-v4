@@ -28,6 +28,9 @@ import com.zhipu.oapi.service.v4.image.ImageResult;
 import com.zhipu.oapi.service.v4.tools.WebSearchApiResponse;
 import com.zhipu.oapi.service.v4.tools.WebSearchParamsRequest;
 import com.zhipu.oapi.service.v4.tools.WebSearchPro;
+import com.zhipu.oapi.service.v4.web_search.WebSearchDTO;
+import com.zhipu.oapi.service.v4.web_search.WebSearchRequest;
+import com.zhipu.oapi.service.v4.web_search.WebSearchResponse;
 import com.zhipu.oapi.utils.FlowableRequestSupplier;
 import com.zhipu.oapi.utils.OkHttps;
 import com.zhipu.oapi.utils.RequestSupplier;
@@ -487,6 +490,11 @@ public class ClientV4 extends AbstractClientBaseService{
 
         // 处理响应
         return this.executeRequest(request, supplier, WebSearchApiResponse.class);
+    }
+
+    public WebSearchResponse invokeWebSearch(WebSearchRequest request) {
+        RequestSupplier<WebSearchRequest, WebSearchDTO> supplier = (params) -> chatApiService.webSearch(request);
+        return this.executeRequest(request, supplier, WebSearchResponse.class);
     }
 
     @Override
