@@ -1,5 +1,6 @@
 package com.zhipu.oapi.service.v4.api.assistant;
 
+import com.zhipu.oapi.service.v4.assistant.AssistantCompletion;
 import com.zhipu.oapi.service.v4.assistant.conversation.ConversationUsageListStatus;
 import com.zhipu.oapi.service.v4.assistant.query_support.AssistantSupportStatus;
 import com.zhipu.oapi.service.v4.assistant.conversation.ConversationParameters;
@@ -20,6 +21,8 @@ public interface AssistantApi {
     @POST("assistant")
     Call<ResponseBody> assistantCompletionStream(@Body Map<String,Object> request);
 
+    @POST("assistant")
+    Single<AssistantCompletion> assistantCompletion(@Body Map<String,Object> request);
 
     @POST("assistant/list")
     Single<AssistantSupportStatus> querySupport(@Body QuerySupportParams request);
