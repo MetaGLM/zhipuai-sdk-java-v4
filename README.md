@@ -15,7 +15,7 @@ Java），让开发者更便捷的调用智谱开放API
         <dependency>
             <groupId>cn.bigmodel.openapi</groupId>
             <artifactId>oapi-java-sdk</artifactId>
-            <version>release-V4-2.3.0</version>
+            <version>release-V4-2.3.4</version>
         </dependency>
 ```
 - 运行单元测试依赖您环境变量中的APIKey和BaseUrl信息，建议您提前设置好环境变量；运行过程中会消耗APIKey对应账户下的少量token
