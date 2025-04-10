@@ -11,6 +11,7 @@ import com.zhipu.oapi.service.v4.api.file.FileApi;
 import com.zhipu.oapi.service.v4.api.fine_tuning.FineTuningApi;
 import com.zhipu.oapi.service.v4.api.images.ImagesApi;
 import com.zhipu.oapi.service.v4.api.tools.ToolsApi;
+import com.zhipu.oapi.service.v4.api.web_search.WebSearchApi;
 import com.zhipu.oapi.service.v4.batchs.Batch;
 import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
 import com.zhipu.oapi.service.v4.batchs.BatchPage;
@@ -20,6 +21,8 @@ import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.image.ImageResult;
 import com.zhipu.oapi.service.v4.tools.WebSearchPro;
+import com.zhipu.oapi.service.v4.web_search.WebSearchDTO;
+import com.zhipu.oapi.service.v4.web_search.WebSearchRequest;
 import io.reactivex.Single;
 import okhttp3.*;
 import org.apache.tika.Tika;
@@ -45,6 +48,7 @@ public class ClientApiService extends ClientBaseService {
     private final ImagesApi imagesApi;
     private final ToolsApi toolsApi;
     private final AudioApi audioApi;
+    private final WebSearchApi webSearchApi;
 
     public ClientApiService(final OkHttpClient client, final String baseUrl) {
         super(client, baseUrl);
@@ -56,6 +60,7 @@ public class ClientApiService extends ClientBaseService {
         this.imagesApi = super.retrofit.create(ImagesApi.class);
         this.toolsApi = super.retrofit.create(ToolsApi.class);
         this.audioApi = super.retrofit.create(AudioApi.class);
+        this.webSearchApi = super.retrofit.create(WebSearchApi.class);
     }
 
 
@@ -270,6 +275,11 @@ public class ClientApiService extends ClientBaseService {
         }
         return audioApi.audioTranscriptions(requestMap, fileData);
     }
+
+    public Single<WebSearchDTO> webSearch(WebSearchRequest request) {
+        return webSearchApi.webSearch(request);
+    }
+
 
     private HttpxBinaryResponseContent fileWrapper(retrofit2.Call<ResponseBody> response) throws IOException {
         Response<ResponseBody> execute = response.execute();

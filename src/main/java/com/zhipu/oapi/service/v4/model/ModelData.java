@@ -8,12 +8,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.zhipu.oapi.service.v4.deserialize.DeltaDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
+import com.zhipu.oapi.service.v4.web_search.WebSearchResp;
 import lombok.Getter;
-
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +29,8 @@ public final class ModelData extends ObjectNode {
     private Long created;
     private String model;
     private String id;
+    @JsonProperty("web_search")
+    private List<WebSearchResp> webSearch;
 
     private String type;
     private String text;
@@ -82,6 +82,11 @@ public final class ModelData extends ObjectNode {
             this.setId(objectNode.get("id").asText());
         } else {
             this.setId(null);
+        }
+        if(objectNode.get("web_search") != null) {
+            this.setWebSearch(objectMapper.convertValue(objectNode.get("web_search"), List.class));
+        } else {
+            this.setWebSearch(null);
         }
         if(objectNode.get("text") != null){
             this.setText(objectNode.get("text").asText());
@@ -186,6 +191,11 @@ public final class ModelData extends ObjectNode {
     public void setDelta(String delta) {
         this.delta = delta;
         this.put("delta", delta);
+    }
+
+    public void setWebSearch(List<WebSearchResp> webSearch) {
+        this.webSearch = webSearch;
+        this.putPOJO("web_search", webSearch);
     }
 
 }
