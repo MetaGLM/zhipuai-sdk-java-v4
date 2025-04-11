@@ -2,11 +2,7 @@ package com.zhipu.oapi.service.v4.audio;
 
 import com.zhipu.oapi.core.model.ClientRequest;
 import com.zhipu.oapi.service.v4.CommonRequest;
-import com.zhipu.oapi.service.v4.model.ChatMessage;
-import com.zhipu.oapi.service.v4.model.ChatMeta;
-import com.zhipu.oapi.service.v4.model.ChatTool;
 import com.zhipu.oapi.service.v4.model.SensitiveWordCheckRequest;
-import com.zhipu.oapi.service.v4.model.params.CodeGeexExtra;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +11,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 

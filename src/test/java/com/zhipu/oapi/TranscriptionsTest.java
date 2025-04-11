@@ -69,7 +69,7 @@ public class TranscriptionsTest {
     @Test
     public void testSSEInvokeTranscriptions() {
         AudioTranscriptionsRequest audioTranscriptionsRequest = new AudioTranscriptionsRequest();
-        audioTranscriptionsRequest.setFile(new java.io.File("src/test/resources/asr.wav"));
+        audioTranscriptionsRequest.setFile(new java.io.File("src/test/resources/asr.webm"));
         audioTranscriptionsRequest.setModel("glm-asr");
         audioTranscriptionsRequest.setStream(true);
         ModelApiResponse sseModelApiResp = client.invokeTranscriptionsApi(audioTranscriptionsRequest);
