@@ -12,7 +12,7 @@ public class JasonUtil {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) //
             .setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-    public static RealtimeClientEvent fromJsonToClientEvent(String json)  {
+    public static RealtimeClientEvent fromJsonToClientEvent(String json) {
         try {
             return objectMapper.readValue(json, RealtimeClientEvent.class);
         } catch (JsonProcessingException e) {
@@ -20,7 +20,7 @@ public class JasonUtil {
         }
     }
 
-    public static String toJsonFromClientEvent(RealtimeClientEvent event)  {
+    public static String toJsonFromClientEvent(RealtimeClientEvent event) {
         try {
             return objectMapper.writeValueAsString(event);
         } catch (JsonProcessingException e) {
@@ -28,7 +28,7 @@ public class JasonUtil {
         }
     }
 
-    public static RealtimeServerEvent fromJsonToServerEvent(String json)  {
+    public static RealtimeServerEvent fromJsonToServerEvent(String json) {
         try {
             return objectMapper.readValue(json, RealtimeServerEvent.class);
         } catch (JsonProcessingException e) {
@@ -36,7 +36,7 @@ public class JasonUtil {
         }
     }
 
-    public static String toJsonFromServerEvent(RealtimeServerEvent event)  {
+    public static String toJsonFromServerEvent(RealtimeServerEvent event) {
         try {
             return objectMapper.writeValueAsString(event);
         } catch (JsonProcessingException e) {
