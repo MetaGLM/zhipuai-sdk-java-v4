@@ -33,8 +33,8 @@ public class OkHttpRealtimeClientTest {
 
         Consumer<RealtimeServerEvent> serverEventHandler = event -> {
             logger.info("收到服务器事件: {}, 类型: {}", event.getType(), event.getClass().getSimpleName());
-            if (event instanceof RealtimeError realtimeError) {
-                logger.error("收到服务器错误事件: {}", JasonUtil.toJsonFromServerEvent(realtimeError));
+            if (event instanceof RealtimeError) {
+                logger.error("收到服务器错误事件: {}", JasonUtil.toJsonFromServerEvent(event));
             }
         };
 
