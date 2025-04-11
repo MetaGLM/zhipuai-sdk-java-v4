@@ -2,7 +2,6 @@ package com.zhipu.oapi.service.v4.api;
 
 import com.fasterxml.jackson.core.*;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
-import com.zhipu.oapi.core.response.RawResponse;
 import com.zhipu.oapi.service.v4.api.audio.AudioApi;
 import com.zhipu.oapi.service.v4.api.batches.BatchesApi;
 import com.zhipu.oapi.service.v4.api.chat.ChatApi;
