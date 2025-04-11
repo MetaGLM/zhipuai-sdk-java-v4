@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -59,7 +61,7 @@ public class SessionObj {
     public SessionObj() {
         this.object = null;
         this.id = null;
-        this.modalities = List.of("text", "audio");
+        this.modalities = Arrays.asList("text", "audio");
         this.model = null;
         this.instructions = null;
         this.voice = "tongtong";
@@ -67,7 +69,7 @@ public class SessionObj {
         this.outputAudioFormat = "pcm16";
         this.inputAudioTranscription = new InputAudioTranscriptionObj();
         this.turnDetection = new TurnDetectionObj();
-        this.tools = List.of();
+        this.tools = new ArrayList<>();
         this.toolChoice = ToolChoiceObj.of("auto");
         this.temperature = 0.8;
         this.maxResponseOutputTokens = IntOrInfObj.inf();
