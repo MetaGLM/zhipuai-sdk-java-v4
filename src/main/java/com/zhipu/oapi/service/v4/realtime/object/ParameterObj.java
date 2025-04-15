@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,8 +25,8 @@ public class ParameterObj {
 
     public ParameterObj() {
         this.type = "object";
-        this.properties = Map.of();
-        this.required = List.of();
+        this.properties = new HashMap<>();
+        this.required = new ArrayList<>();
     }
 
     @Getter

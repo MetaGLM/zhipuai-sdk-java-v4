@@ -25,13 +25,6 @@ public final class OkHttpRealtimeClient implements Closeable {
     private final boolean closeClientOnClose;
 
 
-    public interface CommunicationProvider {
-
-        String getWebSocketUrl();
-
-        String getAuthToken();
-    }
-
     public OkHttpRealtimeClient(CommunicationProvider communicationProvider, Consumer<RealtimeServerEvent> serverEventHandler, OkHttpClient client) {
         this.client = client;
         this.communicationProvider = communicationProvider;
@@ -187,6 +180,13 @@ public final class OkHttpRealtimeClient implements Closeable {
 
     public enum ConnectivityState {
         STOPPED, CONNECTING, CONNECTED, DISCONNECTED, STOPPING, CLOSED
+    }
+
+    public interface CommunicationProvider {
+
+        String getWebSocketUrl();
+
+        String getAuthToken();
     }
 
     public static final class ConnectivityMonitor {

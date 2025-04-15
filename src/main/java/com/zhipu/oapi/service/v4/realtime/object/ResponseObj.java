@@ -6,10 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.List.of;
 
 @Getter
 @Setter
@@ -60,7 +59,7 @@ public class ResponseObj {
         this.temperature = 0.7;
         this.maxOutputTokens = IntOrInfObj.inf();
         this.conversation = "";
-        this.metadata = Map.of();
-        this.input = of();
+        this.metadata = new HashMap<>();
+        this.input = new ArrayList<>();
     }
 }
