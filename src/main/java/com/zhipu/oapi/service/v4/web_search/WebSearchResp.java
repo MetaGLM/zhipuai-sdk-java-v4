@@ -14,7 +14,7 @@ public class WebSearchResp {
 
     private String media;
 
-    private String snippet;
+    private String content;
 
     private String icon;
 }
