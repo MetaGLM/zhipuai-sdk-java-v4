@@ -26,7 +26,11 @@ public class WebSearchDTO {
     @JsonProperty("request_id")
     private String requestId;
 
-    @JsonProperty("web_search")
+    @JsonProperty("search_result")
     private List<WebSearchResp> webSearchResp;
+
+
+    @JsonProperty("search_intent")
+    private List<SearchIntentResp> searchIntentResp;
 
 }
