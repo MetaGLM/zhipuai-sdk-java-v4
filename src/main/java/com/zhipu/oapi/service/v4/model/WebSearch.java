@@ -4,10 +4,7 @@ package com.zhipu.oapi.service.v4.model;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
@@ -36,6 +33,26 @@ public class WebSearch extends ObjectNode {
     private String search_query;
 
 
+    /**
+     * 指定搜索引擎输出结果的Prompt
+     */
+    private String search_prompt;
+
+    /**
+     * 指定搜索引擎
+     */
+    private String search_engine;
+
+    /**
+     * 是否必须要获得搜索结果后进行回答
+     */
+    private Boolean require_search;
+
+    /**
+     * 搜索结果输出位置
+     */
+    private String result_sequence;
+
     public WebSearch(){
         super(JsonNodeFactory.instance);
     }
@@ -56,5 +73,24 @@ public class WebSearch extends ObjectNode {
     public void setSearch_query(String search_query) {
         this.search_query = search_query;
         this.put("search_query",search_query);
+    }
+
+    public void setSearch_prompt(String search_prompt) {
+        this.search_prompt = search_prompt;
+        this.put("search_prompt",search_prompt);
+    }
+    public void setSearch_engine(String search_engine) {
+        this.search_engine = search_engine;
+        this.put("search_engine",search_engine);
+    }
+
+    public void setRequire_search(Boolean require_search) {
+        this.require_search = require_search;
+        this.put("require_search",require_search);
+    }
+
+    public void setResult_sequence(String result_sequence) {
+        this.result_sequence = result_sequence;
+        this.put("result_sequence",result_sequence);
     }
 }
