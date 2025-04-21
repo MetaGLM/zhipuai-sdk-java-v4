@@ -2,6 +2,7 @@ package com.zhipu.oapi.service.v4.api;
 
 import com.fasterxml.jackson.core.*;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
+import com.zhipu.oapi.service.v4.api.audio.AudioApi;
 import com.zhipu.oapi.service.v4.api.batches.BatchesApi;
 import com.zhipu.oapi.service.v4.api.chat.ChatApi;
 import com.zhipu.oapi.service.v4.api.embedding.EmbeddingApi;
@@ -23,6 +24,7 @@ import com.zhipu.oapi.service.v4.web_search.WebSearchDTO;
 import com.zhipu.oapi.service.v4.web_search.WebSearchRequest;
 import io.reactivex.Single;
 import okhttp3.*;
+import org.apache.tika.Tika;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -41,6 +43,8 @@ public class ClientApiService extends ClientBaseService {
     private final ToolsApi toolsApi;
     private final WebSearchApi webSearchApi;
 
+    private final AudioApi audioApi;
+
     public ClientApiService(final OkHttpClient client, final String baseUrl) {
         super(client, baseUrl);
         this.chatApi = super.retrofit.create(ChatApi.class);
@@ -50,6 +54,7 @@ public class ClientApiService extends ClientBaseService {
         this.fineTuningApi = super.retrofit.create(FineTuningApi.class);
         this.imagesApi = super.retrofit.create(ImagesApi.class);
         this.toolsApi = super.retrofit.create(ToolsApi.class);
+        this.audioApi = super.retrofit.create(AudioApi.class);
         this.webSearchApi = super.retrofit.create(WebSearchApi.class);
     }
 
@@ -192,6 +197,39 @@ public class ClientApiService extends ClientBaseService {
         return toolsApi.webSearch(request);
     }
 
+
+    public Call<ResponseBody> audioTranscriptionsStream(Map<String,Object> request) throws IOException {
+        java.io.File file = (java.io.File)request.get("file");
+        Tika tika = new Tika();
+        String contentType = tika.detect(file);
+        RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
+        MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+        request.remove("file");
+        Map<String, RequestBody> requestMap = new HashMap<>();
+        for (String key : request.keySet()) {
+            if(request.get(key) != null){
+                requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
+            }
+        }
+        return audioApi.audioTranscriptionsStream(requestMap, fileData);
+    }
+
+
+    public Single<ModelData> audioTranscriptions(Map<String,Object> request) throws IOException {
+        java.io.File file = (java.io.File)request.get("file");
+        Tika tika = new Tika();
+        String contentType = tika.detect(file);
+        RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
+        MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+        request.remove("file");
+        Map<String, RequestBody> requestMap = new HashMap<>();
+        for (String key : request.keySet()) {
+            if(request.get(key) != null){
+                requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
+            }
+        }
+        return audioApi.audioTranscriptions(requestMap, fileData);
+    }
 
     public Single<WebSearchDTO> webSearch(WebSearchRequest request) {
         return webSearchApi.webSearch(request);
