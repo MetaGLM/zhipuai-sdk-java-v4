@@ -6,7 +6,7 @@
 
     <groupId>cn.bigmodel.openapi</groupId>
     <artifactId>oapi-java-sdk</artifactId>
-    <version>release-V4-2.4.1</version>
+    <version>release-V4-2.4.2</version>
 
     <packaging>jar</packaging>
 
