@@ -173,6 +173,11 @@ public final class ModelData extends ObjectNode {
         this.put("id", id);
     }
 
+    public void setWebSearch(List<WebSearchResp> webSearch) {
+        this.webSearch = webSearch;
+        this.putPOJO("web_search", webSearch);
+    }
+
     public void setText(String text) {
         this.text = text;
         this.put("text", text);
@@ -191,11 +196,6 @@ public final class ModelData extends ObjectNode {
     public void setDelta(String delta) {
         this.delta = delta;
         this.put("delta", delta);
-    }
-
-    public void setWebSearch(List<WebSearchResp> webSearch) {
-        this.webSearch = webSearch;
-        this.putPOJO("web_search", webSearch);
     }
 
 }

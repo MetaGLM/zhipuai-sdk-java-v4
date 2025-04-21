@@ -465,11 +465,6 @@ public class ClientV4 extends AbstractClientBaseService{
         return this.executeRequest(request, supplier, WebSearchApiResponse.class);
     }
 
-    public WebSearchResponse invokeWebSearch(WebSearchRequest request) {
-        RequestSupplier<WebSearchRequest, WebSearchDTO> supplier = (params) -> chatApiService.webSearch(request);
-        return this.executeRequest(request, supplier, WebSearchResponse.class);
-    }
-
     public ModelApiResponse invokeTranscriptionsApi(AudioTranscriptionsRequest request) {
         if (request.getStream()) {
             return audioTranscriptionsSseInvoke(request);
@@ -508,6 +503,11 @@ public class ClientV4 extends AbstractClientBaseService{
         return this.executeRequest(request, supplier, ModelApiResponse.class);
     }
 
+
+    public WebSearchResponse invokeWebSearch(WebSearchRequest request) {
+        RequestSupplier<WebSearchRequest, WebSearchDTO> supplier = (params) -> chatApiService.webSearch(request);
+        return this.executeRequest(request, supplier, WebSearchResponse.class);
+    }
 
     @Override
     public  <Data, Param, TReq extends ClientRequest<Param>, TResp extends ClientResponse<Data>>
