@@ -17,4 +17,6 @@ public class WebSearchResp {
     private String content;
 
     private String icon;
+
+    private String publish_date;
 }
