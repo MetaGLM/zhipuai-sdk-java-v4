@@ -55,7 +55,7 @@ public class WebSearchTest {
                 .searchQuery("2025年特朗普给中国加了多少关税")
                 .searchEngine("search_std")
                 .count(50)
-                .searchDomainFilter("search_domain_filter")
+                .searchDomainFilter("finance.sina.com.cn")
                 .searchRecencyFilter("oneYear")
                 .contentSize("high")
                 .requestId("11111111")
