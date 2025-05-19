@@ -53,6 +53,11 @@ public class WebSearchTest {
         WebSearchRequest webSearchRequest = WebSearchRequest.builder()
                 .searchEngine("search_std")
                 .searchQuery("2025年特朗普给中国加了多少关税")
+                .searchEngine("search_std")
+                .count(50)
+                .searchDomainFilter("search_domain_filter")
+                .searchRecencyFilter("oneYear")
+                .contentSize("high")
                 .requestId("11111111")
                 .build();
 
