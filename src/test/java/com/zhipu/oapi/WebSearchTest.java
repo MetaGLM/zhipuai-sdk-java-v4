@@ -21,8 +21,9 @@ import java.util.concurrent.TimeUnit;
 public class WebSearchTest {
 
     private final static Logger logger = LoggerFactory.getLogger(TestAssistantClientApiService.class);
-    private static final String ZHIPUAI_API_KEY = Constants.getApiKey();
-    private static final String ZHIPUAI_BASE_URL = Constants.getBaseUrl();
+    private static final String ZHIPUAI_API_KEY = "e6cd54169ce348550af2e0eb63816635.TkzFcBWBlCcCGVuy";
+    private static final String ZHIPUAI_BASE_URL = "https://dev.bigmodel.cn/stage-api/paas/v4/";
+
     private static ClientV4 client = null;
 
     private static final String requestIdTemplate = "mycompany-%d";
@@ -52,7 +53,7 @@ public class WebSearchTest {
 
         WebSearchRequest webSearchRequest = WebSearchRequest.builder()
                 .searchEngine("search_std")
-                .searchQuery("2025年特朗普给中国加了多少关税")
+                .searchQuery("今天北京天气怎么样")
                 .searchEngine("search_std")
                 .count(50)
                 .searchDomainFilter("finance.sina.com.cn")
