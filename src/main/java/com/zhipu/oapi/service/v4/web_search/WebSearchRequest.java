@@ -43,6 +43,30 @@ public class WebSearchRequest implements ClientRequest<WebSearchRequest> {
     @JsonProperty("sensitive_word_check")
     private SensitiveWordCheckRequest sensitiveWordCheck;
 
+    /**
+     * 返回结果的条数
+     */
+    @JsonProperty("count")
+    private Integer count;
+
+    /**
+     * 限定搜索结果的范围
+     */
+    @JsonProperty("search_domain_filter")
+    private String searchDomainFilter;
+
+    /**
+     * 限定搜索结果的范围
+     */
+    @JsonProperty("search_recency_filter")
+    private String searchRecencyFilter;
+
+    /**
+     * 控制网页摘要的字数
+     */
+    @JsonProperty("content_size")
+    private String contentSize;
+
     @Override
     public WebSearchRequest getOptions() {
         return this;

@@ -53,6 +53,27 @@ public class WebSearch extends ObjectNode {
      */
     private String result_sequence;
 
+    /**
+     * 返回结果的条数
+     */
+    private Integer count;
+
+    /**
+     * 限定搜索结果的范围
+     */
+    private String search_domain_filter;
+
+    /**
+     * 限定搜索结果的范围
+     */
+    private String search_recency_filter;
+
+    /**
+     * 控制网页摘要的字数
+     */
+    private String content_size;
+
+
     public WebSearch(){
         super(JsonNodeFactory.instance);
     }
@@ -92,5 +113,25 @@ public class WebSearch extends ObjectNode {
     public void setResult_sequence(String result_sequence) {
         this.result_sequence = result_sequence;
         this.put("result_sequence",result_sequence);
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
+        this.put("count",count);
+    }
+
+    public void setSearch_domain_filter(String search_domain_filter) {
+        this.search_domain_filter = search_domain_filter;
+        this.put("search_domain_filter",search_domain_filter);
+    }
+
+    public void setSearch_recency_filter(String search_recency_filter) {
+        this.search_recency_filter = search_recency_filter;
+        this.put("search_recency_filter",search_recency_filter);
+    }
+
+    public void setContent_size(String content_size) {
+        this.content_size = content_size;
+        this.put("content_size",content_size);
     }
 }
