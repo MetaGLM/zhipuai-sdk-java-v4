@@ -1,6 +1,7 @@
 package com.zhipu.oapi.core.token;
 
 import com.zhipu.oapi.core.ConfigV4;
+import com.zhipu.oapi.utils.StringUtils;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -24,19 +25,28 @@ AuthenticationInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         String accessToken = null;
-        if(this.config.isDisableTokenCache()){
-            accessToken = this.config.getApiSecretKey();
-        }else {
-            TokenManagerV4 tokenManagerV4 = GlobalTokenManager.getTokenManagerV4();
+        if(StringUtils.isEmpty(config.getToken())){
+            if(this.config.isDisableTokenCache()){
+                accessToken = this.config.getApiSecretKey();
+            }else {
+                TokenManagerV4 tokenManagerV4 = GlobalTokenManager.getTokenManagerV4();
 
-            accessToken = tokenManagerV4.getToken(this.config);
+                accessToken = tokenManagerV4.getToken(this.config);
+            }
+            Request request = chain.request()
+                    .newBuilder()
+                    .header("Authorization", "Bearer " + accessToken)
+                    .build();
+            return chain.proceed(request);
+        } else {
+            accessToken = this.config.getToken();
+            Request request = chain.request()
+                    .newBuilder()
+                    .header("Authorization",accessToken)
+                    .build();
+            return chain.proceed(request);
         }
 
 
-        Request request = chain.request()
-                .newBuilder()
-                .header("Authorization", "Bearer " + accessToken)
-                .build();
-        return chain.proceed(request);
     }
 }

@@ -82,6 +82,10 @@ public class ConfigV4 {
     @Getter
     private TimeUnit timeOutTimeUnit;
 
+    @Setter
+    @Getter
+    private String token;
+
     public ConfigV4() {
     }
 
