@@ -25,6 +25,10 @@ AuthenticationInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         String accessToken = null;
+        String source_channel = "java-sdk";
+        if(StringUtils.isNotEmpty(config.getSource_channel())){
+            source_channel = config.getSource_channel();
+        }
         if(StringUtils.isEmpty(config.getToken())){
             if(this.config.isDisableTokenCache()){
                 accessToken = this.config.getApiSecretKey();
@@ -36,6 +40,7 @@ AuthenticationInterceptor implements Interceptor {
             Request request = chain.request()
                     .newBuilder()
                     .header("Authorization", "Bearer " + accessToken)
+                    .header("x-source-channel", source_channel)
                     .build();
             return chain.proceed(request);
         } else {
@@ -43,6 +48,7 @@ AuthenticationInterceptor implements Interceptor {
             Request request = chain.request()
                     .newBuilder()
                     .header("Authorization",accessToken)
+                    .header("x-source-channel", source_channel)
                     .build();
             return chain.proceed(request);
         }
