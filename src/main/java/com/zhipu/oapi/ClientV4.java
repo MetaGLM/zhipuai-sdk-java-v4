@@ -11,6 +11,7 @@ import com.zhipu.oapi.core.model.FlowableClientResponse;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.core.token.GlobalTokenManager;
 import com.zhipu.oapi.core.token.TokenManagerV4;
+import com.zhipu.oapi.service.v4.agents.AgentsCompletionRequest;
 import com.zhipu.oapi.service.v4.audio.AudioTranscriptionsRequest;
 import com.zhipu.oapi.service.v4.batchs.*;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
@@ -44,18 +45,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.adapter.rxjava2.HttpException;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collector;
 
 import static com.zhipu.oapi.Constants.BASE_URL;
 
@@ -157,6 +153,29 @@ public class ClientV4 extends AbstractClientBaseService{
         return null;
     }
 
+    public ModelApiResponse invokeAgentApi(AgentsCompletionRequest request) {
+        if (request.getStream()) {
+            return sseAgentInvoke(request);
+        } else {
+            return agentsInvoke(request);
+        }
+    }
+
+    public Single<ModelData> queryAgentsAsyncResult(Map<String,Object> request) {
+        return chatApiService.queryAgentsAsyncResult(request);
+    }
+
+
+    private ModelApiResponse sseAgentInvoke(AgentsCompletionRequest request) {
+        FlowableRequestSupplier<Map<String,Object>, retrofit2.Call<ResponseBody>> supplier = params -> chatApiService.streamAgentsCompletion(params);
+        return streamRequest(
+                request,
+                supplier,
+                ModelApiResponse.class,
+                ModelData.class
+        );
+    }
+
     private ModelApiResponse sseInvoke(ChatCompletionRequest request) {
 
         FlowableRequestSupplier<Map<String,Object>, retrofit2.Call<ResponseBody>> supplier = params ->  chatApiService.streamChatCompletion(params);
@@ -171,6 +190,14 @@ public class ClientV4 extends AbstractClientBaseService{
     private ModelApiResponse invoke(ChatCompletionRequest request) {
 
         RequestSupplier< Map<String, Object>, ModelData> supplier = (params) -> chatApiService.createChatCompletion(
+                params
+        );
+        // 处理响应
+        return this.executeRequest(request, supplier, ModelApiResponse.class);
+    }
+
+    private ModelApiResponse agentsInvoke(AgentsCompletionRequest request) {
+        RequestSupplier< Map<String, Object>, ModelData> supplier = (params) -> chatApiService.agentsCompletion(
                 params
         );
         // 处理响应
