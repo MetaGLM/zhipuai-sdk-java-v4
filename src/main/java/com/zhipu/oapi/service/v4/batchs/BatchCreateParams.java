@@ -15,9 +15,9 @@ import java.util.Map;
 public class BatchCreateParams  implements ClientRequest<BatchCreateParams> {
 
     @JsonProperty("completion_window")
-    private String completionWindow;  // 必须是 "24h"
+    private String completionWindow;
     @JsonProperty("endpoint")
-    private String endpoint;  // 必须是 "/v4/chat/completions" 或 "/v4/embeddings"
+    private String endpoint;
     @JsonProperty("input_file_id")
     private String inputFileId;  // 必须是上传文件的ID
     @JsonProperty("metadata")
@@ -27,12 +27,6 @@ public class BatchCreateParams  implements ClientRequest<BatchCreateParams> {
     }
 
     public BatchCreateParams(String completionWindow, String endpoint, String inputFileId, Map<String, String> metadata) {
-        if (!"24h".equals(completionWindow)) {
-            throw new IllegalArgumentException("completionWindow must be '24h'");
-        }
-        if (!"/v4/chat/completions".equals(endpoint) && !"/v4/embeddings".equals(endpoint)) {
-            throw new IllegalArgumentException("endpoint must be '/v4/chat/completions' or '/v4/embeddings'");
-        }
         this.completionWindow = completionWindow;
         this.endpoint = endpoint;
         this.inputFileId = inputFileId;
