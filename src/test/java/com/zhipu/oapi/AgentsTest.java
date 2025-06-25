@@ -20,7 +20,7 @@ public class AgentsTest {
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
     private static final String API_SECRET_KEY = Constants.getApiKey();
 
-    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
+    private static final ClientV4 client = new ClientV4.Builder("https://dev.bigmodel.cn/api/","4396bee5d8d3bde5e2bdcc7447a397bd.cx2Wfi7BEvXA1MKT")
             .enableTokenCache()
             .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
             .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
@@ -35,12 +35,12 @@ public class AgentsTest {
     @Test
     public void testAgentsSyncInvoke() throws JsonProcessingException {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "hello");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
 
         AgentsCompletionRequest chatCompletionRequest = AgentsCompletionRequest.builder()
-                .agent_id("TranslateAgent")
+                .agent_id("general_translation")
                 .stream(Boolean.FALSE)
                 .messages(messages)
                 .requestId(requestId)
@@ -52,12 +52,12 @@ public class AgentsTest {
     @Test
     public void testAgentsSSEInvoke() {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "hello");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
 
         AgentsCompletionRequest chatCompletionRequest = AgentsCompletionRequest.builder()
-                .agent_id("TranslateAgent")
+                .agent_id("general_translation")
                 .stream(Boolean.TRUE)
                 .messages(messages)
                 .requestId(requestId)

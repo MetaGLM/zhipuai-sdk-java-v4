@@ -1,5 +1,6 @@
 package com.zhipu.oapi.service.v4.agents;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zhipu.oapi.core.model.ClientRequest;
 import com.zhipu.oapi.service.v4.CommonRequest;
 import com.zhipu.oapi.service.v4.model.ChatMessage;
@@ -20,7 +21,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class AgentsCompletionRequest extends CommonRequest  implements ClientRequest<Map<String, Object>> {
+public class AgentsCompletionRequest extends CommonRequest implements ClientRequest<Map<String, Object>> {
 
     /**
      * 智能体id
@@ -44,6 +45,12 @@ public class AgentsCompletionRequest extends CommonRequest  implements ClientReq
      * 敏感词检测控制
      */
     private SensitiveWordCheckRequest sensitiveWordCheck;
+
+    /**
+     * 智能体业务字段
+     * @return
+     */
+    private ObjectNode custom_variables;
 
     @Override
     public Map<String, Object> getOptions() {
