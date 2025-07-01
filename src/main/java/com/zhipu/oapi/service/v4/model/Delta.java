@@ -27,6 +27,8 @@ public class Delta extends ObjectNode {
 
     @Setter
     private Audio audio;
+    private String reasoning_content;
+
 
     @JsonProperty("tool_calls")
     private List<ToolCalls> tool_calls;
@@ -61,6 +63,11 @@ public class Delta extends ObjectNode {
         } else {
             this.setAudio(null);
         }
+        if (objectNode.get("reasoning_content") != null) {
+            this.setReasoning_content(objectNode.get("reasoning_content").asText());
+        } else {
+            this.setReasoning_content(null);
+        }
 
         Iterator<String> fieldNames = objectNode.fieldNames();
 
@@ -93,5 +100,10 @@ public class Delta extends ObjectNode {
                 toolCalls.add(toolCall);
             }
         }
+    }
+
+    public void setReasoning_content(String reasoning_content) {
+        this.reasoning_content = reasoning_content;
+        this.put("reasoning_content", reasoning_content);
     }
 }
