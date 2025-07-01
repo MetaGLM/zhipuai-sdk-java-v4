@@ -11,6 +11,7 @@ import com.zhipu.oapi.core.model.FlowableClientResponse;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.core.token.GlobalTokenManager;
 import com.zhipu.oapi.core.token.TokenManagerV4;
+import com.zhipu.oapi.service.v4.audio.AudioTranscriptionsRequest;
 import com.zhipu.oapi.service.v4.batchs.*;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.fine_turning.*;
@@ -27,6 +28,9 @@ import com.zhipu.oapi.service.v4.image.ImageResult;
 import com.zhipu.oapi.service.v4.tools.WebSearchApiResponse;
 import com.zhipu.oapi.service.v4.tools.WebSearchParamsRequest;
 import com.zhipu.oapi.service.v4.tools.WebSearchPro;
+import com.zhipu.oapi.service.v4.web_search.WebSearchDTO;
+import com.zhipu.oapi.service.v4.web_search.WebSearchRequest;
+import com.zhipu.oapi.service.v4.web_search.WebSearchResponse;
 import com.zhipu.oapi.utils.FlowableRequestSupplier;
 import com.zhipu.oapi.utils.OkHttps;
 import com.zhipu.oapi.utils.RequestSupplier;
@@ -459,6 +463,50 @@ public class ClientV4 extends AbstractClientBaseService{
 
         // 处理响应
         return this.executeRequest(request, supplier, WebSearchApiResponse.class);
+    }
+
+    public ModelApiResponse invokeTranscriptionsApi(AudioTranscriptionsRequest request) {
+        if (request.getStream()) {
+            return audioTranscriptionsSseInvoke(request);
+        } else {
+            return audioTranscriptionsInvoke(request);
+        }
+    }
+
+    private ModelApiResponse audioTranscriptionsSseInvoke(AudioTranscriptionsRequest request) {
+        FlowableRequestSupplier<Map<String,Object>, retrofit2.Call<ResponseBody>> supplier = params -> {
+            try {
+                return chatApiService.audioTranscriptionsStream(params);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        return streamRequest(
+                request,
+                supplier,
+                ModelApiResponse.class,
+                ModelData.class
+        );
+    }
+
+    private ModelApiResponse audioTranscriptionsInvoke(AudioTranscriptionsRequest request) {
+
+        RequestSupplier< Map<String, Object>, ModelData> supplier = (params) -> {
+            try {
+                return chatApiService.audioTranscriptions(
+                        params
+                );
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        return this.executeRequest(request, supplier, ModelApiResponse.class);
+    }
+
+
+    public WebSearchResponse invokeWebSearch(WebSearchRequest request) {
+        RequestSupplier<WebSearchRequest, WebSearchDTO> supplier = (params) -> chatApiService.webSearch(request);
+        return this.executeRequest(request, supplier, WebSearchResponse.class);
     }
 
     @Override

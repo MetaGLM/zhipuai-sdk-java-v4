@@ -8,12 +8,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.zhipu.oapi.service.v4.deserialize.DeltaDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.deserialize.ModelDataDeserializer;
+import com.zhipu.oapi.service.v4.web_search.WebSearchResp;
 import lombok.Getter;
-
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +29,13 @@ public final class ModelData extends ObjectNode {
     private Long created;
     private String model;
     private String id;
+    @JsonProperty("web_search")
+    private List<WebSearchResp> webSearch;
+
+    private String type;
+    private String text;
+    private List<Segment> segments;
+    private String delta;
 
 
     public ModelData() {
@@ -78,6 +83,34 @@ public final class ModelData extends ObjectNode {
         } else {
             this.setId(null);
         }
+        if(objectNode.get("web_search") != null) {
+            this.setWebSearch(objectMapper.convertValue(objectNode.get("web_search"), List.class));
+        } else {
+            this.setWebSearch(null);
+        }
+        if(objectNode.get("text") != null){
+            this.setText(objectNode.get("text").asText());
+        }else {
+            this.setText(null);
+        }
+        if(objectNode.get("type") != null){
+            this.setType(objectNode.get("type").asText());
+        }else {
+            this.setType(null);
+        }
+        if (objectNode.get("segments") != null) {
+            List<Segment> segments =
+                    objectMapper.convertValue(objectNode.get("segments"), new TypeReference<List<Segment>>() {});
+            this.setSegments(segments);
+        } else {
+            this.setSegments(null);
+        }
+        if (objectNode.get("delta") != null) {
+            this.setDelta(objectMapper.convertValue(objectNode.get("delta"), String.class));
+        } else {
+            this.setDelta(null);
+        }
+
 
         Iterator<String> fieldNames = objectNode.fieldNames();
 
@@ -138,6 +171,31 @@ public final class ModelData extends ObjectNode {
     public void setId(String id) {
         this.id = id;
         this.put("id", id);
+    }
+
+    public void setWebSearch(List<WebSearchResp> webSearch) {
+        this.webSearch = webSearch;
+        this.putPOJO("web_search", webSearch);
+    }
+
+    public void setText(String text) {
+        this.text = text;
+        this.put("text", text);
+    }
+
+    public void setType(String type) {
+        this.type = type;
+        this.put("type", type);
+    }
+
+
+    public void setSegments(List<Segment> segments) {
+        this.segments = segments;
+        this.putPOJO("segments", segments);
+    }
+    public void setDelta(String delta) {
+        this.delta = delta;
+        this.put("delta", delta);
     }
 
 }
