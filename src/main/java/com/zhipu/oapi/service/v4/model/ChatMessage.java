@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.zhipu.oapi.service.v4.deserialize.ChatFunctionCallDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.ChatMessageDeserializer;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import lombok.*;
@@ -23,6 +22,7 @@ public class ChatMessage extends ObjectNode {
 
     private String role;
     private Object content;
+    private Audio audio;
 
     private Object reasoning_content;
 
@@ -122,6 +122,12 @@ public class ChatMessage extends ObjectNode {
         this.tool_call_id = tool_call_id;
         this.put("tool_call_id", tool_call_id);
     }
+
+    public void setAudio(Audio audio) {
+        this.audio = audio;
+        this.putPOJO("audio", audio);
+    }
+
 
     public void setReasoning_content(Object reasoning_content) {
         this.reasoning_content = reasoning_content;
