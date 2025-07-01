@@ -2,7 +2,8 @@ package com.zhipu.oapi.service.v4.api;
 
 import com.fasterxml.jackson.core.*;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
-import com.zhipu.oapi.core.response.RawResponse;
+import com.zhipu.oapi.service.v4.api.agents.AgentsApi;
+import com.zhipu.oapi.service.v4.api.audio.AudioApi;
 import com.zhipu.oapi.service.v4.api.batches.BatchesApi;
 import com.zhipu.oapi.service.v4.api.chat.ChatApi;
 import com.zhipu.oapi.service.v4.api.embedding.EmbeddingApi;
@@ -10,6 +11,7 @@ import com.zhipu.oapi.service.v4.api.file.FileApi;
 import com.zhipu.oapi.service.v4.api.fine_tuning.FineTuningApi;
 import com.zhipu.oapi.service.v4.api.images.ImagesApi;
 import com.zhipu.oapi.service.v4.api.tools.ToolsApi;
+import com.zhipu.oapi.service.v4.api.web_search.WebSearchApi;
 import com.zhipu.oapi.service.v4.batchs.Batch;
 import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
 import com.zhipu.oapi.service.v4.batchs.BatchPage;
@@ -19,16 +21,19 @@ import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.image.ImageResult;
 import com.zhipu.oapi.service.v4.tools.WebSearchPro;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
+import com.zhipu.oapi.service.v4.web_search.WebSearchDTO;
+import com.zhipu.oapi.service.v4.web_search.WebSearchRequest;
 import io.reactivex.Single;
 import okhttp3.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.tika.Tika;
 import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 
@@ -41,6 +46,11 @@ public class ClientApiService extends ClientBaseService {
     private final FineTuningApi fineTuningApi;
     private final ImagesApi imagesApi;
     private final ToolsApi toolsApi;
+    private final WebSearchApi webSearchApi;
+
+    private final AudioApi audioApi;
+
+    private final AgentsApi agentsApi;
 
     public ClientApiService(final OkHttpClient client, final String baseUrl) {
         super(client, baseUrl);
@@ -51,6 +61,9 @@ public class ClientApiService extends ClientBaseService {
         this.fineTuningApi = super.retrofit.create(FineTuningApi.class);
         this.imagesApi = super.retrofit.create(ImagesApi.class);
         this.toolsApi = super.retrofit.create(ToolsApi.class);
+        this.audioApi = super.retrofit.create(AudioApi.class);
+        this.webSearchApi = super.retrofit.create(WebSearchApi.class);
+        this.agentsApi = super.retrofit.create(AgentsApi.class);
     }
 
 
@@ -62,6 +75,18 @@ public class ClientApiService extends ClientBaseService {
 
     public Single<ModelData> createChatCompletionAsync(Map<String,Object> request) {
         return chatApi.createChatCompletionAsync(request);
+    }
+
+    public Call<ResponseBody> streamAgentsCompletion(Map<String,Object> request) {
+        return agentsApi.agentsCompletionStream(request);
+    }
+
+    public Single<ModelData> agentsCompletion(Map<String,Object> request) {
+        return agentsApi.agentsCompletionSync(request);
+    }
+
+    public Single<ModelData> queryAgentsAsyncResult(Map<String,Object> request) {
+        return agentsApi.queryAgentsAsyncResult(request);
     }
 
 
@@ -190,6 +215,84 @@ public class ClientApiService extends ClientBaseService {
 
     public Single<WebSearchPro> webSearchPro(Map<String,Object> request) {
         return toolsApi.webSearch(request);
+    }
+
+    public Single<java.io.File> audioSpeech(Map<String,Object> request) throws IOException {
+        Single<ResponseBody> responseBody = audioApi.audioSpeech(request);
+        Path tempDirectory = Files.createTempFile("audio_speech" + UUID.randomUUID(),".wav");
+        java.io.File file = tempDirectory.toFile();
+        writeResponseBodyToFile(responseBody.blockingGet(), file);
+        return Single.just(file);
+    }
+
+    public Single<java.io.File> audioCustomization(Map<String,Object> request) throws IOException {
+        java.io.File voiceFile = (java.io.File)request.get("voice_data");
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), voiceFile);
+        MultipartBody.Part voiceData = MultipartBody.Part.createFormData("voice_data", voiceFile.getName(), requestFile);
+        request.remove("voice_data");
+        Map<String, RequestBody> requestMap = new HashMap<>();
+        for (String key : request.keySet()) {
+            requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
+
+        }
+        Single<ResponseBody> responseBody = audioApi.audioCustomization(requestMap,voiceData);
+        Path tempDirectory = Files.createTempFile("audio_customization" + UUID.randomUUID(),".wav");
+        java.io.File file = tempDirectory.toFile();
+        writeResponseBodyToFile(responseBody.blockingGet(), file);
+        return Single.just(file);
+    }
+
+    private void writeResponseBodyToFile(ResponseBody body, java.io.File file) {
+        try (InputStream inputStream = body.byteStream();
+             OutputStream outputStream = Files.newOutputStream(file.toPath())) {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            outputStream.flush();
+        } catch (IOException e) {
+            logger.error("writeResponseBodyToFile error,msg:{}",e.getMessage(),e);
+            e.printStackTrace();
+        }
+    }
+
+
+    public Call<ResponseBody> audioTranscriptionsStream(Map<String,Object> request) throws IOException {
+        java.io.File file = (java.io.File)request.get("file");
+        Tika tika = new Tika();
+        String contentType = tika.detect(file);
+        RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
+        MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+        request.remove("file");
+        Map<String, RequestBody> requestMap = new HashMap<>();
+        for (String key : request.keySet()) {
+            if(request.get(key) != null){
+                requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
+            }
+        }
+        return audioApi.audioTranscriptionsStream(requestMap, fileData);
+    }
+
+
+    public Single<ModelData> audioTranscriptions(Map<String,Object> request) throws IOException {
+        java.io.File file = (java.io.File)request.get("file");
+        Tika tika = new Tika();
+        String contentType = tika.detect(file);
+        RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
+        MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+        request.remove("file");
+        Map<String, RequestBody> requestMap = new HashMap<>();
+        for (String key : request.keySet()) {
+            if(request.get(key) != null){
+                requestMap.put(key, RequestBody.create(MediaType.parse("text/plain"), request.get(key).toString()));
+            }
+        }
+        return audioApi.audioTranscriptions(requestMap, fileData);
+    }
+
+    public Single<WebSearchDTO> webSearch(WebSearchRequest request) {
+        return webSearchApi.webSearch(request);
     }
 
 

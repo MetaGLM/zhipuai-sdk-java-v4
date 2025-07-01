@@ -65,6 +65,9 @@ public class AssistantParameters  extends CommonRequest implements ClientRequest
     @JsonProperty("metadata")
     private Map<String, Object> metadata;
 
+    @JsonProperty("extra_parameters")
+    private AssistantExtraParameters extraParameters;
+
     @Override
     public Map<String, Object> getOptions() {
         Map<String, Object> paramsMap = new HashMap<>();
@@ -77,6 +80,9 @@ public class AssistantParameters  extends CommonRequest implements ClientRequest
         paramsMap.put("messages", this.getMessages());
         paramsMap.put("attachments", this.getAttachments());
         paramsMap.put("metadata", this.getMetadata());
+        if(this.getExtraParameters() !=null){
+            paramsMap.put("extra_parameters", this.getExtraParameters());
+        }
         return paramsMap;
     }
 }

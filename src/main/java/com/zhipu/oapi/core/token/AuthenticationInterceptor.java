@@ -1,6 +1,7 @@
 package com.zhipu.oapi.core.token;
 
 import com.zhipu.oapi.core.ConfigV4;
+import com.zhipu.oapi.utils.StringUtils;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -31,11 +32,14 @@ AuthenticationInterceptor implements Interceptor {
 
             accessToken = tokenManagerV4.getToken(this.config);
         }
-
-
+        String source_channel = "java-sdk";
+        if(StringUtils.isNotEmpty(config.getSource_channel())){
+            source_channel = config.getSource_channel();
+        }
         Request request = chain.request()
                 .newBuilder()
                 .header("Authorization", "Bearer " + accessToken)
+                .header("x-source-channel", source_channel)
                 .build();
         return chain.proceed(request);
     }

@@ -6,7 +6,7 @@
 
     <groupId>cn.bigmodel.openapi</groupId>
     <artifactId>oapi-java-sdk</artifactId>
-    <version>release-V4-2.3.1</version>
+    <version>release-V4-2.4.3</version>
 
     <packaging>jar</packaging>
 
@@ -208,6 +208,12 @@
             <artifactId>junit-jupiter</artifactId>
             <version>1.19.8</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>2.9.0</version>
         </dependency>
 
     </dependencies>
