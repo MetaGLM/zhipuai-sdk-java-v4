@@ -350,8 +350,6 @@ public class V4Test {
         testQueryResult(taskId);
     }
 
-//
-
     /**
      * 文生图
      */
@@ -369,6 +367,37 @@ public class V4Test {
         createImageRequest.setRequestId("test11111111111111");
         ImageApiResponse imageApiResponse = client.createImage(createImageRequest);
         logger.info("imageApiResponse: {}", mapper.writeValueAsString(imageApiResponse));
+    }
+
+    /**
+     * glm-4-voice测试
+     */
+    @Test
+    public void testVoice() throws JsonProcessingException {
+        List<ChatMessage> messages = new ArrayList<>();
+        List<Object> contentList = new ArrayList<>();
+        Map<String, Object> content = new HashMap<>();
+        content.put("type", "text");
+        content.put("text", "给我讲个冷笑话");
+        contentList.add(content);
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), contentList);
+
+        messages.add(chatMessage);
+        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+
+        HashMap<String, Object> extraJson = new HashMap<>();
+        extraJson.put("temperature", 0.5);
+        extraJson.put("max_tokens", 1024);
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                .model(Constants.ModelChatGLM4Voice)
+                .stream(Boolean.FALSE)
+                .invokeMethod(Constants.invokeMethod)
+                .messages(messages)
+                .requestId(requestId)
+                .extraJson(extraJson)
+                .build();
+        ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        logger.info("model output: {}", mapper.writeValueAsString(invokeModelApiResp));
     }
 
 //
