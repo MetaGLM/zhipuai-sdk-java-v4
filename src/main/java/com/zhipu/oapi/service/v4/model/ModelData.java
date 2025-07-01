@@ -29,6 +29,10 @@ public final class ModelData extends ObjectNode {
     private Long created;
     private String model;
     private String id;
+    private String agent_id;
+    private String conversation_id;
+    private String async_id;
+    private String status;
     @JsonProperty("web_search")
     private List<WebSearchResp> webSearch;
 
@@ -82,6 +86,26 @@ public final class ModelData extends ObjectNode {
             this.setId(objectNode.get("id").asText());
         } else {
             this.setId(null);
+        }
+        if(objectNode.get("agent_id") != null) {
+            this.setAgent_id(objectNode.get("agent_id").asText());
+        } else {
+            this.setAgent_id(null);
+        }
+        if(objectNode.get("conversation_id") != null) {
+            this.setConversation_id(objectNode.get("conversation_id").asText());
+        } else {
+            this.setConversation_id(null);
+        }
+        if(objectNode.get("async_id") != null) {
+            this.setAsync_id(objectNode.get("async_id").asText());
+        } else {
+            this.setAsync_id(null);
+        }
+        if(objectNode.get("status") != null) {
+            this.setStatus(objectNode.get("status").asText());
+        } else {
+            this.setStatus(null);
         }
         if(objectNode.get("web_search") != null) {
             this.setWebSearch(objectMapper.convertValue(objectNode.get("web_search"), List.class));
@@ -196,6 +220,26 @@ public final class ModelData extends ObjectNode {
     public void setDelta(String delta) {
         this.delta = delta;
         this.put("delta", delta);
+    }
+
+    public void setAgent_id(String agent_id) {
+        this.agent_id = agent_id;
+        this.put("agent_id", agent_id);
+    }
+
+    public void setConversation_id(String conversation_id) {
+        this.conversation_id = conversation_id;
+        this.put("conversation_id", conversation_id);
+    }
+
+    public void setAsync_id(String async_id) {
+        this.async_id = async_id;
+        this.put("async_id", async_id);
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+        this.put("status", status);
     }
 
 }

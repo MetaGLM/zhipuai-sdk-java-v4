@@ -2,6 +2,7 @@ package com.zhipu.oapi.service.v4.api;
 
 import com.fasterxml.jackson.core.*;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
+import com.zhipu.oapi.service.v4.api.agents.AgentsApi;
 import com.zhipu.oapi.service.v4.api.audio.AudioApi;
 import com.zhipu.oapi.service.v4.api.batches.BatchesApi;
 import com.zhipu.oapi.service.v4.api.chat.ChatApi;
@@ -49,6 +50,8 @@ public class ClientApiService extends ClientBaseService {
 
     private final AudioApi audioApi;
 
+    private final AgentsApi agentsApi;
+
     public ClientApiService(final OkHttpClient client, final String baseUrl) {
         super(client, baseUrl);
         this.chatApi = super.retrofit.create(ChatApi.class);
@@ -60,6 +63,7 @@ public class ClientApiService extends ClientBaseService {
         this.toolsApi = super.retrofit.create(ToolsApi.class);
         this.audioApi = super.retrofit.create(AudioApi.class);
         this.webSearchApi = super.retrofit.create(WebSearchApi.class);
+        this.agentsApi = super.retrofit.create(AgentsApi.class);
     }
 
 
@@ -71,6 +75,18 @@ public class ClientApiService extends ClientBaseService {
 
     public Single<ModelData> createChatCompletionAsync(Map<String,Object> request) {
         return chatApi.createChatCompletionAsync(request);
+    }
+
+    public Call<ResponseBody> streamAgentsCompletion(Map<String,Object> request) {
+        return agentsApi.agentsCompletionStream(request);
+    }
+
+    public Single<ModelData> agentsCompletion(Map<String,Object> request) {
+        return agentsApi.agentsCompletionSync(request);
+    }
+
+    public Single<ModelData> queryAgentsAsyncResult(Map<String,Object> request) {
+        return agentsApi.queryAgentsAsyncResult(request);
     }
 
 
