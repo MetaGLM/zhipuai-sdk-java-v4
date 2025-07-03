@@ -199,6 +199,7 @@ public class V4Test {
             
             // Use mock data
             ModelApiResponse sseModelApiResp = MockClientV4.mockModelApi(chatCompletionRequest);
+            sseModelApiResp.setFlowable(null);// Clear flowable before printing
             logger.info("Mock response: {}", mapper.writeValueAsString(sseModelApiResp));
             return;
         }

@@ -68,6 +68,7 @@ public class WebSearchToolsTest {
             
             // Use mock data
             WebSearchApiResponse webSearchApiResponse = MockClientV4.mockWebSearchProStreamingInvoke(chatCompletionRequest);
+            webSearchApiResponse.setFlowable(null);// Clear flowable before printing
             logger.info("Mock response: {}", mapper.writeValueAsString(webSearchApiResponse));
             return;
         }
