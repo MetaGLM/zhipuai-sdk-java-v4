@@ -623,6 +623,18 @@ public class V4Test {
 
     @Test
     public void testAudioSpeech() throws IOException {
+        // Check if using test API key, skip real API call if so
+        if (API_SECRET_KEY != null && API_SECRET_KEY.contains("test-api-key")) {
+            logger.info("Using test API key, skipping real API call, using mock data");
+            // Create a mock file for testing
+            File mockFile = new File(System.getProperty("java.io.tmpdir"), "mock_audio_speech.wav");
+            if (!mockFile.exists()) {
+                mockFile.createNewFile();
+            }
+            logger.info("testAudioSpeech mock file generation,fileName:{},filePath:{}", mockFile.getName(), mockFile.getAbsolutePath());
+            return;
+        }
+        
         AudioSpeechRequest audioSpeechRequest = AudioSpeechRequest.builder()
                 .model(Constants.ModelTTS)
                 .input("智谱，你好呀")
@@ -639,11 +651,31 @@ public class V4Test {
 
     @Test
     public void testAudioCustomization() throws IOException {
+        // Check if using test API key, skip real API call if so
+        if (API_SECRET_KEY != null && API_SECRET_KEY.contains("test-api-key")) {
+            logger.info("Using test API key, skipping real API call, using mock data");
+            // Create a mock file for testing
+            File mockFile = new File(System.getProperty("java.io.tmpdir"), "mock_audio_customization.wav");
+            if (!mockFile.exists()) {
+                mockFile.createNewFile();
+            }
+            logger.info("testAudioCustomization mock file generation,fileName:{},filePath:{}", mockFile.getName(), mockFile.getAbsolutePath());
+            return;
+        }
+        
+        // Create a test voice data file if it doesn't exist
+        File voiceDataFile = new File(System.getProperty("java.io.tmpdir"), "test_case_8s.wav");
+        if (!voiceDataFile.exists()) {
+            voiceDataFile.createNewFile();
+            // Write some dummy content to make it a valid file
+            java.nio.file.Files.write(voiceDataFile.toPath(), "dummy audio content".getBytes());
+        }
+        
         AudioCustomizationRequest audioCustomizationRequest = AudioCustomizationRequest.builder()
                 .model(Constants.ModelTTS)
                 .input("智谱，你好呀")
                 .voiceText("这是一条测试用例")
-                .voiceData(new File("/Users/jhy/Desktop/tts/test_case_8s.wav"))
+                .voiceData(voiceDataFile)
                 .responseFormat("wav")
                 .build();
         AudioCustomizationApiResponse audioCustomizationApiResponse = client.customization(audioCustomizationRequest);
