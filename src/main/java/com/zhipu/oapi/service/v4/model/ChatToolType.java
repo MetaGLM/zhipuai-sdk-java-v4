@@ -6,7 +6,10 @@ public enum ChatToolType {
 
     RETRIEVAL("retrieval"),
 
-    FUNCTION("function");
+    FUNCTION("function"),
+
+    MCP("mcp"),
+    ;
 
     private final String value;
 
