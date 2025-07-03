@@ -2,6 +2,7 @@ package com.zhipu.oapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zhipu.oapi.mock.MockClientV4;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.model.params.CodeGeexExtra;
@@ -23,23 +24,66 @@ import java.util.concurrent.atomic.AtomicReference;
 public class CodeGeexTest {
 
     private final static Logger logger = LoggerFactory.getLogger(CodeGeexTest.class);
-    private static final String API_SECRET_KEY = Constants.getApiKey();
+    private static final String API_SECRET_KEY = Constants.getApiKey() != null ? Constants.getApiKey() : "test-api-key.test-api-secret";
 
     private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
             .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
             .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
             .build();
     private static final ObjectMapper mapper = MessageDeserializeFactory.defaultObjectMapper();
-    // 请自定义自己的业务id
+    // Please customize your own business ID
     private static final String requestIdTemplate = "mycompany-%d";
 
 
     @Test
     public void testCodegeex() throws JsonProcessingException {
+        // Check if using test API key, skip real API call if so
+        if (API_SECRET_KEY != null && API_SECRET_KEY.contains("test-api-key")) {
+            logger.info("Using test API key, skipping real API call, using mock data");
+            
+            List<ChatMessage> messages = new ArrayList<>();
+            ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "Help me check Beijing weather");
+            messages.add(chatMessage);
+            String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
 
+            CodeGeexTarget codeGeexTarget = new CodeGeexTarget();
+            codeGeexTarget.setPath("111");
+            codeGeexTarget.setLanguage("python");
+            codeGeexTarget.setCodePrefix("EventSource.Factory factory = EventSources.createFactory(OkHttpUtils.getInstance());");
+            codeGeexTarget.setCodeSuffix("TaskMonitorLocal taskMonitorLocal = getTaskMonitorLocal(algoMqReq);");
+            CodeGeexExtra codeGeexExtra = new CodeGeexExtra();
+            codeGeexExtra.setContexts(new ArrayList<>());
+            codeGeexExtra.setTarget(codeGeexTarget);
+            List<String> stop = new ArrayList<>();
+            stop.add("<|endoftext|>");
+            stop.add("<|user|>");
+            stop.add("<|assistant|>");
+            stop.add("<|observation|>");
+
+            ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                    .model("codegeex-4")
+                    .stream(Boolean.TRUE)
+                    .invokeMethod(Constants.invokeMethod)
+                    .messages(messages)
+                    .stop(stop)
+                    .extra(codeGeexExtra)
+                    .requestId(requestId)
+                    .build();
+            
+            // Use mock data
+            ModelApiResponse sseModelApiResp = MockClientV4.mockModelApi(chatCompletionRequest);
+            if (sseModelApiResp.isSuccess()) {
+                sseModelApiResp.getFlowable().doOnNext(
+                        modelData -> {
+                            logger.info("Mock CodeGeex response: {}", mapper.writeValueAsString(modelData));
+                        }
+                ).blockingSubscribe();
+            }
+            return;
+        }
 
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "帮我查询北京天气");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "Help me check Beijing weather");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
 
@@ -103,7 +147,7 @@ public class CodeGeexTest {
                 data.setCreated(chatMessageAccumulator.getCreated());
             }
             data.setRequestId(chatCompletionRequest.getRequestId());
-            sseModelApiResp.setFlowable(null);// 打印前置空
+            sseModelApiResp.setFlowable(null);// Clear flowable before printing
             sseModelApiResp.setData(data);
         }
         logger.info("model output: {}", mapper.writeValueAsString(sseModelApiResp));

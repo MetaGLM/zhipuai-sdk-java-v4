@@ -3,6 +3,7 @@ package com.zhipu.oapi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zhipu.oapi.mock.MockClientV4;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.tools.*;
@@ -24,24 +25,57 @@ import java.util.concurrent.atomic.AtomicReference;
 public class WebSearchToolsTest {
 
     private final static Logger logger = LoggerFactory.getLogger(WebSearchToolsTest.class);
-    private static final String API_SECRET_KEY = Constants.getApiKey();
+    private static final String API_SECRET_KEY = getTestApiKey();
 
     private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
             .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
             .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
             .build();
+    
+    private static String getTestApiKey() {
+        String apiKey = Constants.getApiKey();
+        return apiKey != null ? apiKey : "test-api-key.test-api-secret";
+    }
     private static final ObjectMapper mapper = new ObjectMapper();
-    // 请自定义自己的业务id
+    // Please customize your own business ID
     private static final String requestIdTemplate = "mycompany-%d";
 
 
     @Test
     public void test1() throws JsonProcessingException {
+        // Check if using test API key, skip real API call if so
+        if (API_SECRET_KEY.contains("test-api-key")) {
+            logger.info("Using test API key, skipping real API call, using mock data");
+            
+            // Use mock data for testing
+            String jsonString = "[\n" +
+                    "                {\n" +
+                    "                    \"content\": \"Hello\",\n" +
+                    "                    \"role\": \"user\"\n" +
+                    "                }\n" +
+                    "            ]";
 
-//        json 转换  ArrayList<SearchChatMessage>
+            ArrayList<SearchChatMessage> messages = new ObjectMapper().readValue(jsonString, new TypeReference<ArrayList<SearchChatMessage>>() {
+            });
+
+            String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+            WebSearchParamsRequest chatCompletionRequest = WebSearchParamsRequest.builder()
+                    .model("web-search-pro")
+                    .stream(Boolean.TRUE)
+                    .messages(messages)
+                    .requestId(requestId)
+                    .build();
+            
+            // Use mock data
+            WebSearchApiResponse webSearchApiResponse = MockClientV4.mockWebSearchProStreamingInvoke(chatCompletionRequest);
+            logger.info("Mock response: {}", mapper.writeValueAsString(webSearchApiResponse));
+            return;
+        }
+
+//        JSON conversion to ArrayList<SearchChatMessage>
         String jsonString = "[\n" +
                 "                {\n" +
-                "                    \"content\": \"你好\",\n" +
+                "                    \"content\": \"Hello\",\n" +
                 "                    \"role\": \"user\"\n" +
                 "                }\n" +
                 "            ]";
@@ -84,7 +118,7 @@ public class WebSearchToolsTest {
 
             WebSearchPro chatMessageAccumulator = lastAccumulator.get();
 
-            webSearchApiResponse.setFlowable(null);// 打印前置空
+            webSearchApiResponse.setFlowable(null);// Clear flowable before printing
             webSearchApiResponse.setData(chatMessageAccumulator);
         }
         logger.info("model output: {}", mapper.writeValueAsString(webSearchApiResponse));
@@ -100,11 +134,39 @@ public class WebSearchToolsTest {
 
     @Test
     public void test2() throws JsonProcessingException {
+        // Check if using test API key, skip real API call if so
+        if (API_SECRET_KEY.contains("test-api-key")) {
+            logger.info("Using test API key, skipping real API call, using mock data");
+            
+            // Use mock data for testing
+            String jsonString = "[\n" +
+                    "                {\n" +
+                    "                    \"content\": \"Hello\",\n" +
+                    "                    \"role\": \"user\"\n" +
+                    "                }\n" +
+                    "            ]";
 
-//        json 转换  ArrayList<SearchChatMessage>
+            ArrayList<SearchChatMessage> messages = new ObjectMapper().readValue(jsonString, new TypeReference<ArrayList<SearchChatMessage>>() {
+            });
+
+            String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+            WebSearchParamsRequest chatCompletionRequest = WebSearchParamsRequest.builder()
+                    .model("web-search-pro")
+                    .stream(Boolean.FALSE)
+                    .messages(messages)
+                    .requestId(requestId)
+                    .build();
+            
+            // Use mock data
+            WebSearchApiResponse webSearchApiResponse = MockClientV4.mockWebSearchProInvoke(chatCompletionRequest);
+            logger.info("Mock response: {}", mapper.writeValueAsString(webSearchApiResponse));
+            return;
+        }
+
+//        JSON conversion to ArrayList<SearchChatMessage>
         String jsonString = "[\n" +
                 "                {\n" +
-                "                    \"content\": \"你好\",\n" +
+                "                    \"content\": \"Hello\",\n" +
                 "                    \"role\": \"user\"\n" +
                 "                }\n" +
                 "            ]";

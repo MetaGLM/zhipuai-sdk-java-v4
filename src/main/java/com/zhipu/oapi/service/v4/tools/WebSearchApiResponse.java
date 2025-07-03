@@ -1,5 +1,6 @@
 package com.zhipu.oapi.service.v4.tools;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zhipu.oapi.core.model.ClientResponse;
 import com.zhipu.oapi.core.model.FlowableClientResponse;
 import com.zhipu.oapi.service.v4.model.ChatError;
@@ -16,6 +17,7 @@ public class WebSearchApiResponse implements FlowableClientResponse<WebSearchPro
     private WebSearchPro data;
     private ChatError error;
 
+    @JsonIgnore
     private Flowable<WebSearchPro> flowable;
 
 }

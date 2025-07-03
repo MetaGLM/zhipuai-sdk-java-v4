@@ -1,5 +1,6 @@
 package com.zhipu.oapi.service.v4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zhipu.oapi.core.model.ClientResponse;
 import com.zhipu.oapi.core.model.FlowableClientResponse;
 import io.reactivex.Flowable;
@@ -13,6 +14,7 @@ public class ModelApiResponse  implements FlowableClientResponse<ModelData> {
 
     private ModelData data;
 
+    @JsonIgnore
     private Flowable<ModelData> flowable;
 
     private ChatError error;

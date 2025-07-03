@@ -10,7 +10,7 @@
 
     <packaging>jar</packaging>
 
-    <name>zhipu sdk for GLM open api</name>
+    <name>ZhiPu sdk for GLM open api</name>
     <description>Java SDK for zhipu Big Model API</description>
     <url>https://open.bigmodel.cn/</url>
     <licenses>
@@ -219,7 +219,6 @@
     </dependencies>
     <profiles>
         <profile>
-            <!--注意,此id必须与setting.xml中指定的一致,不要自作聪明改它名字-->
             <id>ossrh</id>
             <properties>
                 <gpg.executable>gpg</gpg.executable>
@@ -239,7 +238,6 @@
                         </configuration>
                     </plugin>
 
-                    <!--生成源码插件-->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
@@ -260,10 +258,9 @@
                         <configuration>
                             <additionalparam>-Xdoclint:none</additionalparam>
                             <sourcepath>src/main/java</sourcepath>
-                            <!--  https://blog.csdn.net/caicaimaomao/article/details/136554931#/-->
-                            <charset>UTF-8</charset><!-- utf-8读取文件 -->
-                            <encoding>UTF-8</encoding><!-- utf-8进行编码代码 -->
-                            <docencoding>UTF-8</docencoding><!-- utf-8进行编码文档 -->
+                            <charset>UTF-8</charset>
+                            <encoding>UTF-8</encoding>
+                            <docencoding>UTF-8</docencoding>
                         </configuration>
                         <executions>
                             <execution>
@@ -307,16 +304,12 @@
         </profile>
 
         <profile>
-            <!--注意,此id必须与setting.xml中指定的一致,不要自作聪明改它名字-->
             <id>aminer</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <build>
                 <plugins>
-
-
-                    <!--生成源码插件-->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
@@ -337,10 +330,9 @@
                         <configuration>
                             <additionalparam>-Xdoclint:none</additionalparam>
                             <sourcepath>src/main/java</sourcepath>
-                            <!--  https://blog.csdn.net/caicaimaomao/article/details/136554931#/-->
-                            <charset>UTF-8</charset><!-- utf-8读取文件 -->
-                            <encoding>UTF-8</encoding><!-- utf-8进行编码代码 -->
-                            <docencoding>UTF-8</docencoding><!-- utf-8进行编码文档 -->
+                            <charset>UTF-8</charset>
+                            <encoding>UTF-8</encoding>
+                            <docencoding>UTF-8</docencoding>
                         </configuration>
                         <executions>
                             <execution>

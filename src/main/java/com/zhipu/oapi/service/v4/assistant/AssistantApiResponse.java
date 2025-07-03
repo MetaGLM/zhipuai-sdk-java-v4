@@ -1,5 +1,6 @@
 package com.zhipu.oapi.service.v4.assistant;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zhipu.oapi.core.model.FlowableClientResponse;
 import com.zhipu.oapi.service.v4.model.ChatError;
 import io.reactivex.Flowable;
@@ -13,6 +14,7 @@ public class AssistantApiResponse implements FlowableClientResponse<AssistantCom
 
     private AssistantCompletion data;
 
+    @JsonIgnore
     private Flowable<AssistantCompletion> flowable;
 
     private ChatError error;

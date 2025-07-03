@@ -1,29 +1,29 @@
-# ZhipuAI Open Platform Java SDK
+# 智谱AI开放平台 Java SDK
 
 [![Maven Central](https://img.shields.io/maven-central/v/cn.bigmodel.openapi/oapi-java-sdk.svg)](https://search.maven.org/artifact/cn.bigmodel.openapi/oapi-java-sdk)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Java](https://img.shields.io/badge/java-1.8%2B-orange.svg)](https://www.oracle.com/java/)
 
-[中文文档](README_CN.md)
+[English Readme](README.md)
 
-The official Java SDK for [ZhipuAI Open Platform](http://open.bigmodel.cn/howuse/platformintroduced) Big Model API, enabling developers to easily integrate ZhipuAI's powerful AI capabilities into their Java applications.
+[智谱AI开放平台](http://open.bigmodel.cn/howuse/platformintroduced)官方 Java SDK，帮助开发者快速集成智谱AI强大的人工智能能力到Java应用中。
 
-## ✨ Features
+## ✨ 特性
 
-- 🚀 **Type-safe API**: All interfaces are fully type-encapsulated, no need to consult API documentation
-- 🔧 **Easy Integration**: Simple and intuitive API design for quick integration
-- ⚡ **High Performance**: Built with modern Java libraries for optimal performance
-- 🛡️ **Secure**: Built-in authentication and token management
-- 📦 **Lightweight**: Minimal dependencies for easy project integration
+- 🚀 **类型安全**: 所有接口完全类型封装，无需查阅API文档即可完成接入
+- 🔧 **简单易用**: 简洁直观的API设计，快速上手
+- ⚡ **高性能**: 基于现代Java库构建，性能优异
+- 🛡️ **安全可靠**: 内置身份验证和令牌管理
+- 📦 **轻量级**: 最小化依赖，易于项目集成
 
-## 📦 Installation
+## 📦 安装
 
-### Requirements
-- Java 1.8 or higher
-- Maven or Gradle
+### 环境要求
+- Java 1.8 或更高版本
+- Maven 或 Gradle
 
-### Maven
-Add the following dependency to your `pom.xml`:
+### Maven 依赖
+在您的 `pom.xml` 中添加以下依赖：
 
 ```xml
 <dependency>
@@ -33,34 +33,34 @@ Add the following dependency to your `pom.xml`:
 </dependency>
 ```
 
-### 📋 Dependencies
+### 📋 核心依赖
 
-This SDK uses the following core dependencies:
+本SDK使用以下核心依赖库：
 
-| Library | Version |
-|---------|----------|
+| 依赖库 | 版本 |
+|--------|------|
 | OkHttp | 3.14.9 |
 | Java JWT | 4.2.2 |
 | Jackson | 2.11.3 |
 | Retrofit2 | 2.9.0 |
 
-## 🚀 Quick Start
+## 🚀 快速开始
 
-### Basic Usage
+### 基本用法
 
-1. **Create a Client** with your API key
-2. **Call the desired API methods**
+1. **使用API密钥创建客户端**
+2. **调用相应的API方法**
 
-For complete examples, see [V4Test.java](src/test/java/com/zhipu/oapi/V4Test.java). Remember to replace the API key with your own.
+完整示例请参考 [V4Test.java](src/test/java/com/zhipu/oapi/V4Test.java)，记得替换为您自己的API密钥。
 
-### Client Configuration
+### 客户端配置
 
-The SDK provides a flexible `ClientV4` builder for customizing your client:
+SDK提供了灵活的 `ClientV4` 构建器来自定义您的客户端：
 
-**Configuration Options:**
-- `enableTokenCache()`: Enable token caching to reduce token requests
-- `networkConfig()`: Configure connection, read, write timeouts, and ping intervals
-- `connectionPool()`: Set up connection pooling
+**配置选项：**
+- `enableTokenCache()`: 启用令牌缓存，减少令牌请求次数
+- `networkConfig()`: 配置连接、读取、写入超时时间和ping间隔
+- `connectionPool()`: 设置连接池
 
 ```java
 String API_SECRET_KEY = "your_api_key_here";
@@ -71,9 +71,9 @@ private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
         .build();
 ```
 
-## 💡 Examples
+## 💡 使用示例
 
-### Spring Boot Integration
+### Spring Boot 集成
 
 ```java
 package com.zhipu.controller;
@@ -118,18 +118,18 @@ public class TestController {
 
 ```
 
-## 📈 Release Notes
+## 📈 版本更新
 
-For detailed release notes and version history, please see [Release-Note.md](Release-Note.md).
+详细的版本更新记录和历史信息，请查看 [Release-Note.md](Release-Note.md)。
 
-## 📄 License
+## 📄 许可证
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+本项目基于 MIT 许可证开源 - 详情请查看 [LICENSE](LICENSE) 文件。
 
-## 🤝 Contributing
+## 🤝 贡献
 
-We welcome contributions! Please feel free to submit a Pull Request.
+欢迎贡献代码！请随时提交 Pull Request。
 
-## 📞 Support
+## 📞 支持
 
-For questions and support, please visit the [ZhipuAI Open Platform](http://open.bigmodel.cn/) or check our documentation.
+如有问题和技术支持，请访问 [智谱AI开放平台](http://open.bigmodel.cn/) 或查看我们的文档。
