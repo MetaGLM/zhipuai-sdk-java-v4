@@ -32,9 +32,9 @@ public class OkHttpRealtimeClientTest {
         };
 
         Consumer<RealtimeServerEvent> serverEventHandler = event -> {
-            logger.info("收到服务器事件: {}, 类型: {}", event.getType(), event.getClass().getSimpleName());
+            logger.info("Received server event: {}, type: {}", event.getType(), event.getClass().getSimpleName());
             if (event instanceof RealtimeError) {
-                logger.error("收到服务器错误事件: {}", JasonUtil.toJsonFromServerEvent(event));
+                logger.error("Received server error event: {}", JasonUtil.toJsonFromServerEvent(event));
             }
         };
 
@@ -42,33 +42,33 @@ public class OkHttpRealtimeClientTest {
 
         try {
             client.start();
-            logger.info("客户端已启动");
+            logger.info("Client started");
 
             client.waitForConnection();
-            logger.info("WebSocket连接已建立");
+            logger.info("WebSocket connection established");
 
             URL resourceUrl = Resources.getResource("Audio.ServerVad.Input");
             List<String> lines = Resources.readLines(resourceUrl, Charsets.UTF_8);
             for (String text : lines) {
                 if (!text.trim().isEmpty()) {
                     RealtimeClientEvent clientEvent = JasonUtil.fromJsonToClientEvent(text);
-                    logger.info("解析并发送消息: {}", clientEvent.getType());
-                    logger.info("解析并发送消息: {}", JasonUtil.toJsonFromClientEvent(clientEvent));
+                    logger.info("Parse and send message: {}", clientEvent.getType());
+            logger.info("Parse and send message: {}", JasonUtil.toJsonFromClientEvent(clientEvent));
                     client.sendMessage(clientEvent);
                 }
             }
 
             Thread.sleep(5000);
             client.stop();
-            logger.info("客户端已停止");
+            logger.info("Client stopped");
         } catch (Exception e) {
-            logger.error("客户端运行异常", e);
+            logger.error("Client runtime exception", e);
         } finally {
             try {
                 client.close();
-                logger.info("客户端已关闭");
+                logger.info("Client closed");
             } catch (IOException e) {
-                logger.error("关闭客户端时发生异常", e);
+                logger.error("Exception occurred while closing client", e);
             }
         }
     }
