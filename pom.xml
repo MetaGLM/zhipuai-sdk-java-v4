@@ -10,8 +10,8 @@
 
     <packaging>jar</packaging>
 
-    <name>ZhiPu sdk for GLM open api</name>
-    <description>Java SDK for zhipu Big Model API</description>
+    <name>Zhipu sdk for GLM open api</name>
+    <description>Java SDK for Zhipu Big Model API</description>
     <url>https://open.bigmodel.cn/</url>
     <licenses>
         <license>
@@ -150,6 +150,12 @@
             <version>2.9.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+
         <!-- JUnit Jupiter API -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -208,12 +214,6 @@
             <artifactId>junit-jupiter</artifactId>
             <version>1.19.8</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>2.9.0</version>
         </dependency>
 
     </dependencies>
