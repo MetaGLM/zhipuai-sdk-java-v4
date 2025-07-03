@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zhipu.oapi.Constants;
 import com.zhipu.oapi.service.v4.model.ModelData;
 import io.reactivex.Flowable;
@@ -18,7 +17,6 @@ public class RawResponse {
     private String contentType;
     private Map<String, List<String>> headers = new HashMap<>();
     private String body;
-    @JsonIgnore
     private Flowable<ModelData> flowable;
 
     public int getStatusCode() {
