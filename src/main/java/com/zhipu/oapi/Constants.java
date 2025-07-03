@@ -21,6 +21,7 @@ public class Constants {
     public static final String ModelChatGLM40520 = "glm-4-0520";
     public static final String ModelChatGLM4Airx = "glm-4-airx";
     public static final String ModelChatGLMLong = "glm-4-long";
+    public static final String ModelChatGLM4Voice = "glm-4-voice";
 
     // 图片理解
     public static final String ModelChatGLM4VPlus = "glm-4v-plus";
@@ -40,6 +41,9 @@ public class Constants {
     // 历史模型，建议尽快迁移至信模型
     @Deprecated
     public static final String ModelChatGLM3TURBO= "glm-3-turbo";
+
+    //tts模型
+    public static final String ModelTTS = "cogtts";
 
     // invoke methods
     public static final String invokeMethodAsync = "async-invoke";

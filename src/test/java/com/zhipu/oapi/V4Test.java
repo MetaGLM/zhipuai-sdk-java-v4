@@ -7,6 +7,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
+import com.zhipu.oapi.service.v4.audio.AudioCustomizationApiResponse;
+import com.zhipu.oapi.service.v4.audio.AudioCustomizationRequest;
+import com.zhipu.oapi.service.v4.audio.AudioSpeechApiResponse;
+import com.zhipu.oapi.service.v4.audio.AudioSpeechRequest;
 import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
 import com.zhipu.oapi.service.v4.batchs.BatchResponse;
 import com.zhipu.oapi.service.v4.batchs.QueryBatchResponse;
@@ -24,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,8 +43,10 @@ public class V4Test {
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
     private static final String API_SECRET_KEY = Constants.getApiKey() != null ? Constants.getApiKey() : "test-api-key.test-api-secret";
 
+    private static final String API_BASE_URL = Constants.getBaseUrl();
 
-    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
+
+    private static final ClientV4 client = new ClientV4.Builder(API_BASE_URL,API_SECRET_KEY)
             .enableTokenCache()
             .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
             .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
@@ -392,8 +399,6 @@ public class V4Test {
         testQueryResult(taskId);
     }
 
-//
-
     /**
      * Text-to-image
      */
@@ -411,6 +416,37 @@ public class V4Test {
         createImageRequest.setRequestId("test11111111111111");
         ImageApiResponse imageApiResponse = client.createImage(createImageRequest);
         logger.info("imageApiResponse: {}", mapper.writeValueAsString(imageApiResponse));
+    }
+
+    /**
+     * glm-4-voice测试
+     */
+    @Test
+    public void testVoice() throws JsonProcessingException {
+        List<ChatMessage> messages = new ArrayList<>();
+        List<Object> contentList = new ArrayList<>();
+        Map<String, Object> content = new HashMap<>();
+        content.put("type", "text");
+        content.put("text", "给我讲个冷笑话");
+        contentList.add(content);
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), contentList);
+
+        messages.add(chatMessage);
+        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+
+        HashMap<String, Object> extraJson = new HashMap<>();
+        extraJson.put("temperature", 0.5);
+        extraJson.put("max_tokens", 1024);
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                .model(Constants.ModelChatGLM4Voice)
+                .stream(Boolean.FALSE)
+                .invokeMethod(Constants.invokeMethod)
+                .messages(messages)
+                .requestId(requestId)
+                .extraJson(extraJson)
+                .build();
+        ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        logger.info("model output: {}", mapper.writeValueAsString(invokeModelApiResp));
     }
 
     /**
@@ -583,6 +619,37 @@ public class V4Test {
     public void testBatchesCancel() {
         BatchResponse batchResponse = client.batchesCancel("batch_1791021399316246528");
         logger.info("output: {}", batchResponse);
+    }
+
+    @Test
+    public void testAudioSpeech() throws IOException {
+        AudioSpeechRequest audioSpeechRequest = AudioSpeechRequest.builder()
+                .model(Constants.ModelTTS)
+                .input("智谱，你好呀")
+                .voice("child")
+                .responseFormat("wav")
+                .build();
+        AudioSpeechApiResponse audioSpeechApiResponse = client.speech(audioSpeechRequest);
+        File file = audioSpeechApiResponse.getData();
+        file.createNewFile();
+
+        logger.info("testAudioSpeech file generation,fileName:{},filePath:{}",audioSpeechApiResponse.getData().getName(),audioSpeechApiResponse.getData().getAbsolutePath());
+
+    }
+
+    @Test
+    public void testAudioCustomization() throws IOException {
+        AudioCustomizationRequest audioCustomizationRequest = AudioCustomizationRequest.builder()
+                .model(Constants.ModelTTS)
+                .input("智谱，你好呀")
+                .voiceText("这是一条测试用例")
+                .voiceData(new File("/Users/jhy/Desktop/tts/test_case_8s.wav"))
+                .responseFormat("wav")
+                .build();
+        AudioCustomizationApiResponse audioCustomizationApiResponse = client.customization(audioCustomizationRequest);
+        File file = audioCustomizationApiResponse.getData();
+        file.createNewFile();
+        logger.info("testAudioCustomization file generation,fileName:{},filePath:{}",audioCustomizationApiResponse.getData().getName(),audioCustomizationApiResponse.getData().getAbsolutePath());
     }
 
     private static String getAsyncTaskId() throws JsonProcessingException {

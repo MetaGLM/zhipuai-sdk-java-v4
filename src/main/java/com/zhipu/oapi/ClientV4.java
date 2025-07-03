@@ -11,6 +11,7 @@ import com.zhipu.oapi.core.model.FlowableClientResponse;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.core.token.GlobalTokenManager;
 import com.zhipu.oapi.core.token.TokenManagerV4;
+import com.zhipu.oapi.service.v4.agents.AgentsCompletionRequest;
 import com.zhipu.oapi.service.v4.audio.AudioTranscriptionsRequest;
 import com.zhipu.oapi.service.v4.batchs.*;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
@@ -21,6 +22,7 @@ import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.file.*;
+import com.zhipu.oapi.service.v4.audio.*;
 import com.zhipu.oapi.service.v4.image.CreateImageRequest;
 import com.zhipu.oapi.service.v4.image.ImageApiResponse;
 import com.zhipu.oapi.service.v4.image.ImageResult;
@@ -44,18 +46,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.adapter.rxjava2.HttpException;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collector;
 
 import static com.zhipu.oapi.Constants.BASE_URL;
 
@@ -157,6 +154,29 @@ public class ClientV4 extends AbstractClientBaseService{
         return null;
     }
 
+    public ModelApiResponse invokeAgentApi(AgentsCompletionRequest request) {
+        if (request.getStream()) {
+            return sseAgentInvoke(request);
+        } else {
+            return agentsInvoke(request);
+        }
+    }
+
+    public Single<ModelData> queryAgentsAsyncResult(Map<String,Object> request) {
+        return chatApiService.queryAgentsAsyncResult(request);
+    }
+
+
+    private ModelApiResponse sseAgentInvoke(AgentsCompletionRequest request) {
+        FlowableRequestSupplier<Map<String,Object>, retrofit2.Call<ResponseBody>> supplier = params -> chatApiService.streamAgentsCompletion(params);
+        return streamRequest(
+                request,
+                supplier,
+                ModelApiResponse.class,
+                ModelData.class
+        );
+    }
+
     private ModelApiResponse sseInvoke(ChatCompletionRequest request) {
 
         FlowableRequestSupplier<Map<String,Object>, retrofit2.Call<ResponseBody>> supplier = params ->  chatApiService.streamChatCompletion(params);
@@ -171,6 +191,14 @@ public class ClientV4 extends AbstractClientBaseService{
     private ModelApiResponse invoke(ChatCompletionRequest request) {
 
         RequestSupplier< Map<String, Object>, ModelData> supplier = (params) -> chatApiService.createChatCompletion(
+                params
+        );
+        // 处理响应
+        return this.executeRequest(request, supplier, ModelApiResponse.class);
+    }
+
+    private ModelApiResponse agentsInvoke(AgentsCompletionRequest request) {
+        RequestSupplier< Map<String, Object>, ModelData> supplier = (params) -> chatApiService.agentsCompletion(
                 params
         );
         // 处理响应
@@ -268,61 +296,6 @@ public class ClientV4 extends AbstractClientBaseService{
     public HttpxBinaryResponseContent fileContent(String fileId) throws IOException {
         return chatApiService.fileContent(fileId);
     }
-//
-////
-////    public  FileApiResponse retrieveFile(String fileId) throws IOException {
-////
-////        FileApiResponse fileApiResponse = new FileApiResponse();
-////
-////        try {
-////            File file = chatApiService.retrieveFile(fileId);
-////            if (file != null) {
-////                fileApiResponse.setCode(200);
-////                fileApiResponse.setSuccess(true);
-////                fileApiResponse.setMsg("调用成功");
-////                fileApiResponse.setData(file);
-////            }
-////        } catch (ZhiPuAiHttpException e) {
-////            logger.error("业务出错", e);
-////            fileApiResponse.setCode(e.statusCode);
-////            fileApiResponse.setMsg("业务出错");
-////            fileApiResponse.setSuccess(false);
-////            ChatError chatError = new ChatError();
-////            chatError.setCode(Integer.parseInt(e.code));
-////            chatError.setMessage(e.getMessage());
-////            File file = new File();
-////            file.setError(chatError);
-////            fileApiResponse.setData(file);
-////        }
-////        return fileApiResponse;
-////    }
-//
-////    public  FileDelResponse deletedFile(String fileId) throws IOException {
-////        FileDelResponse fileDelResponse = new FileDelResponse();
-////
-////        try {
-////            FileDeleted deleted = chatApiService.deletedFile(fileId);
-////            if (deleted != null) {
-////                fileDelResponse.setCode(200);
-////                fileDelResponse.setSuccess(true);
-////                fileDelResponse.setMsg("调用成功");
-////                fileDelResponse.setData(deleted);
-////            }
-////        } catch (ZhiPuAiHttpException e) {
-////            logger.error("业务出错", e);
-////            fileDelResponse.setCode(e.statusCode);
-////            fileDelResponse.setMsg("业务出错");
-////            fileDelResponse.setSuccess(false);
-////            ChatError chatError = new ChatError();
-////            chatError.setCode(Integer.parseInt(e.code));
-////            chatError.setMessage(e.getMessage());
-////            FileDeleted file = new FileDeleted();
-////            file.setError(chatError);
-////            fileDelResponse.setData(file);
-////        }
-////        return fileDelResponse;
-////    }
-//
 
     public CreateFineTuningJobApiResponse createFineTuningJob(FineTuningJobRequest request) {
 
@@ -470,8 +443,41 @@ public class ClientV4 extends AbstractClientBaseService{
         return this.executeRequest(request, supplier, BatchResponse.class);
     }
 
+    /**
+     * tts接口(Text to speech)
+     * @param request
+     * @return
+     */
+    public AudioSpeechApiResponse speech(AudioSpeechRequest request){
+        RequestSupplier<Map<String, Object>, java.io.File> supplier = (params) -> {
+            try {
+                return chatApiService.audioSpeech(
+                        params
+                );
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        return this.executeRequest(request, supplier, AudioSpeechApiResponse.class);
+    }
 
-
+    /**
+     * tts接口(语音克隆)
+     * @param request
+     * @return
+     */
+    public AudioCustomizationApiResponse customization(AudioCustomizationRequest request){
+        RequestSupplier<Map<String, Object>, java.io.File> supplier = (params) -> {
+            try {
+                return chatApiService.audioCustomization(
+                        params
+                );
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        return this.executeRequest(request, supplier, AudioCustomizationApiResponse.class);
+    }
 
     public WebSearchApiResponse webSearchProStreamingInvoke(WebSearchParamsRequest request) {
         FlowableRequestSupplier<Map<String,Object>, retrofit2.Call<ResponseBody>> supplier = params ->  chatApiService.webSearchProStreaming(params);
