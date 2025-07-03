@@ -8,4 +8,4 @@ Before submitting your PR, there are a few things you can do to make sure it goe
 - [ ] Ensure the tests pass (Run `mvn clean test` from the repository root)
 - [ ] Appropriate docs were updated (if necessary)
 
-Fixes #<issue_number_goes_here> 🦕
+Fixes #<issue_number_goes_here> 
