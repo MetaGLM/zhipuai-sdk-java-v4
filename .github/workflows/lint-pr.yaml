@@ -6,9 +6,6 @@ on:
       - opened
       - edited
       - reopened
-  push:
-    branches:
-      - 'action*'
 
 jobs:
   lint-pr:
