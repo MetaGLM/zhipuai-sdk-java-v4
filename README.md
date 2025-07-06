@@ -35,7 +35,7 @@ Add the following dependency to your `pom.xml`:
 ```
 
 ### Gradle
-Add the following dependency to your `build.gradle`:
+Add the following dependency to your `build.gradle` (for Groovy DSL):
 
 ```groovy
 dependencies {
@@ -43,9 +43,9 @@ dependencies {
 }
 ```
 
-Or `build.gradle.kts`:
+Or `build.gradle.kts` (for Kotlin DSL):
 
-``kotlin
+```kotlin
 dependencies {
     implementation("cn.bigmodel.openapi:oapi-java-sdk:release-V4-2.3.4")
 }
