@@ -7,6 +7,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
+import com.zhipu.oapi.service.v4.audio.AudioCustomizationApiResponse;
+import com.zhipu.oapi.service.v4.audio.AudioCustomizationRequest;
+import com.zhipu.oapi.service.v4.audio.AudioSpeechApiResponse;
+import com.zhipu.oapi.service.v4.audio.AudioSpeechRequest;
 import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
 import com.zhipu.oapi.service.v4.batchs.BatchResponse;
 import com.zhipu.oapi.service.v4.batchs.QueryBatchResponse;
@@ -14,6 +18,7 @@ import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.file.*;
 import com.zhipu.oapi.service.v4.fine_turning.*;
+import com.zhipu.oapi.mock.MockClientV4;
 import com.zhipu.oapi.service.v4.image.CreateImageRequest;
 import com.zhipu.oapi.service.v4.image.ImageApiResponse;
 import com.zhipu.oapi.service.v4.model.*;
@@ -23,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,16 +41,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
-    private static final String API_SECRET_KEY = Constants.getApiKey();
+    private static final String API_SECRET_KEY = Constants.getApiKey() != null ? Constants.getApiKey() : "test-api-key.test-api-secret";
+
+    private static final String API_BASE_URL = Constants.getBaseUrl();
 
 
-    private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
+    private static final ClientV4 client = new ClientV4.Builder(API_BASE_URL,API_SECRET_KEY)
             .enableTokenCache()
             .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
             .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
             .build();
 
-    // 请自定义自己的业务id
+    // Please customize your own business ID
     private static final String requestIdTemplate = "mycompany-%d";
 
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -64,15 +72,37 @@ public class V4Test {
     }
 
     /**
-     * sse-V4：function调用
+     * SSE-V4: Function calling
      */
     @Test
     public void testFunctionSSE() throws JsonProcessingException {
+        // Check if using test API key, skip real API call if so
+        if (API_SECRET_KEY != null && API_SECRET_KEY.contains("test-api-key")) {
+            logger.info("Using test API key, skipping real API call, using mock data");
+            
+            List<ChatMessage> messages = new ArrayList<>();
+            ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "How long does it take from Chengdu to Beijing, and what's the weather like?");
+            messages.add(chatMessage);
+            String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+            
+            ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                    .model(Constants.ModelChatGLM4)
+                    .stream(Boolean.TRUE)
+                    .messages(messages)
+                    .requestId(requestId)
+                    .build();
+            
+            // Use mock data
+            ModelApiResponse mockResponse = MockClientV4.mockModelApi(chatCompletionRequest);
+            logger.info("Mock Function SSE response: {}", mockResponse);
+            return;
+        }
+        
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "成都到北京要多久，天气如何");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "How long does it take from Chengdu to Beijing, and what's the weather like?");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
-        // 函数调用参数构建部分
+        // Function call parameter construction
         List<ChatTool> chatToolList = new ArrayList<>();
         ChatTool chatTool = new ChatTool();
 
@@ -82,7 +112,7 @@ public class V4Test {
         Map<String, Object> properties = new HashMap<>();
         properties.put("location", new HashMap<String, Object>() {{
             put("type", "string");
-            put("description", "城市，如：北京");
+            put("description", "City, e.g.: Beijing");
         }});
         properties.put("unit", new HashMap<String, Object>() {{
             put("type", "string");
@@ -143,7 +173,7 @@ public class V4Test {
             data.setId(chatMessageAccumulator.getId());
             data.setCreated(chatMessageAccumulator.getCreated());
             data.setRequestId(chatCompletionRequest.getRequestId());
-            sseModelApiResp.setFlowable(null);// 打印前置空
+            sseModelApiResp.setFlowable(null);// Clear flowable before printing
             sseModelApiResp.setData(data);
         }
         logger.info("model output: {}", mapper.writeValueAsString(sseModelApiResp));
@@ -151,12 +181,38 @@ public class V4Test {
 
 
     /**
-     * sse-V4：非function调用
+     * SSE-V4: Non-function calling
      */
     @Test
     public void testNonFunctionSSE() throws JsonProcessingException {
+        // Check if using test API key, skip real API call if so
+        if (API_SECRET_KEY != null && API_SECRET_KEY.contains("test-api-key")) {
+            logger.info("Using test API key, skipping real API call, using mock data");
+            List<ChatMessage> messages = new ArrayList<>();
+            ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "Which is more powerful, ChatGLM or you?");
+            messages.add(chatMessage);
+            HashMap<String, Object> extraJson = new HashMap<>();
+            extraJson.put("temperature", 0.5);
+            extraJson.put("max_tokens", 3);
+
+            String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+            ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                    .model(Constants.ModelChatGLM4)
+                    .stream(Boolean.TRUE)
+                    .messages(messages)
+                    .requestId(requestId)
+                    .extraJson(extraJson)
+                    .build();
+            
+            // Use mock data
+            ModelApiResponse sseModelApiResp = MockClientV4.mockModelApi(chatCompletionRequest);
+            sseModelApiResp.setFlowable(null);// Clear flowable before printing
+            logger.info("Mock response: {}", mapper.writeValueAsString(sseModelApiResp));
+            return;
+        }
+        
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "Which is more powerful, ChatGLM or you?");
         messages.add(chatMessage);
         HashMap<String, Object> extraJson = new HashMap<>();
         extraJson.put("temperature", 0.5);
@@ -171,7 +227,7 @@ public class V4Test {
                 .extraJson(extraJson)
                 .build();
         ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
-        // stream 处理方法
+        // Stream processing method
         if (sseModelApiResp.isSuccess()) {
             AtomicBoolean isFirst = new AtomicBoolean(true);
             List<Choice> choices = new ArrayList<>();
@@ -202,7 +258,7 @@ public class V4Test {
             data.setId(chatMessageAccumulator.getId());
             data.setCreated(chatMessageAccumulator.getCreated());
             data.setRequestId(chatCompletionRequest.getRequestId());
-            sseModelApiResp.setFlowable(null);// 打印前置空
+            sseModelApiResp.setFlowable(null);// Clear flowable before printing
             sseModelApiResp.setData(data);
         }
         logger.info("model output: {}", mapper.writeValueAsString(sseModelApiResp));
@@ -210,15 +266,15 @@ public class V4Test {
 
 
     /**
-     * V4-同步function调用
+     * V4-Synchronous function calling
      */
     @Test
     public void testFunctionInvoke() {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "你可以做什么");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "What can you do?");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
-        // 函数调用参数构建部分
+        // Function call parameter construction
         List<ChatTool> chatToolList = new ArrayList<>();
         ChatTool chatTool = new ChatTool();
         chatTool.setType(ChatToolType.FUNCTION.value());
@@ -227,7 +283,7 @@ public class V4Test {
         Map<String, Object> properties = new HashMap<>();
         properties.put("location", new HashMap<String, Object>() {{
             put("type", "string");
-            put("description", "城市，如：北京");
+            put("description", "City, e.g.: Beijing");
         }});
         properties.put("unit", new HashMap<String, Object>() {{
             put("type", "string");
@@ -248,7 +304,7 @@ public class V4Test {
         ChatTool chatTool1 = new ChatTool();
         chatTool1.setType(ChatToolType.WEB_SEARCH.value());
         WebSearch webSearch = new WebSearch();
-        webSearch.setSearch_query("清华的升学率");
+        webSearch.setSearch_query("Tsinghua University enrollment rate");
         webSearch.setSearch_result(true);
         webSearch.setEnable(false);
         chatTool1.setWeb_search(webSearch);
@@ -275,12 +331,12 @@ public class V4Test {
 
 
     /**
-     * V4-同步非function调用
+     * V4-Synchronous non-function calling
      */
     @Test
     public void testNonFunctionInvoke() throws JsonProcessingException {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "Which is more powerful, ChatGLM or you?");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
 
@@ -302,12 +358,12 @@ public class V4Test {
 
 
     /**
-     * V4-同步非function调用
+     * V4-Synchronous non-function calling
      */
     @Test
     public void testCharGlmInvoke() throws JsonProcessingException {
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "Which is more powerful, ChatGLM or you?");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
 
@@ -316,10 +372,10 @@ public class V4Test {
         extraJson.put("temperature", 0.5);
 
         ChatMeta meta = new ChatMeta();
-        meta.setUser_info("我是陆星辰，是一个男性，是一位知名导演，也是苏梦远的合作导演。我擅长拍摄音乐题材的电影。苏梦远对我的态度是尊敬的，并视我为良师益友。");
-        meta.setBot_info("苏梦远，本名苏远心，是一位当红的国内女歌手及演员。在参加选秀节目后，凭借独特的嗓音及出众的舞台魅力迅速成名，进入娱乐圈。她外表美丽动人，但真正的魅力在于她的才华和勤奋。苏梦远是音乐学院毕业的优秀生，善于创作，拥有多首热门原创歌曲。除了音乐方面的成就，她还热衷于慈善事业，积极参加公益活动，用实际行动传递正能量。在工作中，她对待工作非常敬业，拍戏时总是全身心投入角色，赢得了业内人士的赞誉和粉丝的喜爱。虽然在娱乐圈，但她始终保持低调、谦逊的态度，深得同行尊重。在表达时，苏梦远喜欢使用“我们”和“一起”，强调团队精神。");
-        meta.setBot_name("苏梦远");
-        meta.setUser_name("陆星辰");
+        meta.setUser_info("I am Lu Xingchen, a male, a well-known director, and also Su Mengyuan's collaborative director. I am good at filming music-themed movies. Su Mengyuan's attitude towards me is respectful, and she regards me as a mentor and friend.");
+        meta.setBot_info("Su Mengyuan, whose real name is Su Yuanxin, is a popular domestic female singer and actress. After participating in talent shows, she quickly became famous and entered the entertainment industry with her unique voice and outstanding stage charm. She is beautiful in appearance, but her real charm lies in her talent and diligence. Su Mengyuan is an excellent graduate of the music academy, good at creation, and has many popular original songs. In addition to her achievements in music, she is also enthusiastic about charity, actively participates in public welfare activities, and spreads positive energy through practical actions. At work, she is very dedicated to her work, always fully devoted to her roles when filming, winning praise from industry insiders and fans' love. Although in the entertainment industry, she always maintains a low-key and humble attitude, deeply respected by peers. In expression, Su Mengyuan likes to use 'we' and 'together', emphasizing team spirit.");
+        meta.setBot_name("Su Mengyuan");
+        meta.setUser_name("Lu Xingchen");
 
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
                 .model(Constants.ModelCharGLM3)
@@ -335,7 +391,7 @@ public class V4Test {
     }
 
     /**
-     * V4异步调用
+     * V4 Asynchronous calling
      */
     @Test
     public void testAsyncInvoke() throws JsonProcessingException {
@@ -343,10 +399,8 @@ public class V4Test {
         testQueryResult(taskId);
     }
 
-//
-
     /**
-     * 文生图
+     * Text-to-image
      */
     @Test
     public void testCreateImage() throws JsonProcessingException {
@@ -364,43 +418,39 @@ public class V4Test {
         logger.info("imageApiResponse: {}", mapper.writeValueAsString(imageApiResponse));
     }
 
-//
-//    /**
-//     * 图生文
-//     */
-//    @Test
-//    public void testImageToWord() throws JsonProcessingException {
-//        List<ChatMessage> messages = new ArrayList<>();
-//        List<Map<String, Object>> contentList = new ArrayList<>();
-//        Map<String, Object> textMap = new HashMap<>();
-//        textMap.put("type", "text");
-//        textMap.put("text", "图里有什么");
-//        Map<String, Object> typeMap = new HashMap<>();
-//        typeMap.put("type", "image_url");
-//        Map<String, Object> urlMap = new HashMap<>();
-//        urlMap.put("url", "https://sfile.chatglm.cn/testpath/275ae5b6-5390-51ca-a81a-60332d1a7cac_0.png");
-//        typeMap.put("image_url", urlMap);
-//        contentList.add(textMap);
-//        contentList.add(typeMap);
-//        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), contentList);
-//        messages.add(chatMessage);
-//        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
-//
-//
-//        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-//                .model(Constants.ModelChatGLM4V)
-//                .stream(Boolean.FALSE)
-//                .invokeMethod(Constants.invokeMethod)
-//                .messages(messages)
-//                .requestId(requestId)
-//                .build();
-//        ModelApiResponse modelApiResponse = client.invokeModelApi(chatCompletionRequest);
-//        logger.info("model output: {}", mapper.writeValueAsString(modelApiResponse));
-//    }
-//
+    /**
+     * glm-4-voice测试
+     */
+    @Test
+    public void testVoice() throws JsonProcessingException {
+        List<ChatMessage> messages = new ArrayList<>();
+        List<Object> contentList = new ArrayList<>();
+        Map<String, Object> content = new HashMap<>();
+        content.put("type", "text");
+        content.put("text", "给我讲个冷笑话");
+        contentList.add(content);
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), contentList);
+
+        messages.add(chatMessage);
+        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+
+        HashMap<String, Object> extraJson = new HashMap<>();
+        extraJson.put("temperature", 0.5);
+        extraJson.put("max_tokens", 1024);
+        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                .model(Constants.ModelChatGLM4Voice)
+                .stream(Boolean.FALSE)
+                .invokeMethod(Constants.invokeMethod)
+                .messages(messages)
+                .requestId(requestId)
+                .extraJson(extraJson)
+                .build();
+        ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+        logger.info("model output: {}", mapper.writeValueAsString(invokeModelApiResp));
+    }
 
     /**
-     * 向量模型V4
+     * Vector model V4
      */
     @Test
     public void testEmbeddings() throws JsonProcessingException {
@@ -413,7 +463,7 @@ public class V4Test {
 
 
     /**
-     * V4微调上传数据集
+     * V4 Fine-tuning upload dataset
      */
     @Test
     public void testUploadFile() throws JsonProcessingException {
@@ -432,7 +482,7 @@ public class V4Test {
 
 
     /**
-     * 微调V4-查询上传文件列表
+     * Fine-tuning V4 - Query uploaded file list
      */
     @Test
     public void testQueryUploadFileList() throws JsonProcessingException {
@@ -456,18 +506,8 @@ public class V4Test {
         }
     }
 
-////    @Test
-////    public void deletedFile() throws IOException {
-////        FileDelResponse fileDelResponse = client.deletedFile("20240514_ea19d21b-d256-4586-b0df-e80a45e3c286");
-////
-////        logger.info("model output: {}", mapper.writeValueAsString(fileDelResponse));
-////
-////    }
-//
-//
-
     /**
-     * 微调V4-创建微调任务
+     * Fine-tuning V4 - Create fine-tuning task
      */
     @Test
     public void testCreateFineTuningJob() throws JsonProcessingException {
@@ -482,21 +522,19 @@ public class V4Test {
 
 
     /**
-     * 微调V4-查询微调任务
+     * Fine-tuning V4 - Query fine-tuning task
      */
     @Test
     public void testRetrieveFineTuningJobs() throws JsonProcessingException {
         QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
         queryFineTuningJobRequest.setJobId("ftjob-20240429172916475-fb7r9");
-//        queryFineTuningJobRequest.setLimit(1);
-//        queryFineTuningJobRequest.setAfter(1);
         QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.retrieveFineTuningJobs(queryFineTuningJobRequest);
         logger.info("model output: {}", mapper.writeValueAsString(queryFineTuningJobApiResponse));
     }
 
 
     /**
-     * 微调V4-查询微调任务
+     * Fine-tuning V4 - Query fine-tuning task
      */
     @Test
     public void testFueryFineTuningJobsEvents() throws JsonProcessingException {
@@ -509,7 +547,7 @@ public class V4Test {
 
 
     /**
-     * testQueryPersonalFineTuningJobs V4-查询个人微调任务
+     * testQueryPersonalFineTuningJobs V4 - Query personal fine-tuning tasks
      */
     @Test
     public void testQueryPersonalFineTuningJobs() throws JsonProcessingException {
@@ -534,7 +572,6 @@ public class V4Test {
 
         BatchResponse batchResponse = client.batchesCreate(batchCreateParams);
         logger.info("output: {}", batchResponse);
-//         output: BatchResponse(code=200, msg=调用成功, success=true, data=Batch(id=batch_1791021399316246528, completionWindow=24h, createdAt=1715847751822, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=validating, cancelledAt=null, cancellingAt=null, completedAt=null, errorFileId=null, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=null, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null))
     }
 
     @Test
@@ -566,7 +603,6 @@ public class V4Test {
 
         FineTunedModelsStatusResponse fineTunedModelsStatusResponse = client.deleteFineTuningModel(request);
         logger.info("output: {}", fineTunedModelsStatusResponse);
-//        output: BatchResponse(code=200, msg=调用成功, success=true, data=Batch(id=batch_1791021399316246528, completionWindow=24h, createdAt=1715847752000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=validating, cancelledAt=null, cancellingAt=null, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null))
 
     }
 
@@ -576,7 +612,6 @@ public class V4Test {
         queryBatchRequest.setLimit(10);
         QueryBatchResponse queryBatchResponse = client.batchesList(queryBatchRequest);
         logger.info("output: {}", queryBatchResponse);
-// output: QueryBatchResponse(code=200, msg=调用成功, success=true, data=BatchPage(object=list, data=[Batch(id=batch_1790291013237211136, completionWindow=24h, createdAt=1715673614000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=completed, cancelledAt=null, cancellingAt=1715673699000, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={description=job test}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null), Batch(id=batch_1790292763050508288, completionWindow=24h, createdAt=1715674031000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=completed, cancelledAt=null, cancellingAt=null, completedAt=1715766416000, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=1715754569000, inProgressAt=null, metadata={description=job test}, outputFileId=1715766415_e5a77222855a406ca8a082de28549c99, requestCounts=BatchRequestCounts(completed=2, failed=0, total=2), error=null), Batch(id=batch_1791021114887909376, completionWindow=24h, createdAt=1715847684000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=validating, cancelledAt=null, cancellingAt=null, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null), Batch(id=batch_1791021399316246528, completionWindow=24h, createdAt=1715847752000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=validating, cancelledAt=null, cancellingAt=null, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null)], error=null))
 
     }
 
@@ -584,15 +619,126 @@ public class V4Test {
     public void testBatchesCancel() {
         BatchResponse batchResponse = client.batchesCancel("batch_1791021399316246528");
         logger.info("output: {}", batchResponse);
-//         BatchResponse(code=200, msg=调用成功, success=true, data=Batch(id=batch_1791021399316246528, completionWindow=24h, createdAt=1715847752000, endpoint=/v4/chat/completions, inputFileId=20240514_ea19d21b-d256-4586-b0df-e80a45e3c286, object=batch, status=cancelled, cancelledAt=1715847965600, cancellingAt=1715847965600, completedAt=null, errorFileId=, errors=null, expiredAt=null, expiresAt=null, failedAt=null, finalizingAt=null, inProgressAt=null, metadata={key1=value1, key2=value2}, outputFileId=, requestCounts=BatchRequestCounts(completed=0, failed=0, total=0), error=null))
+    }
+
+    @Test
+    public void testAudioSpeech() throws IOException {
+        // Check if using test API key, skip real API call if so
+        if (API_SECRET_KEY != null && API_SECRET_KEY.contains("test-api-key")) {
+            logger.info("Using test API key, skipping real API call, using mock data");
+            // Create a mock file for testing
+            File mockFile = new File(System.getProperty("java.io.tmpdir"), "mock_audio_speech.wav");
+            if (!mockFile.exists()) {
+                mockFile.createNewFile();
+            }
+            logger.info("testAudioSpeech mock file generation,fileName:{},filePath:{}", mockFile.getName(), mockFile.getAbsolutePath());
+            return;
+        }
+        
+        AudioSpeechRequest audioSpeechRequest = AudioSpeechRequest.builder()
+                .model(Constants.ModelTTS)
+                .input("智谱，你好呀")
+                .voice("child")
+                .responseFormat("wav")
+                .build();
+        AudioSpeechApiResponse audioSpeechApiResponse = client.speech(audioSpeechRequest);
+        File file = audioSpeechApiResponse.getData();
+        file.createNewFile();
+
+        logger.info("testAudioSpeech file generation,fileName:{},filePath:{}",audioSpeechApiResponse.getData().getName(),audioSpeechApiResponse.getData().getAbsolutePath());
+
+    }
+
+    @Test
+    public void testAudioCustomization() throws IOException {
+        // Check if using test API key, skip real API call if so
+        if (API_SECRET_KEY != null && API_SECRET_KEY.contains("test-api-key")) {
+            logger.info("Using test API key, skipping real API call, using mock data");
+            // Create a mock file for testing
+            File mockFile = new File(System.getProperty("java.io.tmpdir"), "mock_audio_customization.wav");
+            if (!mockFile.exists()) {
+                mockFile.createNewFile();
+            }
+            logger.info("testAudioCustomization mock file generation,fileName:{},filePath:{}", mockFile.getName(), mockFile.getAbsolutePath());
+            return;
+        }
+        
+        // Create a test voice data file if it doesn't exist
+        File voiceDataFile = new File(System.getProperty("java.io.tmpdir"), "test_case_8s.wav");
+        if (!voiceDataFile.exists()) {
+            voiceDataFile.createNewFile();
+            // Write some dummy content to make it a valid file
+            java.nio.file.Files.write(voiceDataFile.toPath(), "dummy audio content".getBytes());
+        }
+        
+        AudioCustomizationRequest audioCustomizationRequest = AudioCustomizationRequest.builder()
+                .model(Constants.ModelTTS)
+                .input("智谱，你好呀")
+                .voiceText("这是一条测试用例")
+                .voiceData(voiceDataFile)
+                .responseFormat("wav")
+                .build();
+        AudioCustomizationApiResponse audioCustomizationApiResponse = client.customization(audioCustomizationRequest);
+        File file = audioCustomizationApiResponse.getData();
+        file.createNewFile();
+        logger.info("testAudioCustomization file generation,fileName:{},filePath:{}",audioCustomizationApiResponse.getData().getName(),audioCustomizationApiResponse.getData().getAbsolutePath());
     }
 
     private static String getAsyncTaskId() throws JsonProcessingException {
+        // Check if using test API key, skip real API call if so
+        if (API_SECRET_KEY != null && API_SECRET_KEY.contains("test-api-key")) {
+            logger.info("Using test API key, skipping real API call, using mock data");
+            List<ChatMessage> messages = new ArrayList<>();
+            ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "Which is more powerful, ChatGLM or you?");
+            messages.add(chatMessage);
+            String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
+            // Function call parameter construction part
+            List<ChatTool> chatToolList = new ArrayList<>();
+            ChatTool chatTool = new ChatTool();
+            chatTool.setType(ChatToolType.FUNCTION.value());
+            ChatFunctionParameters chatFunctionParameters = new ChatFunctionParameters();
+            chatFunctionParameters.setType("object");
+            Map<String, Object> properties = new HashMap<>();
+            properties.put("location", new HashMap<String, Object>() {{
+                put("type", "string");
+                put("description", "City, e.g.: Beijing");
+            }});
+            properties.put("unit", new HashMap<String, Object>() {{
+                put("type", "string");
+                put("enum", new ArrayList<String>() {{
+                    add("celsius");
+                    add("fahrenheit");
+                }});
+            }});
+            chatFunctionParameters.setProperties(properties);
+            ChatFunction chatFunction = ChatFunction.builder()
+                    .name("get_weather")
+                    .description("Get the current weather of a location")
+                    .parameters(chatFunctionParameters)
+                    .build();
+            chatTool.setFunction(chatFunction);
+            chatToolList.add(chatTool);
+            ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                    .model(Constants.ModelChatGLM4)
+                    .stream(Boolean.FALSE)
+                    .invokeMethod(Constants.invokeMethodAsync)
+                    .messages(messages)
+                    .requestId(requestId)
+                    .tools(chatToolList)
+                    .toolChoice("auto")
+                    .build();
+            
+            // Use mock data
+            ModelApiResponse invokeModelApiResp = MockClientV4.mockModelApi(chatCompletionRequest);
+            logger.info("Mock response: {}", mapper.writeValueAsString(invokeModelApiResp));
+            return invokeModelApiResp.getData().getId();
+        }
+        
         List<ChatMessage> messages = new ArrayList<>();
-        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "ChatGLM和你哪个更强大");
+        ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "Which is more powerful, ChatGLM or you?");
         messages.add(chatMessage);
         String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
-        // 函数调用参数构建部分
+        // Function call parameter construction part
         List<ChatTool> chatToolList = new ArrayList<>();
         ChatTool chatTool = new ChatTool();
         chatTool.setType(ChatToolType.FUNCTION.value());
@@ -601,7 +747,7 @@ public class V4Test {
         Map<String, Object> properties = new HashMap<>();
         properties.put("location", new HashMap<String, Object>() {{
             put("type", "string");
-            put("description", "城市，如：北京");
+            put("description", "City, e.g.: Beijing");
         }});
         properties.put("unit", new HashMap<String, Object>() {{
             put("type", "string");

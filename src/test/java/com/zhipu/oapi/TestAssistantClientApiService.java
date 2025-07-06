@@ -6,29 +6,24 @@ import com.zhipu.oapi.service.v4.api.AssistantClientService;
 import com.zhipu.oapi.service.v4.assistant.*;
 import com.zhipu.oapi.service.v4.assistant.conversation.ConversationParameters;
 import com.zhipu.oapi.service.v4.assistant.conversation.ConversationUsageListResponse;
-import com.zhipu.oapi.service.v4.assistant.conversation.ConversationUsageListStatus;
 import com.zhipu.oapi.service.v4.assistant.message.MessageContent;
 import com.zhipu.oapi.service.v4.assistant.query_support.AssistantSupportResponse;
 import com.zhipu.oapi.service.v4.assistant.query_support.QuerySupportParams;
-import com.zhipu.oapi.service.v4.tools.ChoiceDelta;
-import com.zhipu.oapi.service.v4.tools.WebSearchPro;
 import com.zhipu.oapi.utils.StringUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assumptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class TestAssistantClientApiService {
     private final static Logger logger = LoggerFactory.getLogger(TestAssistantClientApiService.class);
-    private static final String ZHIPUAI_API_KEY = Constants.getApiKey();
+    private static final String ZHIPUAI_API_KEY = Constants.getApiKey() != null ? Constants.getApiKey() : "test-api-key.test-api-secret";
     private static final String ZHIPUAI_BASE_URL = Constants.getBaseUrl();
     private static ClientV4 client = null;
 
@@ -53,10 +48,12 @@ public class TestAssistantClientApiService {
     @Test
     @Order(1)
     public void testAssistantCompletionStream() throws JsonProcessingException {
-
+        // Check if using real API key, skip test if using test key
+        Assumptions.assumeTrue(ZHIPUAI_API_KEY != null && !ZHIPUAI_API_KEY.contains("test-api-key"), 
+                "Skipping test: Using test API key, real API key required for this test");
 
         MessageTextContent textContent = MessageTextContent.builder()
-                .text("帮我搜索下智谱的cogvideox发布时间")
+                .text("Help me search for the release time of Zhipu's CogVideoX")
                 .type("text")
                 .build();
 
@@ -67,11 +64,10 @@ public class TestAssistantClientApiService {
 
         AssistantParameters build = AssistantParameters.builder()
                 .assistantId("659e54b1b8006379b4b2abd6")
-                .model("glm-4-assistant")
                 .stream(true)
                 .messages(Collections.singletonList(messages))
                 .build();
-        // 设置params的相关属性
+        // Set relevant properties of params
         AssistantApiResponse apply = new AssistantClientService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
                 .assistantCompletionStream(build)
                 .apply(client);
@@ -99,11 +95,10 @@ public class TestAssistantClientApiService {
 
             AssistantCompletion assistantCompletion = lastAccumulator.get();
 
-            apply.setFlowable(null);// 打印前置空
+            apply.setFlowable(null);// Clear flowable before printing
             apply.setData(assistantCompletion);
         }
         logger.info("apply output: {}", mapper.writeValueAsString(apply));
-
 
     }
     @Test
@@ -128,5 +123,100 @@ public class TestAssistantClientApiService {
                 .queryConversationUsage(build)
                 .apply(client);
         logger.info("apply output: {}", apply);
+    }
+
+
+    @Test
+    @Order(1)
+    public void testTranslateAssistantCompletionStream() throws JsonProcessingException {
+        // Check if using real API key, skip test if using test key
+        Assumptions.assumeTrue(ZHIPUAI_API_KEY != null && !ZHIPUAI_API_KEY.contains("test-api-key"), 
+                "Skipping test: Using test API key, real API key required for this test");
+
+        MessageTextContent textContent = MessageTextContent.builder()
+                .text("Hello there")
+                .type("text")
+                .build();
+
+        ConversationMessage messages = ConversationMessage.builder()
+                .role("user")
+                .content(Collections.singletonList(textContent))
+                .build();
+
+        AssistantExtraParameters assistantExtraParameters = new AssistantExtraParameters();
+        TranslateParameters translateParameters = new TranslateParameters();
+        translateParameters.setFrom("zh");
+        translateParameters.setTo("en");
+        assistantExtraParameters.setTranslate(translateParameters);
+        AssistantParameters build = AssistantParameters.builder()
+                .assistantId("9996ijk789lmn012o345p999")
+                .stream(true)
+                .messages(Collections.singletonList(messages))
+                .extraParameters(assistantExtraParameters)
+                .build();
+        // Set relevant properties of params
+        AssistantApiResponse apply = new AssistantClientService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
+                .assistantCompletionStream(build)
+                .apply(client);
+        if (apply.isSuccess()) {
+            AtomicBoolean isFirst = new AtomicBoolean(true);
+            List<MessageContent> choices = new ArrayList<>();
+            AtomicReference<AssistantCompletion> lastAccumulator = new AtomicReference<>();
+
+            apply.getFlowable().map(result -> result)
+                    .doOnNext(accumulator -> {
+                        {
+                            if (isFirst.getAndSet(false)) {
+                                logger.info("Response: ");
+                            }
+                            MessageContent delta = accumulator.getChoices().get(0).getDelta();
+                            logger.info("MessageContent: {}", mapper.writeValueAsString(delta));
+                            choices.add(delta);
+                            lastAccumulator.set(accumulator);
+
+                        }
+                    })
+                    .doOnComplete(() -> System.out.println("Stream completed."))
+                    .doOnError(throwable -> System.err.println("Error: " + throwable)) // Handle errors
+                    .blockingSubscribe();// Use blockingSubscribe instead of blockingGet()
+
+            AssistantCompletion assistantCompletion = lastAccumulator.get();
+
+            apply.setFlowable(null);// Clear flowable before printing
+            apply.setData(assistantCompletion);
+        }
+        logger.info("apply output: {}", mapper.writeValueAsString(apply));
+    }
+
+    @Test
+    public void testTranslateAssistantCompletion() throws JsonProcessingException {
+        MessageTextContent textContent = MessageTextContent.builder()
+                .text("Hello there")
+                .type("text")
+                .build();
+
+        ConversationMessage messages = ConversationMessage.builder()
+                .role("user")
+                .content(Collections.singletonList(textContent))
+                .build();
+
+        AssistantExtraParameters assistantExtraParameters = new AssistantExtraParameters();
+        assistantExtraParameters.setTranslate(TranslateParameters.builder()
+                .from("zh")
+                .to("en")
+                .build());
+
+        AssistantParameters build = AssistantParameters.builder()
+                .assistantId("9996ijk789lmn012o345p999")
+                .stream(false)
+                .messages(Collections.singletonList(messages))
+                .extraParameters(assistantExtraParameters)
+                .build();
+
+        // Set relevant properties of params
+        AssistantApiResponse apply = new AssistantClientService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
+                .assistantCompletion(build)
+                .apply(client);
+        logger.info("model output: {}", mapper.writeValueAsString(apply));
     }
 }

@@ -82,6 +82,10 @@ public class ConfigV4 {
     @Getter
     private TimeUnit timeOutTimeUnit;
 
+    @Getter
+    @Setter
+    private String source_channel;
+
     public ConfigV4() {
     }
 

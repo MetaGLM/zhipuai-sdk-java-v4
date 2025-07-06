@@ -1,68 +1,97 @@
-# 智谱大模型开放接口SDK
+# ZhipuAI Open Platform Java SDK
 
-智谱[开放平台](http://open.bigmodel.cn/howuse/platformintroduced)大模型接口Java SDK（Big Model API SDK in
-Java），让开发者更便捷的调用智谱开放API
+[![Maven Central](https://img.shields.io/maven-central/v/cn.bigmodel.openapi/oapi-java-sdk.svg)](https://search.maven.org/artifact/cn.bigmodel.openapi/oapi-java-sdk)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/java-1.8%2B-orange.svg)](https://www.oracle.com/java/)
 
-## 简介
-- <font color="red">**Java SDK仍在开发测试阶段，有bug请留言联系**</font>
-- Java SDK当前不支持Android
-- 对所有接口进行了类型封装，无需查阅API文档即可完成接入
+[中文文档](README_CN.md)
 
-## 安装
+The official Java SDK for [ZhipuAI Open Platform](http://open.bigmodel.cn/howuse/platformintroduced) Big Model API, enabling developers to easily integrate ZhipuAI's powerful AI capabilities into their Java applications.
 
-- 运行环境：JDK1.8+
-- maven坐标
+## ✨ Features
+
+- 🚀 **Type-safe API**: All interfaces are fully type-encapsulated, no need to consult API documentation
+- 🔧 **Easy Integration**: Simple and intuitive API design for quick integration
+- ⚡ **High Performance**: Built with modern Java libraries for optimal performance
+- 🛡️ **Secure**: Built-in authentication and token management
+- 📦 **Lightweight**: Minimal dependencies for easy project integration
+
+## 📦 Installation
+
+### Requirements
+- Java 1.8 or higher
+- Maven or Gradle
+- Not supported on Android platform
+
+### Maven
+Add the following dependency to your `pom.xml`:
+
 ```xml
-        <dependency>
-            <groupId>cn.bigmodel.openapi</groupId>
-            <artifactId>oapi-java-sdk</artifactId>
-            <version>release-V4-2.3.0</version>
-        </dependency>
+<dependency>
+    <groupId>cn.bigmodel.openapi</groupId>
+    <artifactId>oapi-java-sdk</artifactId>
+    <version>release-V4-2.3.4</version>
+</dependency>
 ```
+
+### Gradle
+Add the following dependency to your `build.gradle`:
 
 ```groovy
 dependencies {
-    implementation 'cn.bigmodel.openapi:oapi-java-sdk:release-V4-2.3.0'
+    implementation 'cn.bigmodel.openapi:oapi-java-sdk:release-V4-2.3.4'
 }
 ```
-- 运行单元测试依赖您环境变量中的APIKey和BaseUrl信息，建议您提前设置好环境变量；运行过程中会消耗APIKey对应账户下的少量token
+
+Or `build.gradle.kts`:
+
+``kotlin
+dependencies {
+    implementation("cn.bigmodel.openapi:oapi-java-sdk:release-V4-2.3.4")
+}
 ```
-  export ZHIPUAI_BASE_URL=https://open.bigmodel.cn/api/paas/v4/ # 默认智谱开放平台API地址
-  export ZHIPUAI_API_KEY=6082424a4dxxxxxxxxxxb9d.svyyyyyyyyyK8K # 替换为你自己的APIKey
-```
-### 依赖信息
 
-```text
-okhttp_3.14.9
-java-jwt_4.2.2
-jackson_2.11.3
-retrofit2_2.9.0 
-```
-## 使用
-- 调用流程：
-    1. 使用APIKey创建Client
-    2. 调用Client对应的成员方法
-- [V4Test.java](src/test/java/com/zhipu/oapi/V4Test.java)有完整的demo示例，请替换自己的ApiKey进行测试
+### 📋 Dependencies
 
+This SDK uses the following core dependencies:
 
-> SDK提供了ClientV4的构造器，此方法可以在创建Client时进行配置，可配置项如下：
+| Library | Version |
+|---------|----------|
+| OkHttp | 3.14.9 |
+| Java JWT | 4.2.2 |
+| Jackson | 2.11.3 |
+| Retrofit2 | 2.9.0 |
 
- 
-- enableTokenCache：是否开启token缓存，开启后会缓存token，减少token请求次数
-- networkConfig：设置连接超时、读取超时、写入超时、ping间隔、ping超时时间
-- connectionPool：设置连接池
+## 🚀 Quick Start
 
-``` 
-String API_SECRET_KEY = "your api";
+### Basic Usage
+
+1. **Create a Client** with your API key
+2. **Call the desired API methods**
+
+For complete examples, see [V4Test.java](src/test/java/com/zhipu/oapi/V4Test.java). Remember to replace the API key with your own.
+
+### Client Configuration
+
+The SDK provides a flexible `ClientV4` builder for customizing your client:
+
+**Configuration Options:**
+- `enableTokenCache()`: Enable token caching to reduce token requests
+- `networkConfig()`: Configure connection, read, write timeouts, and ping intervals
+- `connectionPool()`: Set up connection pooling
+
+```java
+String API_SECRET_KEY = "your_api_key_here";
 private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY) 
         .enableTokenCache()
         .networkConfig(30, 10, 10, 10, TimeUnit.SECONDS)
         .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
         .build();
- 
 ```
 
-### spring Controller 示例
+## 💡 Examples
+
+### Spring Boot Integration
 
 ```java
 package com.zhipu.controller;
@@ -107,34 +136,18 @@ public class TestController {
 
 ```
 
+## 📈 Release Notes
 
-## 升级内容
+For detailed release notes and version history, please see [Release-Note.md](Release-Note.md).
 
-#### release-V4-2.3.0
-- 知识库业务
-- 智能助手业务
-- 增加embedding-3支持
+## 📄 License
 
-#### release-V4-2.2.0
-- 重构代码
-- 高级检索接口
-- codegeex接口
-- 视频生成功能
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 🤝 Contributing
 
-#### release-V4-2.1.0
-- 增加拓展报文序列化工具类
-- 增加测试样例
-- 修改为使用api key鉴权
-- 统一通信客户端
-- 删除部分序列化框架依赖
-- 增加批处理API
+We welcome contributions! Please feel free to submit a Pull Request.
 
-#### release-V4-2.0.2
-- readTimeOut时间设置为300s
-- 修改测试demo中apiKey命名
+## 📞 Support
 
-
-#### release-V4-2.0.1
-- 统一client4构造apikey入参
-- 延长token过期时间
+For questions and support, please visit the [ZhipuAI Open Platform](http://open.bigmodel.cn/) or check our documentation.

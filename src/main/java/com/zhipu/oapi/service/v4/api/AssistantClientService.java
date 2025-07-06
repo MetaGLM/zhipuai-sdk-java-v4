@@ -36,9 +36,13 @@ public class AssistantClientService extends ClientBaseService {
 
     // 修改 assistantCompletionStream 方法，使其返回 AssistantGenerationChain
     public AssistantGenerationChain assistantCompletionStream(AssistantParameters request) {
-
         Call<ResponseBody> responseBodyCall = assistantApi.assistantCompletionStream(request.getOptions());
-        return new AssistantGenerationChain(request, responseBodyCall);
+        return new AssistantGenerationChain(request, responseBodyCall,null);
+    }
+
+    public AssistantGenerationChain assistantCompletion(AssistantParameters request) {
+        Single<AssistantCompletion> assistantCompletionSingle = assistantApi.assistantCompletion(request.getOptions());
+        return new AssistantGenerationChain(request, null,assistantCompletionSingle);
     }
 
 
@@ -59,25 +63,34 @@ public class AssistantClientService extends ClientBaseService {
         private final AssistantParameters params;
         private final Call<ResponseBody> responseBodyCall;
 
+        private final Single<AssistantCompletion> assistantCompletionSingle;
+
         public AssistantGenerationChain(AssistantParameters params,
                                         Call<ResponseBody> responseBodyCall
-                                        ) {
+                                       ,Single<AssistantCompletion> assistantCompletionSingle) {
             this.params = params;
             this.responseBodyCall = responseBodyCall;
+            this.assistantCompletionSingle = assistantCompletionSingle;
         }
 
-        public  AssistantApiResponse apply(final ClientV4 clientV4) {
-            FlowableRequestSupplier<Map<String,Object>, retrofit2.Call<ResponseBody>>  supplier = (params) -> {
-                return responseBodyCall;
-            };
-            return clientV4.streamRequest(
-                    params,
-                    supplier,
-                    AssistantApiResponse.class,
-                    AssistantCompletion.class
-            );
+        public AssistantApiResponse apply(final ClientV4 clientV4) {
+            if(params.isStream()){
+                FlowableRequestSupplier<Map<String,Object>, retrofit2.Call<ResponseBody>>  supplier = (params) -> {
+                    return responseBodyCall;
+                };
+                return clientV4.streamRequest(
+                        params,
+                        supplier,
+                        AssistantApiResponse.class,
+                        AssistantCompletion.class
+                );
+            } else {
+                RequestSupplier<Map<String, Object>, AssistantCompletion> supplier = (params) -> {
+                    return assistantCompletionSingle;
+                };
+                 return clientV4.executeRequest(params, supplier, AssistantApiResponse.class);
+            }
         }
-
     }
     public static class AssistantSupportChain extends GenerationChain<AssistantSupportStatus, AssistantSupportResponse> {
         private final QuerySupportParams params;

@@ -25,6 +25,8 @@ public class Delta extends ObjectNode {
 
     private String content;
 
+    @Setter
+    private Audio audio;
 
     @JsonProperty("tool_calls")
     private List<ToolCalls> tool_calls;
@@ -52,6 +54,12 @@ public class Delta extends ObjectNode {
             }));
         } else {
             this.setTool_calls(null);
+        }
+        if (objectNode.get("audio") != null) {
+            Audio audio = objectMapper.convertValue(objectNode.get("audio"), new TypeReference<Audio>() {});
+            this.setAudio(audio);
+        } else {
+            this.setAudio(null);
         }
 
         Iterator<String> fieldNames = objectNode.fieldNames();
