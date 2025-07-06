@@ -45,7 +45,7 @@ dependencies {
 
 或 `build.gradle.kts`（适用于 Kotlin DSL）：
 
-``kotlin
+```kotlin
 dependencies {
     implementation("cn.bigmodel.openapi:oapi-java-sdk:release-V4-2.3.4")
 }
