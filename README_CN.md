@@ -21,6 +21,7 @@
 ### 环境要求
 - Java 1.8 或更高版本
 - Maven 或 Gradle
+- 尚不支持在 Android 平台运行
 
 ### Maven 依赖
 在您的 `pom.xml` 中添加以下依赖：
@@ -31,6 +32,23 @@
     <artifactId>oapi-java-sdk</artifactId>
     <version>release-V4-2.3.4</version>
 </dependency>
+```
+
+### Gradle 依赖
+在您的 `build.gradle` 中添加以下依赖（适用于 Groovy DSL）：
+
+```groovy
+dependencies {
+    implementation 'cn.bigmodel.openapi:oapi-java-sdk:release-V4-2.3.4'
+}
+```
+
+或 `build.gradle.kts`（适用于 Kotlin DSL）：
+
+```kotlin
+dependencies {
+    implementation("cn.bigmodel.openapi:oapi-java-sdk:release-V4-2.3.4")
+}
 ```
 
 ### 📋 核心依赖

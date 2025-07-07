@@ -21,6 +21,7 @@ The official Java SDK for [ZhipuAI Open Platform](http://open.bigmodel.cn/howuse
 ### Requirements
 - Java 1.8 or higher
 - Maven or Gradle
+- Not supported on Android platform
 
 ### Maven
 Add the following dependency to your `pom.xml`:
@@ -31,6 +32,23 @@ Add the following dependency to your `pom.xml`:
     <artifactId>oapi-java-sdk</artifactId>
     <version>release-V4-2.3.4</version>
 </dependency>
+```
+
+### Gradle
+Add the following dependency to your `build.gradle` (for Groovy DSL):
+
+```groovy
+dependencies {
+    implementation 'cn.bigmodel.openapi:oapi-java-sdk:release-V4-2.3.4'
+}
+```
+
+Or `build.gradle.kts` (for Kotlin DSL):
+
+```kotlin
+dependencies {
+    implementation("cn.bigmodel.openapi:oapi-java-sdk:release-V4-2.3.4")
+}
 ```
 
 ### 📋 Dependencies
