@@ -91,6 +91,270 @@ private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
 
 ## 💡 Examples
 
+### Chat Model Invocation
+
+#### Streaming Invocation (SSE)
+
+- **Basic Chat**
+
+```java
+List<ChatMessage> messages = new ArrayList<>();
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "What is the relationship between ZhipuAI and ChatGLM?");
+messages.add(chatMessage);
+String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
+ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+        .model(Constants.ModelChatGLM4)
+        .stream(Boolean.TRUE)
+        .messages(messages)
+        .requestId(requestId)
+        .build();
+ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+if (sseModelApiResp.isSuccess()) {
+    AtomicBoolean isFirst = new AtomicBoolean(true);
+    ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
+            .doOnNext(accumulator -> {
+                // Process streaming results
+                System.out.println("accumulator: " + accumulator);
+            })
+            .doOnComplete(System.out::println)
+            .lastElement()
+            .blockingGet();
+}
+```
+
+- **Function-Calling**
+
+```java
+List<ChatMessage> messages = new ArrayList<>();
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "How much is a flight ticket from Chengdu to Beijing?");
+messages.add(chatMessage);
+String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
+// Function definition
+List<ChatTool> chatToolList = new ArrayList<>();
+ChatTool chatTool = new ChatTool();
+chatTool.setType(ChatToolType.FUNCTION.value());
+ChatFunctionParameters chatFunctionParameters = new ChatFunctionParameters();
+chatFunctionParameters.setType("object");
+Map<String, Object> properties = new HashMap<>();
+properties.put("departure", new HashMap<String, Object>() {{
+    put("type", "string");
+    put("description", "Departure city");
+}});
+properties.put("destination", new HashMap<String, Object>() {{
+    put("type", "string");
+    put("description", "Destination city");
+}});
+chatFunctionParameters.setProperties(properties);
+ChatFunction chatFunction = ChatFunction.builder()
+        .name("query_flight_prices")
+        .description("Query flight prices")
+        .parameters(chatFunctionParameters)
+        .build();
+chatTool.setFunction(chatFunction);
+chatToolList.add(chatTool);
+
+ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+        .model(Constants.ModelChatGLM4)
+        .stream(Boolean.TRUE)
+        .messages(messages)
+        .requestId(requestId)
+        .tools(chatToolList)
+        .toolChoice("auto")
+        .build();
+ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+// Process the returned results
+```
+
+#### Synchronous Invocation
+
+- **Basic Chat**
+
+```java
+List<ChatMessage> messages = new ArrayList<>();
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "What is the relationship between ZhipuAI and ChatGLM?");
+messages.add(chatMessage);
+String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
+ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+        .model(Constants.ModelChatGLM4)
+        .stream(Boolean.FALSE)
+        .invokeMethod(Constants.invokeMethod)
+        .messages(messages)
+        .requestId(requestId)
+        .build();
+ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+System.out.println("model output:" + new ObjectMapper().writeValueAsString(invokeModelApiResp));
+```
+
+- **Function-Calling**
+
+```java
+List<ChatMessage> messages = new ArrayList<>();
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "What can you do?");
+messages.add(chatMessage);
+String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
+// Function definition... (refer to streaming Function-Calling)
+List<ChatTool> chatToolList = new ArrayList<>();
+// ... Add Function and WebSearch tools
+ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+        .model(Constants.ModelChatGLM4)
+        .stream(Boolean.FALSE)
+        .invokeMethod(Constants.invokeMethod)
+        .messages(messages)
+        .requestId(requestId)
+        .tools(chatToolList)
+        .toolChoice("auto")
+        .build();
+ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+```
+
+#### Asynchronous Invocation
+
+```java
+// 1. Initiate an asynchronous task
+List<ChatMessage> messages = new ArrayList<>();
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "What is the relationship between ZhipuAI and ChatGLM?");
+messages.add(chatMessage);
+ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+        .model(Constants.ModelChatGLM4)
+        .stream(Boolean.FALSE)
+        .invokeMethod(Constants.invokeMethodAsync)
+        .messages(messages)
+        .build();
+ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+String taskId = invokeModelApiResp.getData().getTaskId();
+
+// 2. Query the result by taskId
+QueryModelResultRequest request = new QueryModelResultRequest();
+request.setTaskId(taskId);
+QueryModelResultResponse queryResultResp = client.queryModelResult(request);
+```
+
+### Role Playing
+
+```java
+List<ChatMessage> messages = new ArrayList<>();
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "How have you been lately?");
+messages.add(chatMessage);
+
+ChatMeta meta = new ChatMeta();
+meta.setUser_info("I am a film director, specializing in music-themed movies.");
+meta.setBot_info("You are a popular female singer and actress in the country, with outstanding musical talent.");
+meta.setBot_name("Su Mengyuan");
+meta.setUser_name("Lu Xingchen");
+
+ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+        .model(Constants.ModelCharGLM3)
+        .stream(Boolean.FALSE)
+        .invokeMethod(Constants.invokeMethod)
+        .messages(messages)
+        .meta(meta)
+        .build();
+ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+```
+
+### Image Generation
+
+```java
+CreateImageRequest createImageRequest = new CreateImageRequest();
+createImageRequest.setModel(Constants.ModelCogView);
+createImageRequest.setPrompt("A futuristic cloud data center");
+ImageApiResponse imageApiResponse = client.createImage(createImageRequest);
+```
+
+### Vector Models
+
+```java
+EmbeddingRequest embeddingRequest = new EmbeddingRequest();
+embeddingRequest.setInput("hello world");
+embeddingRequest.setModel(Constants.ModelEmbedding2);
+EmbeddingApiResponse apiResponse = client.invokeEmbeddingsApi(embeddingRequest);
+```
+
+### Fine-tuning
+
+#### Create Fine-tuning Job
+
+```java
+FineTuningJobRequest request = new FineTuningJobRequest();
+request.setModel("chatglm3-6b");
+request.setTraining_file("your-file-id");
+CreateFineTuningJobApiResponse createFineTuningJobApiResponse = client.createFineTuningJob(request);
+```
+
+#### Retrieve Fine-tuning Job
+
+```java
+QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
+queryFineTuningJobRequest.setJobId("your-job-id");
+QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.retrieveFineTuningJobs(queryFineTuningJobRequest);
+```
+
+#### List Fine-tuning Jobs
+
+```java
+QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest = new QueryPersonalFineTuningJobRequest();
+queryPersonalFineTuningJobRequest.setLimit(10);
+QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = client.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest);
+```
+
+#### List Fine-tuning Events
+
+```java
+QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
+queryFineTuningJobRequest.setJobId("your-job-id");
+QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = client.queryFineTuningJobsEvents(queryFineTuningJobRequest);
+```
+
+#### Cancel Fine-tuning Job
+
+```java
+FineTuningJobIdRequest request = FineTuningJobIdRequest.builder().jobId("your-job-id").build();
+QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.cancelFineTuningJob(request);
+```
+
+#### Delete Fine-tuned Model
+
+```java
+FineTuningJobModelRequest request = FineTuningJobModelRequest.builder().fineTunedModel("your-fine-tuned-model").build();
+FineTunedModelsStatusResponse fineTunedModelsStatusResponse = client.deleteFineTuningModel(request);
+```
+
+### Batch Processing
+
+#### Create Batch Job
+
+```java
+BatchCreateParams batchCreateParams = new BatchCreateParams(
+        "24h",
+        "/v4/chat/completions",
+        "your-file-id",
+        new HashMap<String, String>() {{
+            put("model", "glm-4");
+        }}
+);
+BatchResponse batchResponse = client.batchesCreate(batchCreateParams);
+```
+
+#### Retrieve Batch Job
+
+```java
+BatchResponse batchResponse = client.batchesRetrieve("your-batch-id");
+```
+
+#### List Batch Jobs
+
+```java
+QueryBatchRequest queryBatchRequest = new QueryBatchRequest();
+queryBatchRequest.setLimit(10);
+QueryBatchResponse queryBatchResponse = client.batchesList(queryBatchRequest);
+```
+
+#### Cancel Batch Job
+
+```java
+BatchResponse batchResponse = client.batchesCancel("your-batch-id");
+```
+
 ### Spring Boot Integration
 
 ```java

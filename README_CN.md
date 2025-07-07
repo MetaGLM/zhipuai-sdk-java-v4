@@ -82,7 +82,7 @@ SDK提供了灵活的 `ClientV4` 构建器来自定义您的客户端：
 
 ```java
 String API_SECRET_KEY = "your_api_key_here";
-private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY) 
+ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
         .enableTokenCache()
         .networkConfig(30, 10, 10, 10, TimeUnit.SECONDS)
         .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
@@ -90,6 +90,270 @@ private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
 ```
 
 ## 💡 使用示例
+
+### 对话模型调用
+
+#### 流式调用（SSE）
+
+- **基础对话**
+
+```java
+List<ChatMessage> messages = new ArrayList<>();
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "智谱AI和ChatGLM是什么关系？");
+messages.add(chatMessage);
+String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
+ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+        .model(Constants.ModelChatGLM4)
+        .stream(Boolean.TRUE)
+        .messages(messages)
+        .requestId(requestId)
+        .build();
+ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+if (sseModelApiResp.isSuccess()) {
+    AtomicBoolean isFirst = new AtomicBoolean(true);
+    ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
+            .doOnNext(accumulator -> {
+                // 处理流式返回结果
+                System.out.println("accumulator: " + accumulator);
+            })
+            .doOnComplete(System.out::println)
+            .lastElement()
+            .blockingGet();
+}
+```
+
+- **Function-Calling**
+
+```java
+List<ChatMessage> messages = new ArrayList<>();
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "从成都到北京的机票多少钱？");
+messages.add(chatMessage);
+String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
+// 函数定义
+List<ChatTool> chatToolList = new ArrayList<>();
+ChatTool chatTool = new ChatTool();
+chatTool.setType(ChatToolType.FUNCTION.value());
+ChatFunctionParameters chatFunctionParameters = new ChatFunctionParameters();
+chatFunctionParameters.setType("object");
+Map<String, Object> properties = new HashMap<>();
+properties.put("departure", new HashMap<String, Object>() {{
+    put("type", "string");
+    put("description", "出发地");
+}});
+properties.put("destination", new HashMap<String, Object>() {{
+    put("type", "string");
+    put("description", "目的地");
+}});
+chatFunctionParameters.setProperties(properties);
+ChatFunction chatFunction = ChatFunction.builder()
+        .name("query_flight_prices")
+        .description("查询航班价格")
+        .parameters(chatFunctionParameters)
+        .build();
+chatTool.setFunction(chatFunction);
+chatToolList.add(chatTool);
+
+ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+        .model(Constants.ModelChatGLM4)
+        .stream(Boolean.TRUE)
+        .messages(messages)
+        .requestId(requestId)
+        .tools(chatToolList)
+        .toolChoice("auto")
+        .build();
+ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
+// 处理返回结果
+```
+
+#### 同步调用
+
+- **基础对话**
+
+```java
+List<ChatMessage> messages = new ArrayList<>();
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "智谱AI和ChatGLM是什么关系？");
+messages.add(chatMessage);
+String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
+ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+        .model(Constants.ModelChatGLM4)
+        .stream(Boolean.FALSE)
+        .invokeMethod(Constants.invokeMethod)
+        .messages(messages)
+        .requestId(requestId)
+        .build();
+ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+System.out.println("model output:" + new ObjectMapper().writeValueAsString(invokeModelApiResp));
+```
+
+- **Function-Calling**
+
+```java
+List<ChatMessage> messages = new ArrayList<>();
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "你能做什么？");
+messages.add(chatMessage);
+String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
+// 函数定义... (参考流式Function-Calling)
+List<ChatTool> chatToolList = new ArrayList<>();
+// ... 添加Function和WebSearch工具
+ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+        .model(Constants.ModelChatGLM4)
+        .stream(Boolean.FALSE)
+        .invokeMethod(Constants.invokeMethod)
+        .messages(messages)
+        .requestId(requestId)
+        .tools(chatToolList)
+        .toolChoice("auto")
+        .build();
+ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+```
+
+#### 异步调用
+
+```java
+// 1. 发起异步任务
+List<ChatMessage> messages = new ArrayList<>();
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "智谱AI和ChatGLM是什么关系？");
+messages.add(chatMessage);
+ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+        .model(Constants.ModelChatGLM4)
+        .stream(Boolean.FALSE)
+        .invokeMethod(Constants.invokeMethodAsync)
+        .messages(messages)
+        .build();
+ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+String taskId = invokeModelApiResp.getData().getTaskId();
+
+// 2. 根据taskId查询结果
+QueryModelResultRequest request = new QueryModelResultRequest();
+request.setTaskId(taskId);
+QueryModelResultResponse queryResultResp = client.queryModelResult(request);
+```
+
+### 角色扮演
+
+```java
+List<ChatMessage> messages = new ArrayList<>();
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "你最近过得怎么样？");
+messages.add(chatMessage);
+
+ChatMeta meta = new ChatMeta();
+meta.setUser_info("我是一名电影导演，擅长拍摄音乐主题的电影。");
+meta.setBot_info("你是一位国内当红的女歌手、演员，拥有出色的音乐才华。");
+meta.setBot_name("苏梦远");
+meta.setUser_name("陆星辰");
+
+ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+        .model(Constants.ModelCharGLM3)
+        .stream(Boolean.FALSE)
+        .invokeMethod(Constants.invokeMethod)
+        .messages(messages)
+        .meta(meta)
+        .build();
+ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
+```
+
+### 图像生成
+
+```java
+CreateImageRequest createImageRequest = new CreateImageRequest();
+createImageRequest.setModel(Constants.ModelCogView);
+createImageRequest.setPrompt("一个充满未来感的云数据中心");
+ImageApiResponse imageApiResponse = client.createImage(createImageRequest);
+```
+
+### 向量模型
+
+```java
+EmbeddingRequest embeddingRequest = new EmbeddingRequest();
+embeddingRequest.setInput("hello world");
+embeddingRequest.setModel(Constants.ModelEmbedding2);
+EmbeddingApiResponse apiResponse = client.invokeEmbeddingsApi(embeddingRequest);
+```
+
+### 微调
+
+#### 创建微调任务
+
+```java
+FineTuningJobRequest request = new FineTuningJobRequest();
+request.setModel("chatglm3-6b");
+request.setTraining_file("your-file-id");
+CreateFineTuningJobApiResponse createFineTuningJobApiResponse = client.createFineTuningJob(request);
+```
+
+#### 查询微调任务
+
+```java
+QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
+queryFineTuningJobRequest.setJobId("your-job-id");
+QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.retrieveFineTuningJobs(queryFineTuningJobRequest);
+```
+
+#### 查询个人微调任务
+
+```java
+QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest = new QueryPersonalFineTuningJobRequest();
+queryPersonalFineTuningJobRequest.setLimit(10);
+QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = client.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest);
+```
+
+#### 查询微调任务事件
+
+```java
+QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
+queryFineTuningJobRequest.setJobId("your-job-id");
+QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = client.queryFineTuningJobsEvents(queryFineTuningJobRequest);
+```
+
+#### 取消微调任务
+
+```java
+FineTuningJobIdRequest request = FineTuningJobIdRequest.builder().jobId("your-job-id").build();
+QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.cancelFineTuningJob(request);
+```
+
+#### 删除微调模型
+
+```java
+FineTuningJobModelRequest request = FineTuningJobModelRequest.builder().fineTunedModel("your-fine-tuned-model").build();
+FineTunedModelsStatusResponse fineTunedModelsStatusResponse = client.deleteFineTuningModel(request);
+```
+
+### 批处理
+
+#### 创建批处理任务
+
+```java
+BatchCreateParams batchCreateParams = new BatchCreateParams(
+        "24h",
+        "/v4/chat/completions",
+        "your-file-id",
+        new HashMap<String, String>() {{
+            put("model", "glm-4");
+        }}
+);
+BatchResponse batchResponse = client.batchesCreate(batchCreateParams);
+```
+
+#### 查询批处理任务
+
+```java
+BatchResponse batchResponse = client.batchesRetrieve("your-batch-id");
+```
+
+#### 查询批处理任务列表
+
+```java
+QueryBatchRequest queryBatchRequest = new QueryBatchRequest();
+queryBatchRequest.setLimit(10);
+QueryBatchResponse queryBatchResponse = client.batchesList(queryBatchRequest);
+```
+
+#### 取消批处理任务
+
+```java
+BatchResponse batchResponse = client.batchesCancel("your-batch-id");
+```
 
 ### Spring Boot 集成
 
