@@ -1,6 +1,5 @@
 package com.zhipu.oapi.service.v4.model;
 
-import com.zhipu.oapi.core.model.ClientResponse;
 import com.zhipu.oapi.core.model.FlowableClientResponse;
 import io.reactivex.Flowable;
 import lombok.Data;

@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @Testcontainers
 public class TestVideosClientApiService {
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
-    private static final String ZHIPUAI_API_KEY = Constants.getApiKey();
+    private static final String ZHIPUAI_API_KEY = Constants.getApiKey() != null ? Constants.getApiKey() : "test-api-key.test-api-secret";
     private static final String ZHIPUAI_BASE_URL = Constants.getBaseUrl();
     private static ClientV4 client = null;
     static {
@@ -49,7 +49,7 @@ public class TestVideosClientApiService {
     public void testVideo(){
 
         VideoCreateParams build = VideoCreateParams.builder()
-                .prompt("一个开船的人")
+                .prompt("A person driving a boat")
                 .model("cogvideox")
                 .withAudio(Boolean.TRUE)
                 .quality("quality")
@@ -69,7 +69,7 @@ public class TestVideosClientApiService {
                 .build();
 
         VideoCreateParams build = VideoCreateParams.builder()
-                .prompt("一个开船的人")
+                .prompt("A person driving a boat")
                 .model("cogvideox")
                 .sensitiveWordCheck(sensitiveWordCheckRequest)
                 .build();
@@ -88,7 +88,7 @@ public class TestVideosClientApiService {
         String imageUrl  = encoder.encodeToString( bytes);
         VideoCreateParams build = VideoCreateParams.builder()
                 .prompt(
-                          "这个场景描绘了一个充满魔法气息的场景。在一个被绿色植物和橙色小花环绕的石桌上，一本古老的书籍摊开着，书页似乎刚刚被翻动过。书籍的旁边放置着一个透明的魔法球，魔法球中充满了闪烁的光点和流动的光影，仿佛有一种神秘的能量在其中流转。魔法球下方的底座散发出微弱的光芒，周围的空气中漂浮着一些细小的光粒，增强了场景的神秘感和魔幻氛围。背景中隐约可见一些模糊的建筑结构，进一步烘托出这个场景的奇幻与神秘。")
+                          "This scene depicts a magical atmosphere. On a stone table surrounded by green plants and orange flowers, an ancient book lies open, its pages seemingly just turned. Next to the book sits a transparent magic orb filled with twinkling lights and flowing shadows, as if mysterious energy flows within. The base beneath the magic orb emits a faint glow, while tiny light particles float in the surrounding air, enhancing the scene's mystique and magical ambiance. Vague architectural structures can be seen in the background, further emphasizing the fantasy and mystery of this scene.")
                 .imageUrl(imageUrl)
                 .model("cogvideox")
                 .build();

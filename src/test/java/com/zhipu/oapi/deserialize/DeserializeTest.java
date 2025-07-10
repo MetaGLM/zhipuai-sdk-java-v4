@@ -18,41 +18,41 @@ public class DeserializeTest {
 
     @Test
     public void testModelDataDeserializer() throws JsonProcessingException {
-        String json = "{\n" +
-                "    \"id\": \"8655897009087545746\",\n" +
-                "    \"created\": 1715676949,\n" +
-                "    \"model\": \"glm-4\",\n" +
-                "    \"choices\": [\n" +
-                "        {\n" +
-                "            \"index\": 0,\n" +
-                "            \"finish_reason\": \"length\",\n" +
-                "            \"delta\": {\n" +
-                "                \"role\": \"assistant\",\n" +
-                "                \"content\": \"\"\n" +
-                "            }\n" +
-                "        }\n" +
-                "    ],\n" +
-                "    \"usage\": {\n" +
-                "        \"prompt_tokens\": 728,\n" +
-                "        \"completion_tokens\": 50,\n" +
-                "        \"total_tokens\": 778\n" +
-                "    },\n" +
-                "    \"web_search\": [\n" +
-                "        {\n" +
-                "            \"title\": \"清华大学的毕业生都去哪里了？本科生升学率79.6%！\",\n" +
-                "            \"link\": \"https://toutiao.com/group/7204786103965188623/\",\n" +
-                "            \"content\": \"有不少的朋友总是关心或者说好奇：清华的毕业生都去哪儿啊？我们一起来看一下，清华大学的《2022届毕业生就业质量报告》，是怎么说的。\\n清华大学2022届毕业生共8003人，与往年相比有所增加。\\n其中，本科生3197人（39.9%）、硕士 生2657人（33.2%）、博士生2149人（26.9%）；\\n男生5135人（64.2%）、女生2868人 （35.8%），男女比例为1.8:1\\n相比2021届，各类学生都有一个小幅增长。（清华大学2021届毕业生，共7741人。其中本科生3154人，硕士研究生2437人，博士生1847人。）\\n截至2022年10月31日，清华大学2022届毕业生毕业去向落实率为98.0%。\\n这个表格，告诉我们三件事：1、国内顶尖高校，本科生以升学为主，研究生以就业为主，已经成为普遍现象。\\n2、清华大学本科生升学率高达79.6%。；和2021届本科毕业生相比较，无论是国内升学，还是出国（境），升学比例再创新高！\\n2021届毕业生：国内升学占比63.7%，出国深造比例13%，二者相加，深造比例为76.6%\\n3、即使是强如清华大学，也不像很多人想象的那样，100%就业，而且单位很牛。看看清华的本科生灵活就业人数以及未就业人数，二者相加，超过了签三方就业的人数。\\n拜托，它毕竟是理工类高校，和艺术类院校不同的。\\n和相当一部分在京高校毕业生有所不同\",\n" +
-                "            \"media\": \"今日头条\",\n" +
-                "            \"icon\": \"https://sfile.chatglm.cn/searchImage/toutiao_com_icon.jpg\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"title\": \"国科大、清华、上科大排前三！报志愿瞄准本科升学率，41所超50%（发布时间：2023-06-22 23:41:58）\",\n" +
-                "            \"link\": \"https://zhuanlan.zhihu.com/p/638950178\",\n" +
-                "            \"content\": \"从6月23日起，全国31个省份近1300万高考考生将陆续迎来查分时刻，接下来就是最关键的高考志愿填报。高考志愿需要综合考虑考分、个人兴趣、高校综合实力、专业排名、高校所在城市、就业等因素，越来越多的考生和家长更看重高校的升学率。近日，上海复旦附中举行的高校咨询会，吸引了复旦、上海交大、同济、华东师大以及清华、人大、南大等36所名校驻场摆摊”，从考生和家长的现场咨询的热门话题来看，升学率不仅是影响考生和家长报考的重要风向标”，也成了高校（院系）招生宣传的一大法宝。本科生升学率是本科生选择攻读硕士研究生人数所占的比例，一般来说，升学率越高代表着高校的综合实力越强。 从目前公布的114所双一流大学的本科升学率来看，升学率超过60%的有16所，超过50%的有41所，超过40%的有75所。2022届本科生升学率最高的中国科学院大学，超过90%，其中国内升学率为81.5%，境外升学率为8.7%。国科大从2014年开始招收本科生，招生人数是所有知名高校中最少的，2022年仅招收本科生408人，超高的升学率一方面与国科大由中科院主管有关，另一方面是招生人数较少。清华大学、上海科技大学、中国科学技术大学和南方科技大学的本科生升学率均超过70%。清华作为国内排名第一的高校，本科生升学率\",\n" +
-                "            \"media\": \"知乎专栏\",\n" +
-                "            \"icon\": \"https://sfile.chatglm.cn/searchImage/zhuanlan_zhihu_com_icon.jpg\"\n" +
-                "        }\n" +
-                "    ]\n" +
+        String json = "{" +
+                "\"id\": \"8655897009087545746\"," +
+                "\"created\": 1715676949," +
+                "\"model\": \"glm-4\"," +
+                "\"choices\": [" +
+                "{" +
+                "\"index\": 0," +
+                "\"finish_reason\": \"length\"," +
+                "\"delta\": {" +
+                "\"role\": \"assistant\"," +
+                "\"content\": \"\"" +
+                "}" +
+                "}" +
+                "]," +
+                "\"usage\": {" +
+                "\"prompt_tokens\": 728," +
+                "\"completion_tokens\": 50," +
+                "\"total_tokens\": 778" +
+                "}," +
+                "\"web_search\": [" +
+                "{" +
+                "\"title\": \"Where do Tsinghua University graduates go? Undergraduate enrollment rate 79.6%!\"," +
+                "\"link\": \"https://toutiao.com/group/7204786103965188623/\"," +
+                "\"content\": \"Many friends are always concerned or curious: where do Tsinghua graduates go? Let's take a look at what Tsinghua University's '2022 Graduate Employment Quality Report' says.\\nTsinghua University had a total of 8,003 graduates in 2022, an increase compared to previous years.\\nAmong them, 3,197 undergraduates (39.9%), 2,657 master's students (33.2%), and 2,149 doctoral students (26.9%);\\n5,135 male students (64.2%) and 2,868 female students (35.8%), with a male-to-female ratio of 1.8:1\\nCompared to the 2021 cohort, all types of students showed a slight increase. (Tsinghua University's 2021 graduates totaled 7,741, including 3,154 undergraduates, 2,437 master's students, and 1,847 doctoral students.)\\nAs of October 31, 2022, the employment rate for Tsinghua University's 2022 graduates was 98.0%.\\nThis table tells us three things: 1. In top domestic universities, undergraduates mainly pursue further education while graduate students mainly seek employment, which has become a common phenomenon.\\n2. Tsinghua University's undergraduate enrollment rate is as high as 79.6%. Compared to 2021 undergraduate graduates, whether domestic enrollment or studying abroad, the enrollment rate has reached a new high!\\n2021 graduates: domestic enrollment accounted for 63.7%, overseas study rate was 13%, combined for a 76.6% further education rate\\n3. Even a strong university like Tsinghua is not as many people imagine - 100% employment with prestigious employers. Look at Tsinghua's undergraduate flexible employment numbers and unemployed numbers; combined, they exceed the number of those with signed three-party employment contracts.\\nPlease, it is after all a science and engineering university, different from art colleges.\\nDifferent from a considerable portion of Beijing university graduates\"," +
+                "\"media\": \"Toutiao\"," +
+                "\"icon\": \"https://sfile.chatglm.cn/searchImage/toutiao_com_icon.jpg\"" +
+                "}," +
+                "{" +
+                "\"title\": \"UCAS, Tsinghua, ShanghaiTech rank top three! Target undergraduate enrollment rates for college applications, 41 schools exceed 50% (Published: 2023-06-22 23:41:58)\"," +
+                "\"link\": \"https://zhuanlan.zhihu.com/p/638950178\"," +
+                "\"content\": \"Starting from June 23, nearly 13 million college entrance examination candidates from 31 provinces nationwide will gradually enter the score checking phase, followed by the most critical college application process. College applications need to comprehensively consider test scores, personal interests, university comprehensive strength, major rankings, university location, employment and other factors. More and more candidates and parents value university enrollment rates. Recently, a university consultation meeting held at Shanghai Fudan High School attracted 36 prestigious schools including Fudan, Shanghai Jiao Tong University, Tongji, East China Normal University, as well as Tsinghua, Renmin University, Nanjing University, etc. From the hot topics of on-site consultations by candidates and parents, enrollment rate is not only an important indicator affecting candidates' and parents' application decisions, but has also become a major tool for university (department) enrollment promotion. Undergraduate enrollment rate is the proportion of undergraduates choosing to pursue master's degrees. Generally speaking, the higher the enrollment rate, the stronger the university's comprehensive strength. From the currently published undergraduate enrollment rates of 114 'Double First-Class' universities, 16 have enrollment rates exceeding 60%, 41 exceed 50%, and 75 exceed 40%. The University of Chinese Academy of Sciences has the highest 2022 undergraduate enrollment rate, exceeding 90%, with domestic enrollment rate at 81.5% and overseas enrollment rate at 8.7%. UCAS began enrolling undergraduates in 2014, with the smallest enrollment among all prestigious universities - only 408 undergraduates in 2022. The extremely high enrollment rate is partly related to UCAS being under the Chinese Academy of Sciences, and partly due to small enrollment numbers. Tsinghua University, ShanghaiTech University, University of Science and Technology of China, and Southern University of Science and Technology all have undergraduate enrollment rates exceeding 70%. As the top-ranked university in China, Tsinghua's undergraduate enrollment rate\"," +
+                "\"media\": \"Zhihu Column\"," +
+                "\"icon\": \"https://sfile.chatglm.cn/searchImage/zhuanlan_zhihu_com_icon.jpg\"" +
+                "}" +
+                "]" +
                 "}";
 
         ModelData jsonNodes = mapper.readValue(json, ModelData.class);
