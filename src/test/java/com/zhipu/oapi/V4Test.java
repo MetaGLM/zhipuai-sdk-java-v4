@@ -7,10 +7,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
+import com.zhipu.oapi.mock.MockClientV4;
 import com.zhipu.oapi.service.v4.audio.AudioCustomizationApiResponse;
 import com.zhipu.oapi.service.v4.audio.AudioCustomizationRequest;
 import com.zhipu.oapi.service.v4.audio.AudioSpeechApiResponse;
 import com.zhipu.oapi.service.v4.audio.AudioSpeechRequest;
+import com.zhipu.oapi.service.v4.audio.AudioSpeechStreamingApiResponse;
 import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
 import com.zhipu.oapi.service.v4.batchs.BatchResponse;
 import com.zhipu.oapi.service.v4.batchs.QueryBatchResponse;
@@ -18,11 +20,12 @@ import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.file.*;
 import com.zhipu.oapi.service.v4.fine_turning.*;
-import com.zhipu.oapi.mock.MockClientV4;
 import com.zhipu.oapi.service.v4.image.CreateImageRequest;
 import com.zhipu.oapi.service.v4.image.ImageApiResponse;
 import com.zhipu.oapi.service.v4.model.*;
+
 import io.reactivex.Flowable;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -634,19 +637,57 @@ public class V4Test {
             logger.info("testAudioSpeech mock file generation,fileName:{},filePath:{}", mockFile.getName(), mockFile.getAbsolutePath());
             return;
         }
-        
-        AudioSpeechRequest audioSpeechRequest = AudioSpeechRequest.builder()
-                .model(Constants.ModelTTS)
-                .input("智谱，你好呀")
-                .voice("child")
-                .responseFormat("wav")
-                .build();
+        AudioSpeechRequest audioSpeechRequest =
+                AudioSpeechRequest.builder()
+                        .model(Constants.ModelTTS)
+                        .input("智谱，你好呀")
+                        .voice("child")
+                        .stream(false)
+                        .responseFormat("wav")
+                        .build();
         AudioSpeechApiResponse audioSpeechApiResponse = client.speech(audioSpeechRequest);
         File file = audioSpeechApiResponse.getData();
         file.createNewFile();
 
-        logger.info("testAudioSpeech file generation,fileName:{},filePath:{}",audioSpeechApiResponse.getData().getName(),audioSpeechApiResponse.getData().getAbsolutePath());
+        logger.info(
+                "testAudioSpeech file generation,fileName:{},filePath:{}",
+                audioSpeechApiResponse.getData().getName(),
+                audioSpeechApiResponse.getData().getAbsolutePath());
+    }
 
+    @Test
+    public void testAudioSpeechStreaming() throws IOException {
+        // Check if using test API key, skip real API call if so
+        if (API_SECRET_KEY != null && API_SECRET_KEY.contains("test-api-key")) {
+            logger.info("Using test API key, skipping real API call, using mock data");
+            // Create a mock file for testing
+            File mockFile = new File(System.getProperty("java.io.tmpdir"), "mock_audio_speech.wav");
+            if (!mockFile.exists()) {
+                mockFile.createNewFile();
+            }
+            logger.info(
+                    "testAudioSpeech mock file generation,fileName:{},filePath:{}",
+                    mockFile.getName(),
+                    mockFile.getAbsolutePath());
+            return;
+        }
+        AudioSpeechRequest audioSpeechRequest =
+                AudioSpeechRequest.builder()
+                        .model(Constants.ModelTTS)
+                        .input("智谱，你好呀")
+                        .voice("child")
+                        .stream(true)
+                        .responseFormat("wav")
+                        .build();
+        AudioSpeechStreamingApiResponse audioSpeechStreamingApiResponse =
+                client.speechStreaming(audioSpeechRequest);
+        try {
+            logger.info(
+                    "audioSpeechStreaming output: {}",
+                    mapper.writeValueAsString(audioSpeechStreamingApiResponse));
+        } catch (JsonProcessingException e) {
+            logger.error("audioSpeechStreaming output error", e);
+        }
     }
 
     @Test

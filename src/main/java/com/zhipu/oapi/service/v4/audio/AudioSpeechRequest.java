@@ -3,6 +3,7 @@ package com.zhipu.oapi.service.v4.audio;
 import com.zhipu.oapi.core.model.ClientRequest;
 import com.zhipu.oapi.service.v4.CommonRequest;
 import com.zhipu.oapi.service.v4.model.SensitiveWordCheckRequest;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,6 +30,8 @@ public class AudioSpeechRequest extends CommonRequest implements ClientRequest<M
      */
     private String input;
 
+    /** 是否流式返回 */
+    private boolean stream;
 
     /**
      * 需要生成语音的音色
@@ -52,6 +55,7 @@ public class AudioSpeechRequest extends CommonRequest implements ClientRequest<M
         paramsMap.put("user_id", this.getUserId());
         paramsMap.put("model", this.getModel());
         paramsMap.put("input", this.getInput());
+        paramsMap.put("stream", this.isStream());
         paramsMap.put("voice", this.getVoice());
         paramsMap.put("response_format", this.getResponseFormat());
         paramsMap.put("sensitive_word_check", this.getSensitiveWordCheck());
