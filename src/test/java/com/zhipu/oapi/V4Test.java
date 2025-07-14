@@ -661,14 +661,12 @@ public class V4Test {
         if (API_SECRET_KEY != null && API_SECRET_KEY.contains("test-api-key")) {
             logger.info("Using test API key, skipping real API call, using mock data");
             // Create a mock file for testing
-            File mockFile = new File(System.getProperty("java.io.tmpdir"), "mock_audio_speech.wav");
-            if (!mockFile.exists()) {
-                mockFile.createNewFile();
-            }
-            logger.info(
-                    "testAudioSpeech mock file generation,fileName:{},filePath:{}",
-                    mockFile.getName(),
-                    mockFile.getAbsolutePath());
+            AudioSpeechStreamingApiResponse mockResponse = new AudioSpeechStreamingApiResponse();
+            mockResponse.setCode(200);
+            mockResponse.setMsg("success");
+            mockResponse.setSuccess(true);
+            mockResponse.setFlowable(null);// Clear flowable before printing
+            logger.info("Mock response: {}", mapper.writeValueAsString(mockResponse));
             return;
         }
         AudioSpeechRequest audioSpeechRequest =
