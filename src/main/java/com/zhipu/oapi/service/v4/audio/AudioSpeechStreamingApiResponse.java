@@ -1,5 +1,6 @@
 package com.zhipu.oapi.service.v4.audio;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zhipu.oapi.core.model.FlowableClientResponse;
 import com.zhipu.oapi.service.v4.model.ChatError;
 
@@ -8,7 +9,7 @@ import io.reactivex.Flowable;
 import lombok.Data;
 
 @Data
-public class AudioSpeechStreamingApiResponse implements FlowableClientResponse<AudioSpeechPro> {
+public class AudioSpeechStreamingApiResponse implements FlowableClientResponse<ObjectNode> {
 
     private int code;
 
@@ -16,9 +17,9 @@ public class AudioSpeechStreamingApiResponse implements FlowableClientResponse<A
 
     private boolean success;
 
-    private AudioSpeechPro data;
+    private ObjectNode data;
 
     private ChatError error;
 
-    private Flowable<AudioSpeechPro> flowable;
+    private Flowable<ObjectNode> flowable;
 }

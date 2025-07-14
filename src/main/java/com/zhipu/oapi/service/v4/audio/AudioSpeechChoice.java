@@ -9,8 +9,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.deserialize.audio.AudioSpeechChoiceDeserializer;
 
+import lombok.Getter;
+
 import java.util.Iterator;
 
+@Getter
 @JsonDeserialize(using = AudioSpeechChoiceDeserializer.class)
 public class AudioSpeechChoice extends ObjectNode {
 
@@ -59,28 +62,16 @@ public class AudioSpeechChoice extends ObjectNode {
         }
     }
 
-    // Getters and Setters
-
-    public int getIndex() {
-        return index;
-    }
+    // Setters
 
     public void setIndex(int index) {
         this.index = index;
         this.put("index", index);
     }
 
-    public String getFinishReason() {
-        return finishReason;
-    }
-
     public void setFinishReason(String finishReason) {
         this.finishReason = finishReason;
         this.put("finish_reason", finishReason);
-    }
-
-    public AudioSpeechDelta getDelta() {
-        return delta;
     }
 
     public void setDelta(AudioSpeechDelta delta) {

@@ -4,6 +4,7 @@ import static com.zhipu.oapi.Constants.BASE_URL;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zhipu.oapi.core.ConfigV4;
 import com.zhipu.oapi.core.cache.ICache;
 import com.zhipu.oapi.core.cache.LocalCache;
@@ -477,7 +478,7 @@ public class ClientV4 extends AbstractClientBaseService{
                 params -> chatApiService.audioSpeechStreaming(params);
 
         return this.streamRequest(
-                request, supplier, AudioSpeechStreamingApiResponse.class, AudioSpeechPro.class);
+                request, supplier, AudioSpeechStreamingApiResponse.class, ObjectNode.class);
     }
 
     /**

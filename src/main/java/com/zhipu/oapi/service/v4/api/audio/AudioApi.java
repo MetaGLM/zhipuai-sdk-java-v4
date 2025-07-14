@@ -31,6 +31,7 @@ public interface AudioApi {
      * @return
      */
     @POST("audio/speech")
+    @Streaming
     Call<ResponseBody> audioSpeechStreaming(@Body Map<String, Object> request);
 
     /**

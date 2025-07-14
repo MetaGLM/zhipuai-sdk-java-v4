@@ -9,12 +9,14 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.deserialize.audio.AudioSpeechProDeserializer;
+import lombok.Getter;
 
 import java.util.Iterator;
 import java.util.List;
 
 @JsonDeserialize(using = AudioSpeechProDeserializer.class)
-public class AudioSpeechPro extends ObjectNode {
+@Getter
+public final class AudioSpeechPro extends ObjectNode {
 
     /** 创建时间 */
     @JsonProperty("created")
@@ -28,9 +30,6 @@ public class AudioSpeechPro extends ObjectNode {
     @JsonProperty("request_id")
     private String requestId;
 
-    /** ID */
-    @JsonProperty("id")
-    private String id;
 
     public AudioSpeechPro() {
         super(JsonNodeFactory.instance);
@@ -58,11 +57,6 @@ public class AudioSpeechPro extends ObjectNode {
         } else {
             this.setRequestId(null);
         }
-        if (objectNode.get("id") != null) {
-            this.setId(objectNode.get("id").asText());
-        } else {
-            this.setId(null);
-        }
 
         Iterator<String> fieldNames = objectNode.fieldNames();
         while (fieldNames.hasNext()) {
@@ -72,36 +66,20 @@ public class AudioSpeechPro extends ObjectNode {
         }
     }
 
-    // Getters and Setters
-    public Integer getCreated() {
-        return created;
-    }
-
+    // Setters
     public void setCreated(Integer created) {
         this.created = created;
         this.put("created", created);
     }
 
-    public List<AudioSpeechChoice> getChoices() {
-        return choices;
-    }
 
     public void setChoices(List<AudioSpeechChoice> choices) {
         this.choices = choices;
         this.putPOJO("choices", choices);
     }
 
-    public String getRequestId() {
-        return requestId;
-    }
-
     public void setRequestId(String requestId) {
         this.requestId = requestId;
         this.put("request_id", requestId);
-    }
-
-    public void setId(String id) {
-        this.id = id;
-        this.put("id", id);
     }
 }

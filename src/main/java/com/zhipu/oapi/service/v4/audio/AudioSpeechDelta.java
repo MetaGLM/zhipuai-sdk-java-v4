@@ -9,8 +9,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
 import com.zhipu.oapi.service.v4.deserialize.audio.AudioSpeechDeltaDeserializer;
 
+import lombok.Getter;
+
 import java.util.Iterator;
 
+@Getter
 @JsonDeserialize(using = AudioSpeechDeltaDeserializer.class)
 public class AudioSpeechDelta extends ObjectNode {
 
@@ -50,17 +53,9 @@ public class AudioSpeechDelta extends ObjectNode {
 
     // Getters and Setters
 
-    public String getRole() {
-        return role;
-    }
-
     public void setRole(String role) {
         this.role = role;
         this.put("role", role);
-    }
-
-    public String getContent() {
-        return content;
     }
 
     public void setContent(String content) {

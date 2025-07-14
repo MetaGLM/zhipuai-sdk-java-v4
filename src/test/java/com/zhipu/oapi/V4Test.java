@@ -44,10 +44,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class V4Test {
 
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
-    private static final String API_SECRET_KEY = Constants.getApiKey() != null ? Constants.getApiKey() : "test-api-key.test-api-secret";
 
-    private static final String API_BASE_URL = Constants.getBaseUrl();
+    private static final String API_SECRET_KEY =
+            "d91103df5c4a47bb808d4c84bcae9fcf.HCFkuDBhwKWLxliY";
 
+    private static final String API_BASE_URL = "https://dev.bigmodel.cn/stage-api/paas/v4/";
 
     private static final ClientV4 client = new ClientV4.Builder(API_BASE_URL,API_SECRET_KEY)
             .enableTokenCache()
@@ -669,23 +670,22 @@ public class V4Test {
             logger.info("Mock response: {}", mapper.writeValueAsString(mockResponse));
             return;
         }
+        String requestId = String.format(requestIdTemplate, System.currentTimeMillis());
         AudioSpeechRequest audioSpeechRequest =
                 AudioSpeechRequest.builder()
                         .model(Constants.ModelTTS)
                         .input("智谱，你好呀")
-                        .voice("child")
-                        .stream(true)
+                        .voice("tongtong")
+                        .stream(Boolean.TRUE)
                         .responseFormat("wav")
                         .build();
+        audioSpeechRequest.setRequestId(requestId);
         AudioSpeechStreamingApiResponse audioSpeechStreamingApiResponse =
                 client.speechStreaming(audioSpeechRequest);
-        try {
-            logger.info(
-                    "audioSpeechStreaming output: {}",
-                    mapper.writeValueAsString(audioSpeechStreamingApiResponse));
-        } catch (JsonProcessingException e) {
-            logger.error("audioSpeechStreaming output error", e);
-        }
+        audioSpeechStreamingApiResponse
+                .getFlowable()
+                .doOnNext(speechPro -> logger.info("speechPro: {}", speechPro.toString()))
+                .blockingSubscribe();
     }
 
     @Test
