@@ -18,12 +18,8 @@ import java.util.concurrent.TimeUnit;
 @Testcontainers
 public class AgentsTest {
 
-    private static final String API_SECRET_KEY =
-            "d91103df5c4a47bb808d4c84bcae9fcf.HCFkuDBhwKWLxliY";
-
-    private static final String API_BASE_URL = "https://dev.bigmodel.cn/stage-api/paas/v4/";
-
     private final static Logger logger = LoggerFactory.getLogger(V4Test.class);
+    private static final String API_SECRET_KEY = Constants.getApiKey() != null ? Constants.getApiKey() : "test-api-key.test-api-secret";
 
     private static final ClientV4 client = new ClientV4.Builder("https://dev.bigmodel.cn/api/", API_SECRET_KEY)
             .enableTokenCache()
