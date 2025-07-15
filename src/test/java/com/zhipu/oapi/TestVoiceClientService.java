@@ -12,7 +12,7 @@ import java.io.File;
 
 public class TestVoiceClientService {
     private static final String BASE_URL = "http://localhost:9203"; // 根据实际情况修改
-    private static final String TOKEN = ""; // 替换为实际token
+    private static final String TOKEN = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJ1c2VyX3R5cGUiOiJTRVJWSUNFIiwidXNlcl9pZCI6MywiYXBpX2tleSI6IjM0ZDhiM2ExNDQ2OTQ0MmY5MTJkNzg5MTJjZjZlMjU1IiwidXNlcl9rZXkiOiIyNzQyNjM0My1iYjI0LTQ4ZDktODVjNy01ODFmMjUwNzBiMzMiLCJjdXN0b21lcl9pZCI6IjEwMDAwMyIsInVzZXJuYW1lIjoiY3BjMTk4NiJ9.3MsaFjRAyArDp2WZsVbvKGPrVjkKvGB5EfBafprcFogbDeZv4s9VCQt4wUaR4FVon1tiL_pnqtMaI6qGGXs0Qg"; // 替换为实际token
 
     @Test
     public void testListTtsVoices() throws Exception {
