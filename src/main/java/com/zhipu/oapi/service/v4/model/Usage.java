@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,12 +19,12 @@ public class Usage {
     private int completionTokens;
     @JsonProperty("total_tokens")
     private int totalTokens;
-//    @SerializedName("prompt_chars")
-//    private int promptChars;
-//    @SerializedName("completion_chars")
-//    private int completionChars;
-//    @SerializedName("total_chars")
-//    private int totalChars;
+
+    @JsonProperty("type")
+    private String type;
+
+    @JsonProperty("seconds")
+    private BigDecimal seconds;
 
     @JsonProperty("total_calls")
     private int totalCalls;
@@ -51,28 +53,21 @@ public class Usage {
         this.totalTokens = totalTokens;
     }
 
-//    public int getPromptChars() {
-//        return promptChars;
-//    }
-//
-//    public void setPromptChars(int promptChars) {
-//        this.promptChars = promptChars;
-//    }
-//
-//    public int getCompletionChars() {
-//        return completionChars;
-//    }
-//
-//    public void setCompletionChars(int completionChars) {
-//        this.completionChars = completionChars;
-//    }
-//
-//    public int getTotalChars() {
-//        return totalChars;
-//    }
-//
-//    public void setTotalChars(int totalChars) {
-//        this.totalChars = totalChars;
-//    }
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public BigDecimal getSeconds() {
+        return seconds;
+    }
+
+    public void setSeconds(BigDecimal seconds) {
+        this.seconds = seconds;
+    }
+
 
 }
