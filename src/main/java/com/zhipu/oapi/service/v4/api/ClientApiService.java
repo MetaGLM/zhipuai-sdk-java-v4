@@ -15,17 +15,21 @@ import com.zhipu.oapi.service.v4.api.web_search.WebSearchApi;
 import com.zhipu.oapi.service.v4.batchs.Batch;
 import com.zhipu.oapi.service.v4.batchs.BatchCreateParams;
 import com.zhipu.oapi.service.v4.batchs.BatchPage;
+import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.file.*;
 import com.zhipu.oapi.service.v4.fine_turning.*;
-import com.zhipu.oapi.service.v4.model.*;
-import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.image.ImageResult;
+import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.tools.WebSearchPro;
 import com.zhipu.oapi.service.v4.web_search.WebSearchDTO;
 import com.zhipu.oapi.service.v4.web_search.WebSearchRequest;
+
 import io.reactivex.Single;
+
 import okhttp3.*;
+
 import org.apache.tika.Tika;
+
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -35,7 +39,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-
 
 public class ClientApiService extends ClientBaseService {
 
@@ -223,6 +226,10 @@ public class ClientApiService extends ClientBaseService {
         java.io.File file = tempDirectory.toFile();
         writeResponseBodyToFile(responseBody.blockingGet(), file);
         return Single.just(file);
+    }
+
+    public Call<ResponseBody> audioSpeechStreaming(Map<String, Object> request) {
+        return audioApi.audioSpeechStreaming(request);
     }
 
     public Single<java.io.File> audioCustomization(Map<String,Object> request) throws IOException {
