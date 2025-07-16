@@ -34,7 +34,7 @@ public class VideoCreateParams implements ClientRequest<VideoCreateParams> {
      *   图片大小：
      */
     @JsonProperty("image_url")
-    private String imageUrl;
+    private Object imageUrl;
 
     /**
      * 调用指定模型进行对 prompt 优化，推荐使用 GLM-4-Air 和 GLM-4-Flash。如未指定，则直接使用原始 prompt。

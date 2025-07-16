@@ -23,6 +23,9 @@ public class ChatMessage extends ObjectNode {
     private String role;
     private Object content;
     private Audio audio;
+
+    private Object reasoning_content;
+
     private String name;
 
     @JsonProperty("tool_calls")
@@ -69,6 +72,11 @@ public class ChatMessage extends ObjectNode {
             this.setTool_call_id(objectNode.get("tool_call_id").asText());
         } else {
             this.setTool_call_id(null);
+        }
+        if (objectNode.get("reasoning_content") != null) {
+            this.setReasoning_content(objectNode.get("reasoning_content").asText());
+        } else {
+            this.setReasoning_content(null);
         }
 
         Iterator<String> fieldNames = objectNode.fieldNames();
@@ -120,4 +128,9 @@ public class ChatMessage extends ObjectNode {
         this.putPOJO("audio", audio);
     }
 
+
+    public void setReasoning_content(Object reasoning_content) {
+        this.reasoning_content = reasoning_content;
+        this.putPOJO("reasoning_content", reasoning_content);
+    }
 }

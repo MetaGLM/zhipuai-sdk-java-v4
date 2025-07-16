@@ -50,7 +50,7 @@ public class TestVideosClientApiService {
 
         VideoCreateParams build = VideoCreateParams.builder()
                 .prompt("A person driving a boat")
-                .model("cogvideox")
+                .model("cogvideox-3")
                 .withAudio(Boolean.TRUE)
                 .quality("quality")
                 .build();
@@ -70,7 +70,7 @@ public class TestVideosClientApiService {
 
         VideoCreateParams build = VideoCreateParams.builder()
                 .prompt("A person driving a boat")
-                .model("cogvideox")
+                .model("cogvideox-3")
                 .sensitiveWordCheck(sensitiveWordCheckRequest)
                 .build();
         VideosResponse apply = new VideosClientApiService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
@@ -90,7 +90,7 @@ public class TestVideosClientApiService {
                 .prompt(
                           "This scene depicts a magical atmosphere. On a stone table surrounded by green plants and orange flowers, an ancient book lies open, its pages seemingly just turned. Next to the book sits a transparent magic orb filled with twinkling lights and flowing shadows, as if mysterious energy flows within. The base beneath the magic orb emits a faint glow, while tiny light particles float in the surrounding air, enhancing the scene's mystique and magical ambiance. Vague architectural structures can be seen in the background, further emphasizing the fantasy and mystery of this scene.")
                 .imageUrl(imageUrl)
-                .model("cogvideox")
+                .model("cogvideox-3")
                 .build();
         VideosResponse apply = new VideosClientApiService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
                 .videoGenerations(build)
