@@ -1,30 +1,30 @@
-# ZhipuAI Open Platform Java SDK
+# 智谱AI开放平台 Java SDK
 
 [![Maven Central](https://img.shields.io/maven-central/v/cn.bigmodel.openapi/oapi-java-sdk.svg)](https://search.maven.org/artifact/cn.bigmodel.openapi/oapi-java-sdk)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Java](https://img.shields.io/badge/java-1.8%2B-orange.svg)](https://www.oracle.com/java/)
 
-[中文文档](README_CN.md)
+[English Readme](README.md)
 
-The official Java SDK for [ZhipuAI Open Platform](http://open.bigmodel.cn/howuse/platformintroduced) Big Model API, enabling developers to easily integrate ZhipuAI's powerful AI capabilities into their Java applications.
+[智谱AI开放平台](http://open.bigmodel.cn/howuse/platformintroduced)官方 Java SDK，帮助开发者快速集成智谱AI强大的人工智能能力到Java应用中。
 
-## ✨ Features
+## ✨ 特性
 
-- 🚀 **Type-safe API**: All interfaces are fully type-encapsulated, no need to consult API documentation
-- 🔧 **Easy Integration**: Simple and intuitive API design for quick integration
-- ⚡ **High Performance**: Built with modern Java libraries for optimal performance
-- 🛡️ **Secure**: Built-in authentication and token management
-- 📦 **Lightweight**: Minimal dependencies for easy project integration
+- 🚀 **类型安全**: 所有接口完全类型封装，无需查阅API文档即可完成接入
+- 🔧 **简单易用**: 简洁直观的API设计，快速上手
+- ⚡ **高性能**: 基于现代Java库构建，性能优异
+- 🛡️ **安全可靠**: 内置身份验证和令牌管理
+- 📦 **轻量级**: 最小化依赖，易于项目集成
 
-## 📦 Installation
+## 📦 安装
 
-### Requirements
-- Java 1.8 or higher
-- Maven or Gradle
-- Not supported on Android platform
+### 环境要求
+- Java 1.8 或更高版本
+- Maven 或 Gradle
+- 尚不支持在 Android 平台运行
 
-### Maven
-Add the following dependency to your `pom.xml`:
+### Maven 依赖
+在您的 `pom.xml` 中添加以下依赖：
 
 ```xml
 <dependency>
@@ -34,8 +34,8 @@ Add the following dependency to your `pom.xml`:
 </dependency>
 ```
 
-### Gradle
-Add the following dependency to your `build.gradle` (for Groovy DSL):
+### Gradle 依赖
+在您的 `build.gradle` 中添加以下依赖（适用于 Groovy DSL）：
 
 ```groovy
 dependencies {
@@ -43,7 +43,7 @@ dependencies {
 }
 ```
 
-Or `build.gradle.kts` (for Kotlin DSL):
+或 `build.gradle.kts`（适用于 Kotlin DSL）：
 
 ```kotlin
 dependencies {
@@ -51,55 +51,55 @@ dependencies {
 }
 ```
 
-### 📋 Dependencies
+### 📋 核心依赖
 
-This SDK uses the following core dependencies:
+本SDK使用以下核心依赖库：
 
-| Library | Version |
-|---------|----------|
+| 依赖库 | 版本 |
+|--------|------|
 | OkHttp | 3.14.9 |
 | Java JWT | 4.2.2 |
 | Jackson | 2.11.3 |
 | Retrofit2 | 2.9.0 |
 
-## 🚀 Quick Start
+## 🚀 快速开始
 
-### Basic Usage
+### 基本用法
 
-1. **Create a Client** with your API key
-2. **Call the desired API methods**
+1. **使用API密钥创建客户端**
+2. **调用相应的API方法**
 
-For complete examples, see [V4Test.java](src/test/java/com/zhipu/oapi/V4Test.java). Remember to replace the API key with your own.
+完整示例请参考 [V4Test.java](src/test/java/com/zhipu/oapi/V4Test.java)，记得替换为您自己的API密钥。
 
-### Client Configuration
+### 客户端配置
 
-The SDK provides a flexible `ClientV4` builder for customizing your client:
+SDK提供了灵活的 `ClientV4` 构建器来自定义您的客户端：
 
-**Configuration Options:**
-- `enableTokenCache()`: Enable token caching to reduce token requests
-- `networkConfig()`: Configure connection, read, write timeouts, and ping intervals
-- `connectionPool()`: Set up connection pooling
+**配置选项：**
+- `enableTokenCache()`: 启用令牌缓存，减少令牌请求次数
+- `networkConfig()`: 配置连接、读取、写入超时时间和ping间隔
+- `connectionPool()`: 设置连接池
 
 ```java
 String API_SECRET_KEY = "your_api_key_here";
-private static final ClientV4 client = new ClientV4.Builder(API_SECRET_KEY) 
+ClientV4 client = new ClientV4.Builder(API_SECRET_KEY)
         .enableTokenCache()
         .networkConfig(30, 10, 10, 10, TimeUnit.SECONDS)
         .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
         .build();
 ```
 
-## 💡 Examples
+## 💡 使用示例
 
-### Chat Model Invocation
+### 对话模型调用
 
-#### Streaming Invocation (SSE)
+#### 流式调用（SSE）
 
-- **Basic Chat**
+- **基础对话**
 
 ```java
 List<ChatMessage> messages = new ArrayList<>();
-ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "What is the relationship between ZhipuAI and ChatGLM?");
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "智谱AI和ChatGLM是什么关系？");
 messages.add(chatMessage);
 String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
 ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
@@ -113,7 +113,7 @@ if (sseModelApiResp.isSuccess()) {
     AtomicBoolean isFirst = new AtomicBoolean(true);
     ChatMessageAccumulator chatMessageAccumulator = mapStreamToAccumulator(sseModelApiResp.getFlowable())
             .doOnNext(accumulator -> {
-                // Process streaming results
+                // 处理流式返回结果
                 System.out.println("accumulator: " + accumulator);
             })
             .doOnComplete(System.out::println)
@@ -126,10 +126,10 @@ if (sseModelApiResp.isSuccess()) {
 
 ```java
 List<ChatMessage> messages = new ArrayList<>();
-ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "How much is a flight ticket from Chengdu to Beijing?");
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "从成都到北京的机票多少钱？");
 messages.add(chatMessage);
 String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
-// Function definition
+// 函数定义
 List<ChatTool> chatToolList = new ArrayList<>();
 ChatTool chatTool = new ChatTool();
 chatTool.setType(ChatToolType.FUNCTION.value());
@@ -138,16 +138,16 @@ chatFunctionParameters.setType("object");
 Map<String, Object> properties = new HashMap<>();
 properties.put("departure", new HashMap<String, Object>() {{
     put("type", "string");
-    put("description", "Departure city");
+    put("description", "出发地");
 }});
 properties.put("destination", new HashMap<String, Object>() {{
     put("type", "string");
-    put("description", "Destination city");
+    put("description", "目的地");
 }});
 chatFunctionParameters.setProperties(properties);
 ChatFunction chatFunction = ChatFunction.builder()
         .name("query_flight_prices")
-        .description("Query flight prices")
+        .description("查询航班价格")
         .parameters(chatFunctionParameters)
         .build();
 chatTool.setFunction(chatFunction);
@@ -162,16 +162,16 @@ ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
         .toolChoice("auto")
         .build();
 ModelApiResponse sseModelApiResp = client.invokeModelApi(chatCompletionRequest);
-// Process the returned results
+// 处理返回结果
 ```
 
-#### Synchronous Invocation
+#### 同步调用
 
-- **Basic Chat**
+- **基础对话**
 
 ```java
 List<ChatMessage> messages = new ArrayList<>();
-ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "What is the relationship between ZhipuAI and ChatGLM?");
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "智谱AI和ChatGLM是什么关系？");
 messages.add(chatMessage);
 String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
 ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
@@ -189,12 +189,12 @@ System.out.println("model output:" + new ObjectMapper().writeValueAsString(invok
 
 ```java
 List<ChatMessage> messages = new ArrayList<>();
-ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "What can you do?");
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "你能做什么？");
 messages.add(chatMessage);
 String requestId = String.format("your-request-id-%d", System.currentTimeMillis());
-// Function definition... (refer to streaming Function-Calling)
+// 函数定义... (参考流式Function-Calling)
 List<ChatTool> chatToolList = new ArrayList<>();
-// ... Add Function and WebSearch tools
+// ... 添加Function和WebSearch工具
 ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
         .model(Constants.ModelChatGLM4)
         .stream(Boolean.FALSE)
@@ -207,12 +207,12 @@ ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
 ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
 ```
 
-#### Asynchronous Invocation
+#### 异步调用
 
 ```java
-// 1. Initiate an asynchronous task
+// 1. 发起异步任务
 List<ChatMessage> messages = new ArrayList<>();
-ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "What is the relationship between ZhipuAI and ChatGLM?");
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "智谱AI和ChatGLM是什么关系？");
 messages.add(chatMessage);
 ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
         .model(Constants.ModelChatGLM4)
@@ -223,24 +223,24 @@ ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
 ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
 String taskId = invokeModelApiResp.getData().getTaskId();
 
-// 2. Query the result by taskId
+// 2. 根据taskId查询结果
 QueryModelResultRequest request = new QueryModelResultRequest();
 request.setTaskId(taskId);
 QueryModelResultResponse queryResultResp = client.queryModelResult(request);
 ```
 
-### Role Playing
+### 角色扮演
 
 ```java
 List<ChatMessage> messages = new ArrayList<>();
-ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "How have you been lately?");
+ChatMessage chatMessage = new ChatMessage(ChatMessageRole.USER.value(), "你最近过得怎么样？");
 messages.add(chatMessage);
 
 ChatMeta meta = new ChatMeta();
-meta.setUser_info("I am a film director, specializing in music-themed movies.");
-meta.setBot_info("You are a popular female singer and actress in the country, with outstanding musical talent.");
-meta.setBot_name("Su Mengyuan");
-meta.setUser_name("Lu Xingchen");
+meta.setUser_info("我是一名电影导演，擅长拍摄音乐主题的电影。");
+meta.setBot_info("你是一位国内当红的女歌手、演员，拥有出色的音乐才华。");
+meta.setBot_name("苏梦远");
+meta.setUser_name("陆星辰");
 
 ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
         .model(Constants.ModelCharGLM3)
@@ -252,16 +252,16 @@ ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
 ModelApiResponse invokeModelApiResp = client.invokeModelApi(chatCompletionRequest);
 ```
 
-### Image Generation
+### 图像生成
 
 ```java
 CreateImageRequest createImageRequest = new CreateImageRequest();
 createImageRequest.setModel(Constants.ModelCogView);
-createImageRequest.setPrompt("A futuristic cloud data center");
+createImageRequest.setPrompt("一个充满未来感的云数据中心");
 ImageApiResponse imageApiResponse = client.createImage(createImageRequest);
 ```
 
-### Vector Models
+### 向量模型
 
 ```java
 EmbeddingRequest embeddingRequest = new EmbeddingRequest();
@@ -270,9 +270,9 @@ embeddingRequest.setModel(Constants.ModelEmbedding2);
 EmbeddingApiResponse apiResponse = client.invokeEmbeddingsApi(embeddingRequest);
 ```
 
-### Fine-tuning
+### 微调
 
-#### Create Fine-tuning Job
+#### 创建微调任务
 
 ```java
 FineTuningJobRequest request = new FineTuningJobRequest();
@@ -281,7 +281,7 @@ request.setTraining_file("your-file-id");
 CreateFineTuningJobApiResponse createFineTuningJobApiResponse = client.createFineTuningJob(request);
 ```
 
-#### Retrieve Fine-tuning Job
+#### 查询微调任务
 
 ```java
 QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
@@ -289,7 +289,7 @@ queryFineTuningJobRequest.setJobId("your-job-id");
 QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.retrieveFineTuningJobs(queryFineTuningJobRequest);
 ```
 
-#### List Fine-tuning Jobs
+#### 查询个人微调任务
 
 ```java
 QueryPersonalFineTuningJobRequest queryPersonalFineTuningJobRequest = new QueryPersonalFineTuningJobRequest();
@@ -297,7 +297,7 @@ queryPersonalFineTuningJobRequest.setLimit(10);
 QueryPersonalFineTuningJobApiResponse queryPersonalFineTuningJobApiResponse = client.queryPersonalFineTuningJobs(queryPersonalFineTuningJobRequest);
 ```
 
-#### List Fine-tuning Events
+#### 查询微调任务事件
 
 ```java
 QueryFineTuningJobRequest queryFineTuningJobRequest = new QueryFineTuningJobRequest();
@@ -305,23 +305,23 @@ queryFineTuningJobRequest.setJobId("your-job-id");
 QueryFineTuningEventApiResponse queryFineTuningEventApiResponse = client.queryFineTuningJobsEvents(queryFineTuningJobRequest);
 ```
 
-#### Cancel Fine-tuning Job
+#### 取消微调任务
 
 ```java
 FineTuningJobIdRequest request = FineTuningJobIdRequest.builder().jobId("your-job-id").build();
 QueryFineTuningJobApiResponse queryFineTuningJobApiResponse = client.cancelFineTuningJob(request);
 ```
 
-#### Delete Fine-tuned Model
+#### 删除微调模型
 
 ```java
 FineTuningJobModelRequest request = FineTuningJobModelRequest.builder().fineTunedModel("your-fine-tuned-model").build();
 FineTunedModelsStatusResponse fineTunedModelsStatusResponse = client.deleteFineTuningModel(request);
 ```
 
-### Batch Processing
+### 批处理
 
-#### Create Batch Job
+#### 创建批处理任务
 
 ```java
 BatchCreateParams batchCreateParams = new BatchCreateParams(
@@ -335,13 +335,13 @@ BatchCreateParams batchCreateParams = new BatchCreateParams(
 BatchResponse batchResponse = client.batchesCreate(batchCreateParams);
 ```
 
-#### Retrieve Batch Job
+#### 查询批处理任务
 
 ```java
 BatchResponse batchResponse = client.batchesRetrieve("your-batch-id");
 ```
 
-#### List Batch Jobs
+#### 查询批处理任务列表
 
 ```java
 QueryBatchRequest queryBatchRequest = new QueryBatchRequest();
@@ -349,13 +349,13 @@ queryBatchRequest.setLimit(10);
 QueryBatchResponse queryBatchResponse = client.batchesList(queryBatchRequest);
 ```
 
-#### Cancel Batch Job
+#### 取消批处理任务
 
 ```java
 BatchResponse batchResponse = client.batchesCancel("your-batch-id");
 ```
 
-### Spring Boot Integration
+### Spring Boot 集成
 
 ```java
 package com.zhipu.controller;
@@ -400,18 +400,18 @@ public class TestController {
 
 ```
 
-## 📈 Release Notes
+## 📈 版本更新
 
-For detailed release notes and version history, please see [Release-Note.md](Release-Note.md).
+详细的版本更新记录和历史信息，请查看 [Release-Note.md](Release-Note.md)。
 
-## 📄 License
+## 📄 许可证
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+本项目基于 MIT 许可证开源 - 详情请查看 [LICENSE](LICENSE) 文件。
 
-## 🤝 Contributing
+## 🤝 贡献
 
-We welcome contributions! Please feel free to submit a Pull Request.
+欢迎贡献代码！请随时提交 Pull Request。
 
-## 📞 Support
+## 📞 支持
 
-For questions and support, please visit the [ZhipuAI Open Platform](http://open.bigmodel.cn/) or check our documentation.
+如有问题和技术支持，请访问 [智谱AI开放平台](http://open.bigmodel.cn/) 或查看我们的文档。

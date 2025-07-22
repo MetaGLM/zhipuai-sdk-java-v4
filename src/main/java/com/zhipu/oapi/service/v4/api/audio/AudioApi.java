@@ -2,7 +2,9 @@ package com.zhipu.oapi.service.v4.api.audio;
 
 
 import com.zhipu.oapi.service.v4.model.ModelData;
+
 import io.reactivex.Single;
+
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -11,7 +13,6 @@ import retrofit2.Call;
 import retrofit2.http.*;
 
 import java.util.Map;
-
 
 public interface AudioApi {
 
@@ -23,6 +24,15 @@ public interface AudioApi {
     @POST("audio/speech")
     Single<ResponseBody> audioSpeech(@Body Map<String,Object> request);
 
+    /**
+     * tts接口(streaming Text to speech)
+     *
+     * @param request
+     * @return
+     */
+    @POST("audio/speech")
+    @Streaming
+    Call<ResponseBody> audioSpeechStreaming(@Body Map<String, Object> request);
 
     /**
      * 语音克隆接口

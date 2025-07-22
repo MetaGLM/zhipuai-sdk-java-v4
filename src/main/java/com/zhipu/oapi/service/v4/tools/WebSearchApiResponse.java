@@ -1,9 +1,7 @@
 package com.zhipu.oapi.service.v4.tools;
 
-import com.zhipu.oapi.core.model.ClientResponse;
 import com.zhipu.oapi.core.model.FlowableClientResponse;
 import com.zhipu.oapi.service.v4.model.ChatError;
-import com.zhipu.oapi.service.v4.model.ModelData;
 import io.reactivex.Flowable;
 import lombok.Data;
 

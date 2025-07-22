@@ -1,7 +1,10 @@
 package com.zhipu.oapi;
 
+import static com.zhipu.oapi.Constants.BASE_URL;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zhipu.oapi.core.ConfigV4;
 import com.zhipu.oapi.core.cache.ICache;
 import com.zhipu.oapi.core.cache.LocalCache;
@@ -12,20 +15,20 @@ import com.zhipu.oapi.core.response.HttpxBinaryResponseContent;
 import com.zhipu.oapi.core.token.GlobalTokenManager;
 import com.zhipu.oapi.core.token.TokenManagerV4;
 import com.zhipu.oapi.service.v4.agents.AgentsCompletionRequest;
+import com.zhipu.oapi.service.v4.api.ClientApiService;
+import com.zhipu.oapi.service.v4.audio.*;
 import com.zhipu.oapi.service.v4.audio.AudioTranscriptionsRequest;
 import com.zhipu.oapi.service.v4.batchs.*;
 import com.zhipu.oapi.service.v4.deserialize.MessageDeserializeFactory;
-import com.zhipu.oapi.service.v4.fine_turning.*;
-import com.zhipu.oapi.service.v4.model.*;
-import com.zhipu.oapi.service.v4.api.ClientApiService;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingApiResponse;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingRequest;
 import com.zhipu.oapi.service.v4.embedding.EmbeddingResult;
 import com.zhipu.oapi.service.v4.file.*;
-import com.zhipu.oapi.service.v4.audio.*;
+import com.zhipu.oapi.service.v4.fine_turning.*;
 import com.zhipu.oapi.service.v4.image.CreateImageRequest;
 import com.zhipu.oapi.service.v4.image.ImageApiResponse;
 import com.zhipu.oapi.service.v4.image.ImageResult;
+import com.zhipu.oapi.service.v4.model.*;
 import com.zhipu.oapi.service.v4.tools.WebSearchApiResponse;
 import com.zhipu.oapi.service.v4.tools.WebSearchParamsRequest;
 import com.zhipu.oapi.service.v4.tools.WebSearchPro;
@@ -36,16 +39,21 @@ import com.zhipu.oapi.utils.FlowableRequestSupplier;
 import com.zhipu.oapi.utils.OkHttps;
 import com.zhipu.oapi.utils.RequestSupplier;
 import com.zhipu.oapi.utils.StringUtils;
+
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+
 import lombok.Getter;
 import lombok.Setter;
+
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import retrofit2.Response;
 import retrofit2.adapter.rxjava2.HttpException;
 
@@ -53,8 +61,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import static com.zhipu.oapi.Constants.BASE_URL;
 
 // 抽象类
 abstract class AbstractClientBaseService {
@@ -459,6 +465,20 @@ public class ClientV4 extends AbstractClientBaseService{
             }
         };
         return this.executeRequest(request, supplier, AudioSpeechApiResponse.class);
+    }
+
+    /**
+     * tts接口(Text to speech streaming)
+     *
+     * @param request
+     * @return
+     */
+    public AudioSpeechStreamingApiResponse speechStreaming(AudioSpeechRequest request) {
+        FlowableRequestSupplier<Map<String, Object>, retrofit2.Call<ResponseBody>> supplier =
+                params -> chatApiService.audioSpeechStreaming(params);
+
+        return this.streamRequest(
+                request, supplier, AudioSpeechStreamingApiResponse.class, ObjectNode.class);
     }
 
     /**

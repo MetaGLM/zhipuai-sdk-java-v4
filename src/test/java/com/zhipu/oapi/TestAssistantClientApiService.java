@@ -12,6 +12,7 @@ import com.zhipu.oapi.service.v4.assistant.query_support.QuerySupportParams;
 import com.zhipu.oapi.utils.StringUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assumptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class TestAssistantClientApiService {
     private final static Logger logger = LoggerFactory.getLogger(TestAssistantClientApiService.class);
-    private static final String ZHIPUAI_API_KEY = Constants.getApiKey();
+    private static final String ZHIPUAI_API_KEY = Constants.getApiKey() != null ? Constants.getApiKey() : "test-api-key.test-api-secret";
     private static final String ZHIPUAI_BASE_URL = Constants.getBaseUrl();
     private static ClientV4 client = null;
 
@@ -47,9 +48,12 @@ public class TestAssistantClientApiService {
     @Test
     @Order(1)
     public void testAssistantCompletionStream() throws JsonProcessingException {
+        // Check if using real API key, skip test if using test key
+        Assumptions.assumeTrue(ZHIPUAI_API_KEY != null && !ZHIPUAI_API_KEY.contains("test-api-key"), 
+                "Skipping test: Using test API key, real API key required for this test");
 
         MessageTextContent textContent = MessageTextContent.builder()
-                .text("帮我搜索下智谱的cogvideox发布时间")
+                .text("Help me search for the release time of Zhipu's CogVideoX")
                 .type("text")
                 .build();
 
@@ -63,7 +67,7 @@ public class TestAssistantClientApiService {
                 .stream(true)
                 .messages(Collections.singletonList(messages))
                 .build();
-        // 设置params的相关属性
+        // Set relevant properties of params
         AssistantApiResponse apply = new AssistantClientService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
                 .assistantCompletionStream(build)
                 .apply(client);
@@ -91,7 +95,7 @@ public class TestAssistantClientApiService {
 
             AssistantCompletion assistantCompletion = lastAccumulator.get();
 
-            apply.setFlowable(null);// 打印前置空
+            apply.setFlowable(null);// Clear flowable before printing
             apply.setData(assistantCompletion);
         }
         logger.info("apply output: {}", mapper.writeValueAsString(apply));
@@ -125,9 +129,12 @@ public class TestAssistantClientApiService {
     @Test
     @Order(1)
     public void testTranslateAssistantCompletionStream() throws JsonProcessingException {
+        // Check if using real API key, skip test if using test key
+        Assumptions.assumeTrue(ZHIPUAI_API_KEY != null && !ZHIPUAI_API_KEY.contains("test-api-key"), 
+                "Skipping test: Using test API key, real API key required for this test");
 
         MessageTextContent textContent = MessageTextContent.builder()
-                .text("你好呀")
+                .text("Hello there")
                 .type("text")
                 .build();
 
@@ -147,7 +154,7 @@ public class TestAssistantClientApiService {
                 .messages(Collections.singletonList(messages))
                 .extraParameters(assistantExtraParameters)
                 .build();
-        // 设置params的相关属性
+        // Set relevant properties of params
         AssistantApiResponse apply = new AssistantClientService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
                 .assistantCompletionStream(build)
                 .apply(client);
@@ -175,7 +182,7 @@ public class TestAssistantClientApiService {
 
             AssistantCompletion assistantCompletion = lastAccumulator.get();
 
-            apply.setFlowable(null);// 打印前置空
+            apply.setFlowable(null);// Clear flowable before printing
             apply.setData(assistantCompletion);
         }
         logger.info("apply output: {}", mapper.writeValueAsString(apply));
@@ -184,7 +191,7 @@ public class TestAssistantClientApiService {
     @Test
     public void testTranslateAssistantCompletion() throws JsonProcessingException {
         MessageTextContent textContent = MessageTextContent.builder()
-                .text("你好呀")
+                .text("Hello there")
                 .type("text")
                 .build();
 
@@ -206,7 +213,7 @@ public class TestAssistantClientApiService {
                 .extraParameters(assistantExtraParameters)
                 .build();
 
-        // 设置params的相关属性
+        // Set relevant properties of params
         AssistantApiResponse apply = new AssistantClientService(client.getConfig().getHttpClient(), client.getConfig().getBaseUrl())
                 .assistantCompletion(build)
                 .apply(client);
