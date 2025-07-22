@@ -102,7 +102,10 @@ public class ChatCompletionRequest extends CommonRequest  implements ClientReque
      */
     private  Object toolChoice;
 
-
+    /**
+     * 推理相关参数
+     */
+    private ChatThinking thinking;
 
 
     private String invokeMethod;
@@ -126,6 +129,7 @@ public class ChatCompletionRequest extends CommonRequest  implements ClientReque
         paramsMap.put("stop", this.getStop());
         paramsMap.put("meta", this.getMeta());
         paramsMap.put("extra", this.getExtra());
+        paramsMap.put("thinking", this.getThinking());
         if(this.getExtraJson() !=null){
             paramsMap.putAll(this.getExtraJson());
         }

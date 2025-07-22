@@ -17,15 +17,16 @@ public class Usage {
     private int completionTokens;
     @JsonProperty("total_tokens")
     private int totalTokens;
-//    @SerializedName("prompt_chars")
-//    private int promptChars;
-//    @SerializedName("completion_chars")
-//    private int completionChars;
-//    @SerializedName("total_chars")
-//    private int totalChars;
 
     @JsonProperty("total_calls")
     private int totalCalls;
+
+    @JsonProperty("prompt_tokens_details")
+    private PromptTokensDetails promptTokensDetails;
+
+    @JsonProperty("completion_tokens_details")
+    private CompletionTokensDetails completionTokensDetails;
+
 
     public int getPromptTokens() {
         return promptTokens;
@@ -51,28 +52,21 @@ public class Usage {
         this.totalTokens = totalTokens;
     }
 
-//    public int getPromptChars() {
-//        return promptChars;
-//    }
-//
-//    public void setPromptChars(int promptChars) {
-//        this.promptChars = promptChars;
-//    }
-//
-//    public int getCompletionChars() {
-//        return completionChars;
-//    }
-//
-//    public void setCompletionChars(int completionChars) {
-//        this.completionChars = completionChars;
-//    }
-//
-//    public int getTotalChars() {
-//        return totalChars;
-//    }
-//
-//    public void setTotalChars(int totalChars) {
-//        this.totalChars = totalChars;
-//    }
+    public PromptTokensDetails getPromptTokensDetails(){
+        return promptTokensDetails;
+    }
+
+    public void setPromptTokensDetails(PromptTokensDetails promptTokensDetails) {
+        this.promptTokensDetails = promptTokensDetails;
+    }
+
+    public CompletionTokensDetails getCompletionTokensDetails(){
+        return completionTokensDetails;
+    }
+
+    public void setCompletionTokensDetails(CompletionTokensDetails completionTokensDetails) {
+        this.completionTokensDetails = completionTokensDetails;
+    }
+
 
 }
