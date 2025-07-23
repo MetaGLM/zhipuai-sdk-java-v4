@@ -22,6 +22,8 @@ public class ChatTool extends ObjectNode {
     @JsonProperty("web_search")
     private WebSearch web_search;
 
+    private MCPTool mcp;
+
     public ChatTool(){
         super(JsonNodeFactory.instance);
     }
@@ -47,5 +49,10 @@ public class ChatTool extends ObjectNode {
     public void setWeb_search(WebSearch web_search) {
         this.web_search = web_search;
         this.putPOJO("web_search",web_search);
+    }
+
+    public void setMcp(MCPTool mcp) {
+        this.mcp = mcp;
+        this.putPOJO("mcp", mcp);
     }
 }
