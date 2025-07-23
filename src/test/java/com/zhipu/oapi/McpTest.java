@@ -19,8 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class McpTest {
 
     private final static Logger logger = LoggerFactory.getLogger(TestAssistantClientApiService.class);
-    private static final String ZHIPUAI_API_KEY = Constants.getApiKey();
-    private static final String ZHIPUAI_BASE_URL = Constants.getBaseUrl();
+    private static final String ZHIPUAI_API_KEY = getTestApiKey();
 
     private static ClientV4 client = null;
 
@@ -29,19 +28,16 @@ public class McpTest {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     static {
-        if (StringUtils.isNotEmpty(ZHIPUAI_BASE_URL)) {
-            client = new ClientV4.Builder(ZHIPUAI_BASE_URL, ZHIPUAI_API_KEY)
-                    .enableTokenCache()
-                    .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
-                    .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
-                    .build();
-        } else {
-            client = new ClientV4.Builder(ZHIPUAI_API_KEY)
-                    .enableTokenCache()
-                    .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
-                    .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
-                    .build();
-        }
+        client = new ClientV4.Builder(ZHIPUAI_API_KEY)
+                .enableTokenCache()
+                .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
+                .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
+                .build();
+    }
+
+    private static String getTestApiKey() {
+        String apiKey = Constants.getApiKey();
+        return apiKey != null ? apiKey : "test-api-key.test-api-secret";
     }
 
     @Test
