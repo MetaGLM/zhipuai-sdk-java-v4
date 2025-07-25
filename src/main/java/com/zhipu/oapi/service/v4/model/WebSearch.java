@@ -74,6 +74,12 @@ public class WebSearch extends ObjectNode {
     private String content_size;
 
 
+    /**
+     * 是否开启意图识别
+     */
+    private Boolean search_intent;
+
+
     public WebSearch(){
         super(JsonNodeFactory.instance);
     }
@@ -133,5 +139,10 @@ public class WebSearch extends ObjectNode {
     public void setContent_size(String content_size) {
         this.content_size = content_size;
         this.put("content_size",content_size);
+    }
+
+    public void setSearch_intent(Boolean search_intent) {
+        this.search_intent = search_intent;
+        this.put("search_intent",search_intent);
     }
 }
