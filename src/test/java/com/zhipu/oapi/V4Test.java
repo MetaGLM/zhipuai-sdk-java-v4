@@ -49,7 +49,7 @@ public class V4Test {
     private static final String API_BASE_URL = Constants.getBaseUrl();
 
 
-    private static final ClientV4 client = new ClientV4.Builder("http://localhost:9203/v4/audio/speech?Authorization=Bearer eyJhbGciOiJIUzUxMiJ9.eyJ1c2VyX3R5cGUiOiJTRVJWSUNFIiwidXNlcl9pZCI6MywiYXBpX2tleSI6IjM0ZDhiM2ExNDQ2OTQ0MmY5MTJkNzg5MTJjZjZlMjU1IiwidXNlcl9rZXkiOiIyNzQyNjM0My1iYjI0LTQ4ZDktODVjNy01ODFmMjUwNzBiMzMiLCJjdXN0b21lcl9pZCI6IjEwMDAwMyIsInVzZXJuYW1lIjoiY3BjMTk4NiJ9.3MsaFjRAyArDp2WZsVbvKGPrVjkKvGB5EfBafprcFogbDeZv4s9VCQt4wUaR4FVon1tiL_pnqtMaI6qGGXs0Qg",API_SECRET_KEY)
+    private static final ClientV4 client = new ClientV4.Builder(API_BASE_URL, API_SECRET_KEY)
             .enableTokenCache()
             .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
             .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
@@ -674,7 +674,7 @@ public class V4Test {
                 AudioSpeechRequest.builder()
                         .model(Constants.ModelTTS)
                         .encodeFormat("base64")
-                        .input("不好,欢迎来到智谱开放平台")
+                        .input("你好,欢迎来到智谱开放平台")
                         .voice("female")
                         .stream(Boolean.TRUE)
                         .responseFormat("wav")
