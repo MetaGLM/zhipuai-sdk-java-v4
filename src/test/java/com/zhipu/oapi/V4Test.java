@@ -49,7 +49,7 @@ public class V4Test {
     private static final String API_BASE_URL = Constants.getBaseUrl();
 
 
-    private static final ClientV4 client = new ClientV4.Builder(API_BASE_URL,API_SECRET_KEY)
+    private static final ClientV4 client = new ClientV4.Builder(API_BASE_URL, API_SECRET_KEY)
             .enableTokenCache()
             .networkConfig(300, 100, 100, 100, TimeUnit.SECONDS)
             .connectionPool(new okhttp3.ConnectionPool(8, 1, TimeUnit.SECONDS))
@@ -673,8 +673,9 @@ public class V4Test {
         AudioSpeechRequest audioSpeechRequest =
                 AudioSpeechRequest.builder()
                         .model(Constants.ModelTTS)
-                        .input("智谱，你好呀")
-                        .voice("tongtong")
+                        .encodeFormat("base64")
+                        .input("你好,欢迎来到智谱开放平台")
+                        .voice("female")
                         .stream(Boolean.TRUE)
                         .responseFormat("wav")
                         .build();
