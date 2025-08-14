@@ -67,6 +67,10 @@ public class WebSearchRequest implements ClientRequest<WebSearchRequest> {
     @JsonProperty("content_size")
     private String contentSize;
 
+
+    @JsonProperty("search_intent")
+    private Boolean searchIntent;
+
     @Override
     public WebSearchRequest getOptions() {
         return this;
