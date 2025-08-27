@@ -1,3 +1,8 @@
+
+Z.AI 和 智谱AI 的 [全新 Java SDK](https://github.com/THUDM/z-ai-sdk-java) 已经发布：[z-ai-sdk-java](https://github.com/THUDM/z-ai-sdk-java)！推荐使用此 SDK，以获得更好、更快的长期支持。
+
+---
+
 # 智谱AI开放平台 Java SDK
 
 [![Maven Central](https://img.shields.io/maven-central/v/cn.bigmodel.openapi/oapi-java-sdk.svg)](https://search.maven.org/artifact/cn.bigmodel.openapi/oapi-java-sdk)
