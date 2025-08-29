@@ -643,6 +643,8 @@ public class V4Test {
                         .input("智谱，你好呀")
                         .voice("child")
                         .stream(false)
+                        .speed(1.0f)
+                        .volume(1.0f)
                         .responseFormat("wav")
                         .build();
         AudioSpeechApiResponse audioSpeechApiResponse = client.speech(audioSpeechRequest);
@@ -676,6 +678,8 @@ public class V4Test {
                         .encodeFormat("base64")
                         .input("你好,欢迎来到智谱开放平台")
                         .voice("female")
+                        .speed(1.0f)
+                        .volume(1.0f)
                         .stream(Boolean.TRUE)
                         .responseFormat("wav")
                         .build();

@@ -38,6 +38,12 @@ public class AudioSpeechRequest extends CommonRequest implements ClientRequest<M
      */
     private String voice;
 
+    /** 语速 */
+    private Float speed;
+
+    /** 音量 */
+    private Float volume;
+
     /**
      * 需要生成语音文件的格式
      */
@@ -62,6 +68,8 @@ public class AudioSpeechRequest extends CommonRequest implements ClientRequest<M
         paramsMap.put("input", this.getInput());
         paramsMap.put("stream", this.isStream());
         paramsMap.put("voice", this.getVoice());
+        paramsMap.put("speed", this.getSpeed());
+        paramsMap.put("volume", this.getVolume());
         paramsMap.put("response_format", this.getResponseFormat());
         paramsMap.put("encode_format", this.getEncodeFormat());
         paramsMap.put("sensitive_word_check", this.getSensitiveWordCheck());
