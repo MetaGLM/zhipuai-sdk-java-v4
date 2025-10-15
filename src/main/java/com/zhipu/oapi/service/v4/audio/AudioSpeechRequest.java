@@ -44,6 +44,11 @@ public class AudioSpeechRequest extends CommonRequest implements ClientRequest<M
     private String responseFormat;
 
     /**
+     * 需要流式返回的音频编码格式
+     */
+    private String encodeFormat;
+
+    /**
      * 敏感词检测控制
      */
     private SensitiveWordCheckRequest sensitiveWordCheck;
@@ -58,6 +63,7 @@ public class AudioSpeechRequest extends CommonRequest implements ClientRequest<M
         paramsMap.put("stream", this.isStream());
         paramsMap.put("voice", this.getVoice());
         paramsMap.put("response_format", this.getResponseFormat());
+        paramsMap.put("encode_format", this.getEncodeFormat());
         paramsMap.put("sensitive_word_check", this.getSensitiveWordCheck());
         if(this.getExtraJson() !=null){
             paramsMap.putAll(this.getExtraJson());

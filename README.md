@@ -1,3 +1,8 @@
+
+**The [New Java SDK](https://github.com/THUDM/z-ai-sdk-java) for Z.AI and ZhipuAI has released: [z-ai-sdk-java](https://github.com/THUDM/z-ai-sdk-java)!** It is recommended to use this SDK for better, faster, and long-term support.
+
+---
+
 # ZhipuAI Open Platform Java SDK
 
 [![Maven Central](https://img.shields.io/maven-central/v/cn.bigmodel.openapi/oapi-java-sdk.svg)](https://search.maven.org/artifact/cn.bigmodel.openapi/oapi-java-sdk)
